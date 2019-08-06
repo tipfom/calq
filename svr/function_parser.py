@@ -36,7 +36,6 @@ def parseToTree(function, start=0):
             break
     return Node(k, start, len(function), [])
 
-
 def buildFunctionFromTree(tree, sympy_vars):
     expr = 0
 
@@ -74,6 +73,21 @@ def buildFunctionFromTree(tree, sympy_vars):
 
     return expr
 
+def getConstant(text):
+    if text == "pi":
+        return const_pi
+    elif text  == "e":
+        return const_e
+    elif text == "pinf":
+        return +oo
+    elif text == "ninf":
+        return -oo
+    else:
+        try:
+            return int(text)
+        except:
+            return None
+
 class Node():
     def __init__(self, key, start, end, childs):
         self.key=key
@@ -85,27 +99,5 @@ class Node():
         return len(self.childs) == 0
     
     def isConstant(self):
-        if (self.isVariable()):
-            if self.key == "pi":
-                self.const = const_pi
-                return True
-            elif self.key == "e":
-                self.const = const_e
-                return True
-
-            elif self.key == "pinf":
-                self.const = +oo
-                return True
-
-            elif self.key == "ninf":
-                self.const = -oo
-                return True
-
-            else:
-                try:
-                    self.const = int(self.key)
-                    return True
-                except:
-                    return False
-
-        return False
+        self.const = getConstant(self.key)
+        return self.const != None
