@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Calq.Core;
 using Xamarin.Forms;
 
 namespace Calq
@@ -16,6 +17,16 @@ namespace Calq
         public MainPage()
         {
             InitializeComponent();
+        }
+
+        private void Button_Clicked(object sender, EventArgs e)
+        {
+            string s = "1/x+ln(e^x)";
+            testButton.Text = Function.ToPrefix(s);
+            System.Diagnostics.Debug.WriteLine(testButton.Text);
+            Term t = Term.TermFromMixedString(s);
+            System.Diagnostics.Debug.WriteLine(t.ToString());
+
         }
     }
 }
