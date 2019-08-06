@@ -3,11 +3,12 @@ import socketserver
 import sympy
 import base64
 from urllib.parse import urlparse, parse_qs
-from sympy import symbols
-from mpmath import pi as const_pi, e as const_euler
+from sympy import symbols, oo
+
+const_pi = sympy.pi
+const_e = sympy.exp(1)
 
 PORT = 8080
-
 
 class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
@@ -25,9 +26,13 @@ def execCommand(params):
         if(len(params["method"]) == 1 and params["method"][0] == "int"):
             # function=base64
             # vars=list
-            func = base64.b64decode((params["function"][0]).encode()).decode("utf-8") 
-            ar = params["vars"]
-            return integrate(func, ar)
+            # lim1, lim2
+            function_text = base64.b64decode((params["function"][0]).encode()).decode("utf-8") 
+            variables = params["vars"]
+            lim = None
+            if params.__contains__("lim1") and params.__contains__("lim2"):
+                lim = (params["lim1"][0], params["lim2"][0])
+            return integrate(function_text, variables, lim)
     return "false"
 
 class Node():
@@ -46,8 +51,17 @@ class Node():
                 self.const = const_pi
                 return True
             elif self.key == "e":
-                self.const = const_euler
+                self.const = const_e
                 return True
+
+            elif self.key == "pinf":
+                self.const = +oo
+                return True
+
+            elif self.key == "ninf":
+                self.const = -oo
+                return True
+
             else:
                 try:
                     self.const = int(self.key)
@@ -129,7 +143,7 @@ def buildFunctionFromTree(tree, sympy_vars):
     return expr
 
 
-def integrate(func_str, vars):
+def integrate(func_str, vars, lim = None):
     sympyVars = {}
 
     for var in vars:
@@ -138,8 +152,21 @@ def integrate(func_str, vars):
     func = buildFunctionFromTree(parseToTree(func_str), sympyVars)
     delta = sympyVars["x"]
 
-    integral = sympy.integrate(func, delta)
 
+    if lim == None:
+        integral = sympy.integrate(func, delta)
+    else:
+        lower_limit_node = Node(lim[0], 0,0,[])
+        if lower_limit_node.isConstant():
+            lower_limit = lower_limit_node.const
+        else:
+            lower_limit = sympyVars[lower_limit_node.key]
+        upper_limit_node = Node(lim[1], 0,0,[])
+        if upper_limit_node.isConstant():
+            upper_limit = upper_limit_node.const
+        else:
+            upper_limit = sympyVars[upper_limit_node.key]
+        integral = sympy.integrate(func, (delta, lower_limit, upper_limit))
     return str(integral)
 
 x = integrate("+[/[1,x],ln[^[e,x]]]", ["x"])
