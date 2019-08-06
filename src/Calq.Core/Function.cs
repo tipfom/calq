@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MathNet.Symbolics;
+
 
 namespace Calq.Core
 {
@@ -12,9 +14,10 @@ namespace Calq.Core
             Multiplication, Division,
             Power,
 
-            Ln, Sin, Cos,
+            Sqrt, Log, Sin, Cos,
 
-            Int,
+            //PythonDinger
+            Lim, Int,
             Solve,
 
             Unknown
@@ -29,7 +32,9 @@ namespace Calq.Core
         };
         private static string[] PrefixOperators = new string[]
         {
-            "ln","sin", "cos", "int", "solve"
+            "sqrt", "log","sin", "cos",
+            "lim", "int",
+            "solve"
         };
 
         public readonly Operators Name;
@@ -44,17 +49,36 @@ namespace Calq.Core
         public static Function FunctionFromMixedString(string s)
         {
             List<Term> paras = new List<Term>();
-            System.Diagnostics.Debug.WriteLine(s);
-
+            
             for (int i = 0; i < PrefixOperators.Length; i++)
             {
+                bool possible = true;
                 if (s.StartsWith(PrefixOperators[i]))
                 {
-                    s = s.Substring(PrefixOperators[i].Length);
-                    s = s.Substring(1, s.Length - 2);
 
-                    return new Function((Operators)(i + InfixOperators.Length), s.Split(',').Select(x => TermFromMixedString(x)).ToList());
+                    int bracketDepth = 0;
+                    for(int j = PrefixOperators[i].Length; j < s.Length - 1; j++)
+                    {
+                        if (s[j] == '(') bracketDepth++;
+                        if (s[j] == ')') bracketDepth--;
+
+                        if (bracketDepth == 0)
+                        {
+                            possible = false;
+                            break;
+                        }
+                    }
+
+                    if (possible)
+                    {
+                        s = s.Substring(PrefixOperators[i].Length);
+                        s = s.Substring(1, s.Length - 2);
+
+                        return new Function((Operators)(i + InfixOperators.Length), s.Split(',').Select(x => TermFromMixedString(x)).ToList());
+                    }
                 }
+
+                if (!possible) break;
             }
 
             //infix-operators
@@ -153,14 +177,63 @@ namespace Calq.Core
             return s;
         }
 
-        public override Term Evaluate()
+        public override Expression Evaluate()
         {
-            throw new System.NotImplementedException();
-        }
+            Expression buffer;
+            switch (Name)
+            {
+                case Operators.Equals:
+                    //python stuff
+                    return null;
+                case Operators.Int:
+                    //python stuff
+                    return null;
+                case Operators.Lim:
+                    //python stuff
+                    return null;
+                case Operators.Solve:
+                    //python stuff
+                    return null;
 
-        public override Term Approximate()
-        {
-            throw new System.NotImplementedException();
+                case Operators.Addition:
+                    buffer = Parameter[0].Evaluate();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer += Parameter[i].Evaluate();
+                    return buffer;
+                case Operators.Subtraktion:
+                    buffer = Parameter[0].Evaluate();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer -= Parameter[i].Evaluate();
+                    return buffer;
+                case Operators.Multiplication:
+                    buffer = Parameter[0].Evaluate();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer *= Parameter[i].Evaluate();
+                    return buffer;
+                case Operators.Division:
+                    buffer = Parameter[0].Evaluate();
+                    for(int i = 1; i < Parameter.Count; i++)
+                        buffer /= Parameter[i].Evaluate();
+                    return buffer;
+                case Operators.Power:
+                    buffer = Parameter[0].Evaluate();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer = Expression.Pow(buffer, Parameter[i].Evaluate());
+                    return buffer;
+
+                case Operators.Sqrt:
+                    return Expression.Sqrt(Parameter[0].Evaluate());
+                case Operators.Log:
+                    if (Parameter.Count == 1) return Expression.Ln(Parameter[0].Evaluate());
+                    else return Expression.Log(Parameter[0].Evaluate(), Parameter[1].Evaluate());
+                case Operators.Sin:
+                    return Expression.Sin(Parameter[0].Evaluate());
+                case Operators.Cos:
+                    return Expression.Cos(Parameter[0].Evaluate());
+
+            }
+
+            return null;
         }
 
         public override string ToString()

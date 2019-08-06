@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using MathNet.Symbolics;
 
 namespace Calq.Core
 {
@@ -8,14 +9,15 @@ namespace Calq.Core
     {
         public enum VarType
         {
-            E, Pi, Phi,
+            E, Pi, I,
+            Integer, Double,
             Variable
         }
 
         public VarType Type;
         private static string[] ConstantsRep = new string[]
         {
-            "e", "π", "φ"
+            "e", "π", "i"
         };
 
         public readonly string Name;
@@ -23,25 +25,45 @@ namespace Calq.Core
         public Variable(string name)
         {
             Name = name;
-            
+
+            Type = VarType.Variable;
             for(int i = 0; i < ConstantsRep.Length; i++)
             {
-                if(Name == ConstantsRep[i])
+                if (Name == ConstantsRep[i])
                 {
                     Type = (VarType)i;
-                    break;
+                    return;
                 }
             }
+
+            const string Alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+            for(int i = 0; i < Alphabet.Length; i++)
+            {
+                if (name.Contains(Alphabet[i].ToString()))
+                {
+                    return;
+                }
+            }
+
+            if (name.Contains("."))
+                Type = VarType.Double;
+            else
+                Type = VarType.Integer;
+            
         }
 
-        public override Term Approximate()
+        public override Expression Evaluate()
         {
-            throw new NotImplementedException();
-        }
-
-        public override Term Evaluate()
-        {
-            throw new NotImplementedException();
+            switch (Type)
+            {
+                case VarType.E: return Expression.E;
+                case VarType.Pi: return Expression.Pi;
+                case VarType.I: return Expression.I;
+                case VarType.Integer: return Expression.FromInt64(long.Parse(Name));
+                case VarType.Double: return Expression.Real(double.Parse(Name));
+                default: return Expression.Symbol(Name);
+            }
         }
 
         public override string ToString()
