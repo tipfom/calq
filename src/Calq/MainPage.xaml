@@ -3,15 +3,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="clr-namespace:Calq"
              mc:Ignorable="d"
              x:Class="Calq.MainPage">
 
-    <StackLayout>
-<Button Text="hello Wolrd" Clicked="Button_Clicked" x:Name="testButton"/>
-        <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
-    </StackLayout>
+    <ContentPage.BindingContext>
+        <c:MainPageViewModel/>
+    </ContentPage.BindingContext>
+    
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ListView ItemsSource="{Binding Log}"
+                  Grid.Row="0"/>
+
+        <Entry Text="{Binding Expression}"
+               Grid.Row="1"/>
+        <Button Text="Evaluate Expression"
+                Command="{Binding EvaluateExpressionCommand}"
+                Grid.Row="2"/>
+    </Grid>
 
 </ContentPage>

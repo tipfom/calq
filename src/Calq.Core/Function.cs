@@ -186,7 +186,6 @@ namespace Calq.Core
                     //python stuff
                     return null;
                 case Operators.Int:
-                    //python stuff
                     return null;
                 case Operators.Lim:
                     //python stuff

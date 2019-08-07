@@ -19,28 +19,5 @@ namespace Calq
         {
             InitializeComponent();
         }
-
-        private void Button_Clicked(object sender, EventArgs e)
-        {
-            //string s = "0 + 1 * 1 * (x - 2) / (1 - 2) * (x - 3) / (1 - 3) * (x - 4) / (1 - 4) + 8 * 1 * (x - 1) / (2 - 1) * (x - 3) / (2 - 3) * (x - 4) / (2 - 4) + 27 * 1 * (x - 1) / (3 - 1) * (x - 2) / (3 - 2) * (x - 4) / (3 - 4) + 64 * 1 * (x - 1) / (4 - 1) * (x - 2) / (4 - 2) * (x - 3) / (4 - 3)";
-            string s = "π + 1 * (x - 1) + sqrt(x) - cos(π) * e^x";
-            Expression exp = Infix.ParseOrThrow(s);
-            System.Diagnostics.Debug.WriteLine(Infix.Format(exp));
-
-            //testButton.Text = Function.ToPrefix(s);
-            //System.Diagnostics.Debug.WriteLine(testButton.Text);
-            Term t = Term.TermFromMixedString(s);
-            System.Diagnostics.Debug.WriteLine(t.ToString());
-
-            System.Diagnostics.Debug.WriteLine(Infix.Format(t.Evaluate()));
-            exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
-            System.Diagnostics.Debug.WriteLine(Infix.Format(exp));
-
-            string asdnanf = WebHelper.GetIntegral("^[e,-[^[x,2]]", new List<string>() { "x" }, "x");
-            System.Diagnostics.Debug.WriteLine(asdnanf);
-
-            string aifniawnfi = WebHelper.GetLimit("/[1,x]", new List<string>() { "x" }, "x", "0", "+");
-            System.Diagnostics.Debug.WriteLine(aifniawnfi);
-        }
     }
 }
