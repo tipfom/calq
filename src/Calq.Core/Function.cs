@@ -254,5 +254,75 @@ namespace Calq.Core
         {
             return Operator.StringRep[0] + "[" + string.Join(",", Parameter) + "]";
         }
+
+        public override string ToLaTeX()
+        {
+            switch (Operator.Name)
+            {
+                case Operator.Operators.Equals:
+                    //return Infix.Format(Parameter[0].Evaluate()) == Infix.Format(Parameter[1].Evaluate()) ? Expression.Symbol("True") : Expression.Symbol("False");
+                    return null;
+
+                case Operator.Operators.Int:
+                    // TODO:
+                    // - bessere Unterstützung der Python Formattierung (** ist dort ^, pinf ist oo, ninf ist -oo)
+                    // - unbekannte Funktionen zulassen oder alle von Python (inverse Gaus usw) hinzufügen, oder beides am besten
+                    if (Parameter.Count == 2)
+                    {
+                        return $@"\int {Parameter[0].ToLaTeX()} d{Parameter[1].ToLaTeX()}";
+                    }
+                    else if (Parameter.Count == 4)
+                    {
+                        return $@"\int_{Parameter[2].ToLaTeX()}^{Parameter[3].ToLaTeX()} {Parameter[0].ToLaTeX()} d{Parameter[1].ToLaTeX()}";
+                    }
+                    return null;
+                case Operator.Operators.Lim:
+                    if (Parameter.Count == 3)
+                    {
+                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()}\to{Parameter[2].ToLaTeX()+"}"} {Parameter[0].ToLaTeX()}";
+                    }
+                    else if (Parameter.Count == 4)
+                    {
+                        // TODO : +-
+                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()}\to{Parameter[2].ToLaTeX() + "}"} {Parameter[0].ToLaTeX()}";
+                    }
+                    return null;
+                case Operator.Operators.Solve:
+                    //python stuff
+                    return null;
+
+                case Operator.Operators.Addition:
+                    string res = Parameter[0].ToLaTeX();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        res += "+" + Parameter[i].ToLaTeX(); 
+                    return res;
+                case Operator.Operators.Subtraktion:
+                    res = Parameter[0].ToLaTeX();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        res += "-" + Parameter[i].ToLaTeX();
+                    return res;
+                case Operator.Operators.Multiplication:
+                    res = Parameter[0].ToLaTeX();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        res += "*" + Parameter[i].ToLaTeX();
+                    return res;
+                case Operator.Operators.Division:
+                    return $@"\frac{"{"+Parameter[0].ToLaTeX()+"}"}{"{"+Parameter[1].ToLaTeX()+"}"}";
+                case Operator.Operators.Power:
+                    return $@"{Parameter[0].ToLaTeX()}^{"{"+Parameter[1].ToLaTeX()+"}"}";
+
+                case Operator.Operators.Sqrt:
+                    return $@"\sqrt{"{" + Parameter[0].ToLaTeX() + "}"}";
+                case Operator.Operators.Log:
+                    if (Parameter.Count == 1) return $@"\log{"{" + Parameter[0].ToLaTeX() + "}"}";
+                    return $@"\log_{"{" + Parameter[1].ToLaTeX() + "}"} {Parameter[0].ToLaTeX()}";
+                case Operator.Operators.Sin:
+                    return $@"\sin ({Parameter[0].ToLaTeX()})";
+                case Operator.Operators.Cos:
+                    return $@"\cos ({Parameter[0].ToLaTeX()})";
+            }
+
+            return null;
+        }
     }
 }

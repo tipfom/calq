@@ -12,6 +12,7 @@ namespace Calq.Core
         public abstract string ToInfix();
         public abstract IEnumerable<string> GetVariableNames();
 
+        public abstract string ToLaTeX();
         public static bool CheckBracketCount(string s)
         {
             Stack<char> brackets = new Stack<char>();

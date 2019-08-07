@@ -10,25 +10,24 @@
              x:Class="Calq.App">
     <Application.Resources>
         <DataTemplate x:Key="ShowLatex" x:DataType="log:ExpressionResult">
-            <Grid>
+            <Grid HeightRequest="160">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <math:MathView LaTeX="{Binding ExpressionLaTeX}"
-                               FontSize="10"
-                               HeightRequest="60"
                                Grid.Row="0"
-                               HorizontalOptions="Start"/>
+                               HorizontalOptions="Start">
+                </math:MathView>
 
 
                 <ScrollView Orientation="Horizontal"
                             Grid.Row="1"
                             HorizontalOptions="End">
                     <math:MathView LaTeX="{Binding ResultLaTeX}"
-                                   FontSize="10"
-                                   HeightRequest="60"
+                                   FontSize="40"
+                                   HeightRequest="120"
                                    HorizontalOptions="End">
                     </math:MathView>
                 </ScrollView>

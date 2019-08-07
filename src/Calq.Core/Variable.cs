@@ -86,5 +86,9 @@ namespace Calq.Core
             return Name;
         }
 
+        public override string ToLaTeX()
+        {
+            return Name;
+        }
     }
 }

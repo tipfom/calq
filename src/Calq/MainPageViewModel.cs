@@ -51,14 +51,14 @@ namespace Calq
                 if (Term.CheckBracketCount(Expression))
                 {
                     Term t = Term.TermFromMixedString(Expression);
+                    string expLat = t.ToLaTeX();
                     var exp = t.GetAsExpression();
                     if (WebHelper.IsOnline)
                     {
                         t = Term.TermFromMixedString(Infix.Format(exp));
                         exp = t.Evaluate();
                     }
-                    Log.Add(new Logging.ExpressionResult());
-                    Log.Add(new Logging.ErrorResult() { ErrorMessage = "TEST ERROR WILL BE HERE" });
+                    Log.Add(new Logging.ExpressionResult() { ExpressionLaTeX =  expLat, ResultLaTeX= Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX()});
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }

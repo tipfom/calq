@@ -72,5 +72,10 @@ namespace Calq.Core
         {
             return "{" + string.Join(",", terms) + "}";
         }
+
+        public override string ToLaTeX()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
