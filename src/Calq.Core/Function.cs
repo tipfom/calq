@@ -7,6 +7,13 @@ namespace Calq.Core
 {
     public class Function : Term
     {
+        private static Operator Add { get { return InfixOperators[1]; } }
+        private static Operator Sub { get { return InfixOperators[2]; } }
+        private static Operator Mul { get { return InfixOperators[3]; } }
+        private static Operator Div { get { return InfixOperators[4]; } }
+        private static Operator Pow { get { return InfixOperators[5]; } }
+
+        private static Operator Log { get { return PrefixOperators[1]; } }
 
         private static readonly Operator[] InfixOperators = new Operator[]
         {
@@ -24,6 +31,7 @@ namespace Calq.Core
             new Operator(Operator.Operators.Log, false, new string[]{"log"}, new List<int>(){ 1, 2 }),
             new Operator(Operator.Operators.Sin, false, new string[]{"sin"}, new List<int>(){ 1 }),
             new Operator(Operator.Operators.Cos, false, new string[]{"cos"}, new List<int>(){ 1 }),
+            new Operator(Operator.Operators.Differentiate, false, new string[]{"dif"}, new List<int>(){ 2 }),
 
             new Operator(Operator.Operators.Lim, false, new string[]{ "limes", "lim" }, new List<int>(){ 3, 4 }),
             new Operator(Operator.Operators.Int, false, new string[]{ "∫", "integral", "int", }, new List<int>(){ 2, 4 }),
@@ -39,6 +47,11 @@ namespace Calq.Core
         {
             Operator = op;
             Parameter = parameter;
+        }
+        public Function(Operator op, params Term[] parameter)
+        {
+            Operator = op;
+            Parameter = parameter.ToList();
         }
 
         public static Function FunctionFromMixedString(string s)
@@ -189,6 +202,8 @@ namespace Calq.Core
                 case Operator.Operators.Solve:
                     return Expression.Symbol(ToInfix());
 
+                case Operator.Operators.Differentiate:
+                    return Parameter[1].Differentiate(Parameter[0].ToString()).GetAsExpression();
                 case Operator.Operators.Addition:
                     buffer = Parameter[0].GetAsExpression();
                     for (int i = 1; i < Parameter.Count; i++)
@@ -250,10 +265,95 @@ namespace Calq.Core
             }
         }
 
+        public override Term Differentiate(string argument)
+        {
+            Function ret;
+
+            switch (Operator.Name)
+            {
+                case Operator.Operators.Addition:
+                    return new Function(Operator, Parameter.Select(x => x.Differentiate(argument)).ToList());
+                case Operator.Operators.Subtraktion:
+                    return new Function(Operator, Parameter.Select(x => x.Differentiate(argument)).ToList());
+
+                case Operator.Operators.Multiplication:
+                    ret = new Function(Add, new List<Term>());
+                    for(int i = 0; i < Parameter.Count; i++)
+                    {
+                        Function f = new Function(Mul, new List<Term>());
+                        for(int j = 0; j < Parameter.Count; j++)
+                        {
+                            if (i == j) f.Parameter.Add(Parameter[j].Differentiate(argument));
+                            else f.Parameter.Add(Parameter[j]);
+                        }
+
+                        ret.Parameter.Add(f);
+                    }
+                    return ret;
+                case Operator.Operators.Division:
+                    Term g = new Function(Mul, new List<Term>());
+
+                    if(Parameter.Count == 2)
+                    {
+                        g = Parameter[1];
+                    }
+                    else
+                    {
+                        g = new Function(Mul, new List<Term>());
+
+                        for(int i = 1; 1 < Parameter.Count; i++)
+                        {
+                            ((Function)g).Parameter.Add(Parameter[i]);
+                        }
+                    }
+
+                    ret = new Function(Div, new List<Term>());
+                    ret.Parameter.Add(new Function(Sub, new List<Term>(2)
+                    {
+                        new Function(Mul, new List<Term>(2) { Parameter[0].Differentiate(argument), g}),
+                        new Function(Mul, new List<Term>(2) { Parameter[0], g.Differentiate(argument)})
+                    }));
+                    ret.Parameter.Add(new Function(Pow, new List<Term>(2)
+                    {
+                        Parameter[1],
+                        new Variable("2")
+                    }));
+
+                    return ret;
+                case Operator.Operators.Power:
+                    Term t = Parameter[0];
+                    g = new Function(Mul, new List<Term>());
+                    if (Parameter.Count == 2)
+                    {
+                        g = Parameter[1];
+                    }
+                    else
+                    {
+                        g = new Function(Pow, new List<Term>());
+
+                        for (int i = 1; 1 < Parameter.Count; i++)
+                        {
+                            ((Function)g).Parameter.Add(Parameter[i]);
+                        }
+                    }
+
+                    ret = new Function(Mul, new List<Term>());
+                    ret.Parameter.Add(new Function(Pow, t, new Function(Sub, g, new Variable("1"))));
+                    ret.Parameter.Add(new Function(Add, 
+                        new Function(Mul, g, t.Differentiate(argument)),
+                        new Function(Mul, t, new Function(Log, t), g.Differentiate(argument))));
+
+                    return ret;
+            }
+
+            return null;
+        }
+
         //Returns prefixString
         public override string ToString()
         {
             return Operator.StringRep[0] + "[" + string.Join(",", Parameter) + "]";
         }
+
     }
 }

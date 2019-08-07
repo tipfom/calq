@@ -11,6 +11,7 @@ namespace Calq.Core
         public abstract Expression GetAsExpression();
         public abstract string ToInfix();
         public abstract IEnumerable<string> GetVariableNames();
+        public abstract Term Differentiate(string argument);
 
         public static bool CheckBracketCount(string s)
         {

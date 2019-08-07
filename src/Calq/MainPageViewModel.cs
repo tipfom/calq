@@ -52,12 +52,17 @@ namespace Calq
                 {
                     Term t = Term.TermFromMixedString(Expression);
                     var exp = t.GetAsExpression();
-                    if (WebHelper.IsOnline)
+                    if (WebHelper.IsOnline && false)
                     {
                         t = Term.TermFromMixedString(Infix.Format(exp));
                         exp = t.Evaluate();
+
                     }
-                    Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+
+                    string normal = Infix.Format(exp);
+                    string expandet = Infix.Format(Algebraic.Expand(exp));
+
+                    Log.Add($"\"{Expression}\": {(normal.Length < expandet.Length ? normal : expandet)}");
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }
