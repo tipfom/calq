@@ -5,6 +5,7 @@ import base64
 from urllib.parse import urlparse, parse_qs
 from integration import integrate
 from limits import limit
+from solver import execSolve
 
 PORT = 8080
 
@@ -41,6 +42,13 @@ def execCommand(params):
                 elif params["dir"][0] == "3":
                     dir = "+-"
                 return limit(function_text, variables, argument_text, lim, dir)
+            elif params["method"][0] == "sol":
+                function_texts = []
+                for func in params["function"]:
+                    function_texts.append(base64.b64decode(func.encode()).decode("utf-8"))
+                variables = params["vars"]
+                solve_for = params["solve"]
+                return execSolve(function_texts, variables, solve_for)
     return "false"
    
 with socketserver.TCPServer(("", PORT), SimpleHTTPRequestHandler) as httpd:
