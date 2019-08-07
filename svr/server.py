@@ -53,6 +53,8 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 txt_variables = params["var"]
                 txt_delta = params["d"][0]
                 txt_limit = None
+                if params.__contains__("llim") and params.__contains__("ulim"):
+                    txt_lim = (params["llim"][0], params["ulim"][0])
                 self.replyResult(integrateExpression(txt_expression, txt_variables, txt_delta, txt_limit))
 
             elif params["method"][0] == "lim":
