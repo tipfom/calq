@@ -27,7 +27,7 @@ namespace Calq
                 _Expression = value;
             }
         }
-        public ObservableCollection<string> Log { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<object> Log { get; set; } = new ObservableCollection<object>();
 
         public Command EvaluateExpressionCommand { get; private set; }
 
@@ -57,7 +57,8 @@ namespace Calq
                         t = Term.TermFromMixedString(Infix.Format(exp));
                         exp = t.Evaluate();
                     }
-                    Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+                    Log.Add(new Logging.ExpressionResult());
+                    Log.Add(new Logging.ErrorResult() { ErrorMessage = "TEST ERROR WILL BE HERE" });
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }
