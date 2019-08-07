@@ -38,9 +38,20 @@ namespace Calq
 
         private void EvaluateExpression()
         {
-            Term t = Term.TermFromMixedString(Expression);
-            var exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
-            Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+            try
+            {
+                Term t = Term.TermFromMixedString(Expression);
+                var exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
+                Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+            }
+            catch(InvalidParameterCountException e)
+            {
+                System.Diagnostics.Debug.WriteLine("Invalid parameter count at " + e.Message);
+            }
+            catch(MissingArgumentException e)
+            {
+                System.Diagnostics.Debug.WriteLine("Missing argument");
+            }
         }
     }
 }
