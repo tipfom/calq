@@ -10,7 +10,7 @@ namespace Calq
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        const string ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyz()π1234567890,.*/-+^{} ";
+        const string ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyz()π∫1234567890,.*/-+^{} ";
 
         private string _Expression;
         public string Expression {
@@ -48,9 +48,13 @@ namespace Calq
         {
             try
             {
-                Term t = Term.TermFromMixedString(Expression);
-                var exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
-                Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+                if (Term.CheckBracketCount(Expression))
+                {
+                    Term t = Term.TermFromMixedString(Expression);
+                    var exp = t.GetAsExpression();
+                    Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+                }
+                else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }
             catch(InvalidParameterCountException e)
             {

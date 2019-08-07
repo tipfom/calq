@@ -66,6 +66,11 @@ namespace Calq.Core
             }
         }
 
+        public override Expression GetAsExpression()
+        {
+            return Evaluate();
+        }
+
         public override IEnumerable<string> GetVariableNames()
         {
             yield return Name;
@@ -75,5 +80,11 @@ namespace Calq.Core
         {
             return Name;
         }
+
+        public override string ToInfix()
+        {
+            return Name;
+        }
+
     }
 }
