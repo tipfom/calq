@@ -28,7 +28,7 @@ namespace Calq.Core
         public static string GetLimit(string prefixExpression, List<string> variables, string argument, string valueApproaching, string direction)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
-            return Request($"method=lim&function={base64Expression}&vars={string.Join("&vars=", variables)}&arg={argument}&lim={valueApproaching}&dir={((direction == "+") ? "1" : (direction == "-" ? "2" : "3"))}");
+            return Request($"method=lim&function={base64Expression}&vars={string.Join("&vars=", variables)}&arg={argument}&lim={valueApproaching}&dir={((direction == "r") ? "1" : (direction == "l" ? "2" : "3"))}");
         }
 
         private static string Request(string parameters)

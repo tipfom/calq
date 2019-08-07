@@ -186,9 +186,33 @@ namespace Calq.Core
                     //python stuff
                     return null;
                 case Operators.Int:
+                    // TODO:
+                    // - bessere Unterstützung der Python Formattierung (** ist dort ^, pinf ist oo, ninf ist -oo)
+                    // - unbekannte Funktionen zulassen oder alle von Python (inverse Gaus usw) hinzufügen, oder beides am besten
+                    // - bessere Methode um alle benutzten Variablen in einem Term zu finden
+                    if(Parameter.Count == 2)
+                    {
+                        string pExpr = WebHelper.GetIntegral(Parameter[0].ToString(), new List<string>() { "x" }, Parameter[1].ToString()).Replace("**","^");
+                        return Term.TermFromMixedString(pExpr).Evaluate();
+                    } else if (Parameter.Count == 4)
+                    {
+
+                        string pExpr = WebHelper.GetIntegral(Parameter[0].ToString(), new List<string>() { "x" }, Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString()).Replace("**", "^"); ;
+                        return Term.TermFromMixedString(pExpr).Evaluate();
+                    }
                     return null;
                 case Operators.Lim:
-                    //python stuff
+                    if (Parameter.Count == 3)
+                    {
+                        string pExpr = WebHelper.GetLimit(Parameter[0].ToString(), new List<string>() { "x" }, Parameter[1].ToString(), Parameter[2].ToString()).Replace("**", "^").Replace("-oo","ninf").Replace("oo","pinf");
+                        return Term.TermFromMixedString(pExpr).Evaluate();
+                    }
+                    else if (Parameter.Count == 4)
+                    {
+
+                        string pExpr = WebHelper.GetLimit(Parameter[0].ToString(), new List<string>() { "x" }, Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString()).Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf");
+                        return Term.TermFromMixedString(pExpr).Evaluate();
+                    }
                     return null;
                 case Operators.Solve:
                     //python stuff

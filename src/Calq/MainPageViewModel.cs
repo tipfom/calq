@@ -24,10 +24,8 @@ namespace Calq
         private void EvaluateExpression()
         {
             Term t = Term.TermFromMixedString(Expression);
-            System.Diagnostics.Debug.WriteLine(t.ToString());
-
             var exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
-            Log.Add(Infix.Format(exp));
+            Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
         }
     }
 }
