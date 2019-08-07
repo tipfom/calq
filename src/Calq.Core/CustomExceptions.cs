@@ -19,4 +19,12 @@ namespace Calq.Core
 
         }
     }
+
+    public class NotEvaluateableException : Exception
+    {
+        public NotEvaluateableException(string message) : base(message)
+        {
+
+        }
+    }
 }

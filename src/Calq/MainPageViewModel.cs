@@ -40,9 +40,13 @@ namespace Calq
         {
             try
             {
-                Term t = Term.TermFromMixedString(Expression);
-                var exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
-                Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+                if (Term.CheckBracketCount(Expression))
+                {
+                    Term t = Term.TermFromMixedString(Expression);
+                    var exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
+                    Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
+                }
+                else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }
             catch(InvalidParameterCountException e)
             {

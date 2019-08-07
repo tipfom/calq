@@ -94,7 +94,8 @@ namespace Calq.Core
                     {
                         int bracketDepth = 0;
                         List<int> splits = new List<int>();
-                        for (int j = StringRep[i].Length; j < s.Length - 1; j++)
+                        s = s.Substring(StringRep[i].Length);
+                        for (int j = 0; j < s.Length - 1; j++)
                         {
                             if (s[j] == '(') bracketDepth++;
                             if (s[j] == ')') bracketDepth--;
@@ -105,15 +106,14 @@ namespace Calq.Core
                             }
                             if(s[j] == ',' && bracketDepth == 1)
                             {
-                                splits.Add(j);
+                                splits.Add(j - 1);
                             }
                         }
+                        s = s.Substring(1, s.Length - 2);
 
                         if (!ParaCount.Contains(splits.Count + 1))
                             throw new InvalidParameterCountException(s);
                     
-                        s = s.Substring(StringRep[i].Length);
-                        s = s.Substring(1, s.Length - 2);
 
                         splits.Insert(0, -1);
                         splits.Add(s.Length);
