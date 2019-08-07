@@ -6,6 +6,7 @@ from urllib.parse import urlparse, parse_qs
 from integration import integrateExpression
 from limits import limitExpression
 from solver import solveExpression
+import threading
 
 PORT = 8080
 
@@ -17,6 +18,11 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.handleGET_Handshake()
         elif self.path.startswith("/math"):
             self.handleGET_Math(parse_qs(urlparse(self.path).query))
+        else:
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(threading.current_thread().getName().encode())
+    
       
     def replyError(self, error_message):
         self.send_response(400)
@@ -81,6 +87,13 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             return self.replyError("method missing")
    
-httpServer = socketserver.TCPServer(("", PORT), SimpleHTTPRequestHandler)
-print("serving at port", PORT)
-httpServer.serve_forever()
+import sys, os, socket
+from socketserver import ThreadingMixIn
+from http.server import HTTPServer
+
+class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
+    pass
+
+server = ThreadingSimpleServer(("", PORT), SimpleHTTPRequestHandler)
+while 1:
+    server.handle_request()
