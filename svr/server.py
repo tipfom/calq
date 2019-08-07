@@ -51,6 +51,6 @@ def execCommand(params):
                 return execSolve(function_texts, variables, solve_for)
     return "false"
    
-with socketserver.TCPServer(("", PORT), SimpleHTTPRequestHandler) as httpd:
-    print("serving at port", PORT)
-    httpd.serve_forever()
+httpServer = socketserver.TCPServer(("", PORT), SimpleHTTPRequestHandler)
+print("serving at port", PORT)
+httpServer.serve_forever()
