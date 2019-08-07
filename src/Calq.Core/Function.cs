@@ -7,113 +7,57 @@ namespace Calq.Core
 {
     public class Function : Term
     {
-        public enum Operators
+
+        private static Operator[] InfixOperators = new Operator[]
         {
-            //Infix
-            Equals,
-            Addition, Subtraktion,
-            Multiplication, Division,
-            Power,
-
-            //Prefix
-            Sqrt, Log, Sin, Cos,
-
-            //Python-commands
-            Lim, Int,
-            Solve,
-
-            Unknown
-        }
-
-        private static char[] InfixOperators = new char[]
-        {
-            '=',
-            '+', '-',
-            '*', '/',
-            '^'
-        };
-        private static string[] PrefixOperators = new string[]
-        {
-            "sqrt", "log","sin", "cos",
-            "lim", "int",
-            "solve"
+            new Operator(Operator.Operators.Equals, true, new string[]{"==", "="}, null),
+            new Operator(Operator.Operators.Addition, true, new string[]{"+"}, null),
+            new Operator(Operator.Operators.Subtraktion, true, new string[]{"-"}, null),
+            new Operator(Operator.Operators.Multiplication, true, new string[]{"*"}, null),
+            new Operator(Operator.Operators.Division, true, new string[]{"/"}, null),
+            new Operator(Operator.Operators.Power, true, new string[]{"^"}, null),
         };
 
-        public readonly Operators Name;
+        private static Operator[] PrefixOperators = new Operator[]
+        {
+            new Operator(Operator.Operators.Sqrt, false, new string[]{"sqrt"}, new List<int>(){ 1 }),
+            new Operator(Operator.Operators.Log, false, new string[]{"ln"}, new List<int>(){ 1 }),
+            new Operator(Operator.Operators.Log, false, new string[]{"log"}, new List<int>(){ 1, 2 }),
+            new Operator(Operator.Operators.Sin, false, new string[]{"sin"}, new List<int>(){ 1 }),
+            new Operator(Operator.Operators.Cos, false, new string[]{"cos"}, new List<int>(){ 1 }),
+
+            new Operator(Operator.Operators.Lim, false, new string[]{ "limes", "lim" }, new List<int>(){ 3, 4 }),
+            new Operator(Operator.Operators.Int, false, new string[]{ "integral", "int", }, new List<int>(){ 2, 4 }),
+
+            new Operator(Operator.Operators.Sqrt, false, new string[]{"solve"}, new List<int>(){ 2 })
+        };
+
+
+        public readonly Operator Operator;
         public readonly List<Term> Parameter;
 
-        public Function(Operators name, List<Term> parameter)
+        public Function(Operator op, List<Term> parameter)
         {
-            Name = name;
+            Operator = op;
             Parameter = parameter;
         }
 
         public static Function FunctionFromMixedString(string s)
         {
-            List<Term> paras = new List<Term>();
-
             for (int i = 0; i < PrefixOperators.Length; i++)
             {
-                bool possible = true;
-                if (s.StartsWith(PrefixOperators[i]))
+                if(PrefixOperators[i].TryParse(s, out Function t))
                 {
-                    int bracketDepth = 0;
-                    for(int j = PrefixOperators[i].Length; j < s.Length - 1; j++)
-                    {
-                        if (s[j] == '(') bracketDepth++;
-                        if (s[j] == ')') bracketDepth--;
-
-                        if (bracketDepth == 0)
-                        {
-                            possible = false;
-                            break;
-                        }
-                    }
-
-                    if (possible)
-                    {
-                        s = s.Substring(PrefixOperators[i].Length);
-
-                        return new Function((Operators)(i + InfixOperators.Length), s.Split(',').Select(x => TermFromMixedString(x)).ToList());
-                    }
+                    return t;
                 }
-
-                if (!possible) break;
             }
 
             //infix-operators
             for (int i = 0; i < InfixOperators.Length; i++)
             {
-                int bracketDepth = 0;
-                List<int> pos = new List<int>();
-                for (int j = 0; j < s.Length; j++)
+                if (InfixOperators[i].TryParse(s, out Function t))
                 {
-                    if (s[j] == '(') bracketDepth++;
-                    if (s[j] == ')') bracketDepth--;
-
-                    if (s[j] == InfixOperators[i] && bracketDepth == 0)
-                    {
-                        if(InfixOperators[i] == '-')
-                        {
-                            if(j > 0)
-                                if (!InfixOperators.Contains(s[j - 1]))
-                                    pos.Add(j);
-                        }
-                        else pos.Add(j);
-                    }
-                }
-
-                if (pos.Count > 0)
-                {
-                    pos.Insert(0, -1);
-                    pos.Add(s.Length);
-
-                    for (int j = 1; j < pos.Count; j++)
-                    {
-                       paras.Add(TermFromMixedString(s.Substring(pos[j - 1] + 1, pos[j] - pos[j - 1] - 1)));
-                    }
-
-                    return new Function((Operators)i, paras);
+                    return t;
                 }
             }
 
@@ -130,12 +74,13 @@ namespace Calq.Core
                 }
 
                 if (s.Length > counter)
-                    return new Function(Operators.Multiplication, new List<Term>(2) { new Variable(s.Substring(0, counter)), TermFromMixedString(s.Substring(counter)) });
+                    return new Function(InfixOperators[3], new List<Term>(2) { new Variable(s.Substring(0, counter)), TermFromMixedString(s.Substring(counter)) });
             }
 
+            //-sign
             if(s[0] == '-')
             {
-                return new Function(Operators.Multiplication, new List<Term>(2) { new Variable("-1"), TermFromMixedString(s.Substring(1)) });
+                return new Function(InfixOperators[3], new List<Term>(2) { new Variable("-1"), TermFromMixedString(s.Substring(1)) });
             }
 
             if (s[0] == '(' && s[s.Length - 1] == ')')
@@ -146,140 +91,81 @@ namespace Calq.Core
             return null;
         }
 
-        public static string ToPrefix(string s)
-        {
-            System.Diagnostics.Debug.WriteLine(s);
-
-            for(int i = 0; i < PrefixOperators.Length; i++)
-            {
-                if (s.StartsWith(PrefixOperators[i]))
-                {
-                    s = s.Substring(PrefixOperators[i].Length);
-                    s = s.Substring(1, s.Length - 2);
-
-                    return PrefixOperators[i] + "[" + string.Join(",", s.Split(',').Select(x => ToPrefix(x))) + "]";
-                }
-            }
-
-            //infix-operators
-            for (int i = 0; i < InfixOperators.Length; i++)
-            {
-                int bracketDepth = 0;
-                List<int> pos = new List<int>();
-                for(int j = 0; j < s.Length; j++)
-                {
-                    if (s[j] == '(') bracketDepth++;
-                    if (s[j] == ')') bracketDepth--;
-
-                    if (s[j] == InfixOperators[i] && bracketDepth == 0)
-                    {
-                        pos.Add(j);
-                    }
-                }
-
-                if(pos.Count > 0)
-                {
-                    string buffer = InfixOperators[i].ToString() + "[";
-
-                    pos.Insert(0, -1);
-                    pos.Add(s.Length);
-                    for(int j = 1; j < pos.Count; j++)
-                    {
-                        buffer += ToPrefix(s.Substring(pos[j - 1] + 1, pos[j] - pos[j - 1] - 1));
-
-                        if (j < pos.Count - 1) buffer += ",";
-                    }
-
-                    buffer += "]";
-
-                    return buffer;
-                }
-            }
-
-            if (s[0] == '(' && s[s.Length - 1] == ')')
-            {
-                return ToPrefix(s.Substring(1, s.Length - 2));
-            }
-
-            return s;
-        }
-
         public override Expression Evaluate()
         {
             Expression buffer;
-            switch (Name)
+            switch (Operator.Name)
             {
-                case Operators.Equals:
-                    //python stuff
-                    return null;
-                case Operators.Int:
+                case Operator.Operators.Equals:
+                    return Infix.Format(Parameter[0].Evaluate()) == Infix.Format(Parameter[1].Evaluate()) ? Expression.Symbol("True") : Expression.Symbol("False");
+
+                case Operator.Operators.Int:
                     // TODO:
                     // - bessere Unterstützung der Python Formattierung (** ist dort ^, pinf ist oo, ninf ist -oo)
                     // - unbekannte Funktionen zulassen oder alle von Python (inverse Gaus usw) hinzufügen, oder beides am besten
                     if(Parameter.Count == 2)
                     {
                         string pExpr = WebHelper.GetIntegral(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString()).Replace("**","^");
-                        return Term.TermFromMixedString(pExpr).Evaluate();
+                        return TermFromMixedString(pExpr).Evaluate();
                     } else if (Parameter.Count == 4)
                     {
 
                         string pExpr = WebHelper.GetIntegral(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString()).Replace("**", "^"); ;
-                        return Term.TermFromMixedString(pExpr).Evaluate();
+                        return TermFromMixedString(pExpr).Evaluate();
                     }
                     return null;
-                case Operators.Lim:
+                case Operator.Operators.Lim:
                     if (Parameter.Count == 3)
                     {
                         string pExpr = WebHelper.GetLimit(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString()).Replace("**", "^").Replace("-oo","ninf").Replace("oo","pinf");
-                        return Term.TermFromMixedString(pExpr).Evaluate();
+                        return TermFromMixedString(pExpr).Evaluate();
                     }
                     else if (Parameter.Count == 4)
                     {
 
                         string pExpr = WebHelper.GetLimit(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString()).Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf");
-                        return Term.TermFromMixedString(pExpr).Evaluate();
+                        return TermFromMixedString(pExpr).Evaluate();
                     }
                     return null;
-                case Operators.Solve:
+                case Operator.Operators.Solve:
                     //python stuff
                     return null;
 
-                case Operators.Addition:
+                case Operator.Operators.Addition:
                     buffer = Parameter[0].Evaluate();
                     for (int i = 1; i < Parameter.Count; i++)
                         buffer += Parameter[i].Evaluate();
                     return buffer;
-                case Operators.Subtraktion:
+                case Operator.Operators.Subtraktion:
                     buffer = Parameter[0].Evaluate();
                     for (int i = 1; i < Parameter.Count; i++)
                         buffer -= Parameter[i].Evaluate();
                     return buffer;
-                case Operators.Multiplication:
+                case Operator.Operators.Multiplication:
                     buffer = Parameter[0].Evaluate();
                     for (int i = 1; i < Parameter.Count; i++)
                         buffer *= Parameter[i].Evaluate();
                     return buffer;
-                case Operators.Division:
+                case Operator.Operators.Division:
                     buffer = Parameter[0].Evaluate();
                     for(int i = 1; i < Parameter.Count; i++)
                         buffer /= Parameter[i].Evaluate();
                     return buffer;
-                case Operators.Power:
+                case Operator.Operators.Power:
                     buffer = Parameter[0].Evaluate();
                     for (int i = 1; i < Parameter.Count; i++)
                         buffer = Expression.Pow(buffer, Parameter[i].Evaluate());
                     return buffer;
 
-                case Operators.Sqrt:
+                case Operator.Operators.Sqrt:
                     return Expression.Sqrt(Parameter[0].Evaluate());
-                case Operators.Log:
+                case Operator.Operators.Log:
                     if (Parameter.Count == 1) return Expression.Ln(Parameter[0].Evaluate());
                     else return Expression.Log(Parameter[0].Evaluate(), Parameter[1].Evaluate());
-                case Operators.Sin:
+                case Operator.Operators.Sin:
                     return Expression.Sin(Parameter[0].Evaluate());
-                case Operators.Cos:
+                case Operator.Operators.Cos:
                     return Expression.Cos(Parameter[0].Evaluate());
-
             }
 
             return null;
@@ -297,10 +183,7 @@ namespace Calq.Core
         //Returns prefixString
         public override string ToString()
         {
-            if ((int)Name < InfixOperators.Length)
-                return InfixOperators[(int)Name] + "[" + string.Join(",", Parameter) + "]";
-            else
-                return PrefixOperators[((int)Name) - InfixOperators.Length] + "[" + string.Join(",", Parameter) + "]";
+            return Operator.StringRep[0] + "[" + string.Join(",", Parameter) + "]";
         }
     }
 }
