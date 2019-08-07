@@ -3,46 +3,85 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace Calq.Core
 {
     public static class WebHelper
     {
+        const string VERSION = "1.0";
 #if LOCAL
-        const string SERVER_URL = "http://localhost:8080/?";
+        const string SERVER_URL = "http://localhost:8080";
 #else
-        const string SERVER_URL = "http://timpokart.de:8080/?";
+        const string SERVER_URL = "http://timpokart.de:8080";
 #endif
 
-        public static string GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable)
+        static WebHelper()
+        {
+            new Thread(new ThreadStart(() =>
+            {
+                while (true)
+                {
+                    string version;
+                    if (Request("/handshake", out version) && version == VERSION)
+                    {
+                        IsOnline = true;
+                    } else
+                    {
+                        IsOnline = false;
+                    }
+                    Thread.Sleep(5000);
+                }
+            })).Start();
+        }
+
+        public static bool IsOnline { get; private set; }
+
+        public static bool GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable, out string result)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
-            return Request($"method=int&function={base64Expression}&vars={string.Join("&vars=", variables)}&delta={variable}");
+            return Request($"/math?method=int&expr={base64Expression}&var={string.Join("&var=", variables)}&d={variable}", out result);
         }
 
-        public static string GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable, string lowerLimit, string upperLimit)
+        public static bool GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable, string lowerLimit, string upperLimit, out string result)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
-            return Request($"method=int&function={base64Expression}&vars={string.Join("&vars=", variables)}&delta={variable}&lim1={lowerLimit}&lim2={upperLimit}");
+            return Request($"/math?method=int&expr={base64Expression}&var={string.Join("&var=", variables)}&d={variable}&ulim={upperLimit}&llim={lowerLimit}", out result);
         }
 
-        public static string GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching)
+        public static bool GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching, out string result)
         {
-            return GetLimit(prefixExpression, variables, argument, valueApproaching, "+-");
+            return GetLimit(prefixExpression, variables, argument, valueApproaching, "+-", out result);
         }
 
-        public static string GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching, string direction)
+        public static bool GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching, string direction, out string result)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
-            return Request($"method=lim&function={base64Expression}&vars={string.Join("&vars=", variables)}&arg={argument}&lim={valueApproaching}&dir={((direction == "r") ? "1" : (direction == "l" ? "2" : "3"))}");
+            return Request($"/math?method=lim&expr={base64Expression}&var={string.Join("&var=", variables)}&arg={argument}&val={valueApproaching}&dir={((direction == "r") ? "1" : (direction == "l" ? "2" : "3"))}", out result);
         }
 
-        private static string Request(string parameters)
+        private static bool Request(string path, out string value)
         {
-            WebRequest httpReq = WebRequest.CreateHttp(SERVER_URL + parameters);
-            httpReq.Method = "GET";
-            WebResponse webResponse = httpReq.GetResponse();
-            return new StreamReader(webResponse.GetResponseStream()).ReadToEnd();
+            try
+            {
+                HttpWebRequest httpReq = (HttpWebRequest)WebRequest.CreateHttp(SERVER_URL + path);
+                httpReq.Method = "GET";
+                HttpWebResponse webResponse = (HttpWebResponse)httpReq.GetResponse();
+                value = new StreamReader(webResponse.GetResponseStream()).ReadToEnd();
+                if (webResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                value = "error connecting";
+                return false;
+            }
         }
     }
 }
