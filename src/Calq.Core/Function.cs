@@ -73,7 +73,7 @@ namespace Calq.Core
                     if (possible)
                     {
                         s = s.Substring(PrefixOperators[i].Length);
-
+                        s = s.Substring(1, s.Length - 2);
                         return new Function((Operators)(i + InfixOperators.Length), s.Split(',').Select(x => TermFromMixedString(x)).ToList());
                     }
                 }

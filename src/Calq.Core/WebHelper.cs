@@ -8,6 +8,12 @@ namespace Calq.Core
 {
     public static class WebHelper
     {
+#if LOCAL
+        const string SERVER_URL = "http://localhost:8080/?";
+#else
+        const string SERVER_URL = "http://timpokart.de:8080/?";
+#endif
+
         public static string GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
@@ -33,7 +39,7 @@ namespace Calq.Core
 
         private static string Request(string parameters)
         {
-            WebRequest httpReq = WebRequest.CreateHttp($"http://localhost:8080/?" + parameters);
+            WebRequest httpReq = WebRequest.CreateHttp(SERVER_URL + parameters);
             httpReq.Method = "GET";
             WebResponse webResponse = httpReq.GetResponse();
             return new StreamReader(webResponse.GetResponseStream()).ReadToEnd();
