@@ -1,17 +1,20 @@
-from function_parser import *
-from sympy import symbols
+from sympy import symbols, limit
+from function_parser import buildFunctionFromTree, parseToTree, getConstant
 
-def limit(funcion_text, variables, argument_text, lim, dir):
-    sympy_variables = {}
+def limitExpression(txt_expression, txt_variables, txt_argument, txt_value, txt_dir):
+    try:
+        sympy_variables = {}
 
-    for var in variables:
-        sympy_variables[var] = symbols(var)
+        for var in txt_variables:
+            sympy_variables[var] = symbols(var)
 
-    sympy_function = buildFunctionFromTree(parseToTree(funcion_text), sympy_variables)
-    sympy_argument = sympy_variables[argument_text]
-    sympy_limit = getConstant(lim)
-    if sympy_limit == None:
-        sympy_limit = sympy_variables[lim]
+        sympy_function = buildFunctionFromTree(parseToTree(txt_expression), sympy_variables)
+        sympy_argument = sympy_variables[txt_argument]
+        sympy_value = getConstant(txt_value)
+        if sympy_value == None:
+            sympy_value = sympy_variables[txt_value]
 
-    limit = sympy.limit(sympy_function, sympy_argument, sympy_limit, dir)
-    return str(limit)
+        result = limit(sympy_function, sympy_argument, sympy_value, dir)
+        return [True, str(result)]
+    except:
+        return [False]

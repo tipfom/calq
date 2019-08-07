@@ -3,53 +3,83 @@ import socketserver
 import sympy
 import base64
 from urllib.parse import urlparse, parse_qs
-from integration import integrate
-from limits import limit
-from solver import execSolve
+from integration import integrateExpression
+from limits import limitExpression
+from solver import solveExpression
 
 PORT = 8080
 
+version = "1.0"
+
 class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        if self.path == "/handshake":
+            self.handleGET_Handshake()
+        elif self.path.startswith("/math"):
+            self.handleGET_Math(parse_qs(urlparse(self.path).query))
+      
+    def replyError(self, error_message):
+        self.send_response(400)
         self.end_headers()
-        parsedUrl = parse_qs(urlparse(self.path).query)
-        self.wfile.write(execCommand(parsedUrl).encode())
-        return
+        self.wfile.write(error_message.encode())
+        
+    def handleGET_Handshake(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(version.encode())
 
-def execCommand(params):
-    if params.__contains__("method"):
-        if len(params["method"]) == 1:
+    def replyResult(self, r):
+        if r[0]:
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(r[1].encode())
+        else:
+            self.replyError("error on limit")
+
+
+    def handleGET_Math(self, params):
+        if params.__contains__("method") and len(params["method"]) == 1:
             if params["method"][0] == "int": 
-                # Parameter: function (base64 repräsentation des Präfixterms), vars (variablen), lim1&lim2 (obere&untere grenze), delta (Variable nach der integriert wird)
-                function_text = base64.b64decode((params["function"][0]).encode()).decode("utf-8") 
-                variables = params["vars"]
-                delta = params["delta"][0]
-                lim = None
-                if params.__contains__("lim1") and params.__contains__("lim2"):
-                    lim = (params["lim1"][0], params["lim2"][0])
-                return integrate(function_text, variables, delta, lim)
+                if not params.__contains__("expr") or len(params["expr"]) != 1 or not params.__contains__("var") or not params.__contains__("d") or len(params["d"]) != 1:
+                    return self.replyError("invalid parameters for integrate")
+        
+                txt_expression = base64.b64decode((params["expr"][0]).encode()).decode("utf-8") 
+                txt_variables = params["var"]
+                txt_delta = params["d"][0]
+                txt_limit = None
+                self.replyResult(integrateExpression(txt_expression, txt_variables, txt_delta, txt_limit))
+
             elif params["method"][0] == "lim":
-                function_text = base64.b64decode((params["function"][0]).encode()).decode("utf-8") 
-                variables = params["vars"]
-                argument_text = params["arg"][0]
-                lim = params["lim"][0]
+                if not params.__contains__("expr") or len(params["expr"]) != 1 or not params.__contains__("var") or not params.__contains__("arg") or len(params["arg"]) != 1 or not params.__contains__("val") or len(params["val"]) != 1 or not params.__contains__("lim") or len(params["lim"]) != 1:
+                    return self.replyError("invalid parameters for limit")
+                
+                txt_expression = base64.b64decode((params["expr"][0]).encode()).decode("utf-8") 
+                txt_variables = params["var"]
+                txt_argument = params["arg"][0]
+                txt_value = params["val"][0]
                 if params["dir"][0] == "1":
-                    dir = "+"
+                    txt_dir = "+"
                 elif params["dir"][0] == "2":
-                    dir = "-"
+                    txt_dir = "-"
                 elif params["dir"][0] == "3":
-                    dir = "+-"
-                return limit(function_text, variables, argument_text, lim, dir)
+                    txt_dir = "+-"
+                self.replyResult(limitExpression(txt_expression, txt_variables, txt_argument, txt_value, txt_dir))
+    
             elif params["method"][0] == "sol":
-                function_texts = []
+                if not params.__contains__("expr")  or not params.__contains__("var") or not params.__contains__("arg") or len(params["arg"]) != 1 or not params.__contains__("val") or len(params["val"]) != 1 or not params.__contains__("solve"):
+                    return self.replyError("invalid parameters for limit")
+                
+                txts_expression = []
                 for func in params["function"]:
-                    function_texts.append(base64.b64decode(func.encode()).decode("utf-8"))
-                variables = params["vars"]
-                solve_for = params["solve"]
-                return execSolve(function_texts, variables, solve_for)
-    return "false"
+                    txts_expression.append(base64.b64decode(func.encode()).decode("utf-8"))
+                txt_variables = params["var"]
+                txt_solve = params["solve"]
+                self.replyResult(solveExpression(txts_expression, txt_variables, txt_solve))
+
+            else:
+                return self.replyError("method unknown")
+        else:
+            return self.replyError("method missing")
    
 httpServer = socketserver.TCPServer(("", PORT), SimpleHTTPRequestHandler)
 print("serving at port", PORT)

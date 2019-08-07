@@ -1,19 +1,22 @@
 from sympy import symbols, solve
 from function_parser import buildFunctionFromTree, parseToTree
 
-def execSolve(function_texts, variables, solve_for_texts):
-    sympy_variables = {}
+def solveExpression(txts_expression, txts_variables, txts_solve):
+    try:
+        sympy_variables = {}
 
-    for var in variables:
-        sympy_variables[var] = symbols(var)
+        for var in txts_variables:
+            sympy_variables[var] = symbols(var)
 
-    functions = []
-    for function_text in function_texts:
-        functions.append(buildFunctionFromTree(parseToTree(function_text), sympy_variables))
+        sympy_expression = []
+        for txt_expression in txts_expression:
+            sympy_expression.append(buildFunctionFromTree(parseToTree(txt_expression), sympy_variables))
 
-    solve_for = []
-    for var in solve_for_texts:    
-        solve_for.append(sympy_variables[var])
+        solve_for = []
+        for var in txts_solve:    
+            solve_for.append(sympy_variables[var])
 
-    sol = solve(functions, solve_for)
-    return str(sol)
+        sol = solve(sympy_expression, solve_for)
+        return [True, str(sol)]
+    except:
+        return [False]
