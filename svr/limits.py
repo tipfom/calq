@@ -14,7 +14,7 @@ def limitExpression(txt_expression, txt_variables, txt_argument, txt_value, txt_
         if sympy_value == None:
             sympy_value = sympy_variables[txt_value]
 
-        result = limit(sympy_function, sympy_argument, sympy_value, dir)
+        result = limit(sympy_function, sympy_argument, sympy_value, txt_dir)
         return [True, str(result)]
     except:
         return [False]

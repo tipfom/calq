@@ -52,6 +52,11 @@ namespace Calq
                 {
                     Term t = Term.TermFromMixedString(Expression);
                     var exp = t.GetAsExpression();
+                    if (WebHelper.IsOnline)
+                    {
+                        t = Term.TermFromMixedString(Infix.Format(exp));
+                        exp = t.Evaluate();
+                    }
                     Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");

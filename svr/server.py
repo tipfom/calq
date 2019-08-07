@@ -50,7 +50,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.replyResult(integrateExpression(txt_expression, txt_variables, txt_delta, txt_limit))
 
             elif params["method"][0] == "lim":
-                if not params.__contains__("expr") or len(params["expr"]) != 1 or not params.__contains__("var") or not params.__contains__("arg") or len(params["arg"]) != 1 or not params.__contains__("val") or len(params["val"]) != 1 or not params.__contains__("lim") or len(params["lim"]) != 1:
+                if not params.__contains__("expr") or len(params["expr"]) != 1 or not params.__contains__("var") or not params.__contains__("arg") or len(params["arg"]) != 1 or not params.__contains__("val") or len(params["val"]) != 1:
                     return self.replyError("invalid parameters for limit")
                 
                 txt_expression = base64.b64decode((params["expr"][0]).encode()).decode("utf-8") 
