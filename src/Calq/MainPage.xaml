@@ -13,19 +13,27 @@
     
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <Grid BackgroundColor="{Binding OnlineColor}"
+              Grid.Column="0">
+            <Label Text="{Binding OnlineText}"
+                   VerticalOptions="CenterAndExpand"
+                   HorizontalOptions="CenterAndExpand"/>
+        </Grid>
+        
         <ListView ItemsSource="{Binding Log}"
-                  Grid.Row="0"/>
+                  Grid.Row="1"/>
 
         <Entry Text="{Binding Expression}"
-               Grid.Row="1"/>
+               Grid.Row="2"/>
         <Button Text="Evaluate Expression"
                 Command="{Binding EvaluateExpressionCommand}"
-                Grid.Row="2"/>
+                Grid.Row="3"/>
     </Grid>
 
 </ContentPage>

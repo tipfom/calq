@@ -31,9 +31,17 @@ namespace Calq
 
         public Command EvaluateExpressionCommand { get; private set; }
 
+        public string OnlineText { get { return WebHelper.IsOnline ? "Online" : "Offline"; } }
+
+        public Color OnlineColor { get { return WebHelper.IsOnline ? Color.Green : Color.Red; } }
+
         public MainPageViewModel()
         {
             EvaluateExpressionCommand = new Command(EvaluateExpression);
+            WebHelper.IsOnlineChanged += () => {
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineText"));
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineColor"));
+            };
         }
 
         private void EvaluateExpression()

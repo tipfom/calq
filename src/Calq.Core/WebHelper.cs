@@ -16,6 +16,8 @@ namespace Calq.Core
         const string SERVER_URL = "http://timpokart.de:8080";
 #endif
 
+        public static event Action IsOnlineChanged;
+
         static WebHelper()
         {
             new Thread(new ThreadStart(() =>
@@ -26,7 +28,8 @@ namespace Calq.Core
                     if (Request("/handshake", out version) && version == VERSION)
                     {
                         IsOnline = true;
-                    } else
+                    }
+                    else
                     {
                         IsOnline = false;
                     }
@@ -35,7 +38,17 @@ namespace Calq.Core
             })).Start();
         }
 
-        public static bool IsOnline { get; private set; }
+        private static bool _IsOnline;
+        public static bool IsOnline {
+            get { return _IsOnline; }
+            private set {
+                if (_IsOnline != value)
+                {
+                    _IsOnline = value;
+                    IsOnlineChanged.Invoke();
+                }
+            }
+        }
 
         public static bool GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable, out string result)
         {
