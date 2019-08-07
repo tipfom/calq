@@ -9,7 +9,7 @@ namespace Calq.Core
     {
         public abstract Expression Evaluate();
         public abstract Expression GetAsExpression();
-        public abstract string GetInfix();
+        public abstract string ToInfix();
         public abstract IEnumerable<string> GetVariableNames();
 
         public static bool CheckBracketCount(string s)

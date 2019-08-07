@@ -81,7 +81,7 @@ namespace Calq.Core
             return Name;
         }
 
-        public override string GetInfix()
+        public override string ToInfix()
         {
             return Name;
         }

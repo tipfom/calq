@@ -25,12 +25,6 @@ namespace Calq.Core
 
             Unknown
         }
-        public enum ParseResult
-        {
-            succesful,
-            paraCountMissmatch,
-            unkownName
-        }
 
         public readonly Operators Name;
         public readonly bool IsInfix;

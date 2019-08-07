@@ -26,7 +26,7 @@ namespace Calq.Core
             new Operator(Operator.Operators.Cos, false, new string[]{"cos"}, new List<int>(){ 1 }),
 
             new Operator(Operator.Operators.Lim, false, new string[]{ "limes", "lim" }, new List<int>(){ 3, 4 }),
-            new Operator(Operator.Operators.Int, false, new string[]{ "integral", "int", }, new List<int>(){ 2, 4 }),
+            new Operator(Operator.Operators.Int, false, new string[]{ "∫", "integral", "int", }, new List<int>(){ 2, 4 }),
 
             new Operator(Operator.Operators.Solve, false, new string[]{"solve"}, new List<int>(){ 2 })
         };
@@ -178,11 +178,11 @@ namespace Calq.Core
                     return Infix.Format(Parameter[0].Evaluate()) == Infix.Format(Parameter[1].Evaluate()) ? Expression.Symbol("True") : Expression.Symbol("False");
 
                 case Operator.Operators.Int:
-                    return Expression.Symbol(ToString());
+                    return Expression.Symbol(ToInfix());
                 case Operator.Operators.Lim:
-                    return Expression.Symbol(ToString());
+                    return Expression.Symbol(ToInfix());
                 case Operator.Operators.Solve:
-                    return Expression.Symbol(ToString());
+                    return Expression.Symbol(ToInfix());
 
                 case Operator.Operators.Addition:
                     buffer = Parameter[0].GetAsExpression();
@@ -224,15 +224,15 @@ namespace Calq.Core
             return null;
         }
 
-        public override string GetInfix()
+        public override string ToInfix()
         {
             if (Operator.IsInfix)
             {
-                return string.Join(Operator.StringRep[0], Parameter.Select(x => x.GetInfix()));
+                return string.Join(Operator.StringRep[0], Parameter.Select(x => x.ToInfix()));
             }
             else
             {
-                return Operator.StringRep[0] +  "(" + string.Join(",", Parameter.Select(x => x.GetInfix())) + ")";
+                return Operator.StringRep[0] +  "(" + string.Join(",", Parameter.Select(x => x.ToInfix())) + ")";
             }
         }
 
