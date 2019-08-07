@@ -10,7 +10,7 @@ namespace Calq
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        const string ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyz()π1234567890,.*/-+^{}";
+        const string ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyz()π1234567890,.*/-+^{} ";
 
         private string _Expression;
         public string Expression {
