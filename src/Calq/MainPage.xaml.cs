@@ -36,6 +36,11 @@ namespace Calq
             exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
             System.Diagnostics.Debug.WriteLine(Infix.Format(exp));
 
+            string asdnanf = WebHelper.GetIntegral("^[e,-[^[x,2]]", new List<string>() { "x" }, "x");
+            System.Diagnostics.Debug.WriteLine(asdnanf);
+
+            string aifniawnfi = WebHelper.GetLimit("/[1,x]", new List<string>() { "x" }, "x", "0", "+");
+            System.Diagnostics.Debug.WriteLine(aifniawnfi);
         }
     }
 }
