@@ -21,7 +21,7 @@ namespace Calq.Core
 
             //Python-commands
             Lim, Int,
-            Solve,
+            Solve, Erf,
 
             Unknown
         }
