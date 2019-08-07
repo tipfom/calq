@@ -91,5 +91,9 @@ namespace Calq.Core
             if (Name == argument) return new Variable("1");
             else return new Variable("0");
         }
+        public override string ToLaTeX()
+        {
+            return Name;
+        }
     }
 }

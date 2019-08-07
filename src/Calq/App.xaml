@@ -3,9 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:calq="clr-namespace:Calq"
+             xmlns:math="clr-namespace:CSharpMath.Forms;assembly=CSharpMath.Forms"
+             xmlns:log="clr-namespace:Calq.Logging"
              mc:Ignorable="d"
              x:Class="Calq.App">
     <Application.Resources>
+        <DataTemplate x:Key="ShowLatex" x:DataType="log:ExpressionResult">
+            <Grid HeightRequest="160">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <math:MathView LaTeX="{Binding ExpressionLaTeX}"
+                               Grid.Row="0"
+                               HorizontalOptions="Start">
+                </math:MathView>
+
+
+                <ScrollView Orientation="Horizontal"
+                            Grid.Row="1"
+                            HorizontalOptions="End">
+                    <math:MathView LaTeX="{Binding ResultLaTeX}"
+                                   FontSize="40"
+                                   HeightRequest="120"
+                                   HorizontalOptions="End">
+                    </math:MathView>
+                </ScrollView>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ShowError" x:DataType="log:ErrorResult">
+            <StackLayout Orientation="Horizontal">
+                <Label Text="!" FontSize="20" TextColor="Red"/>
+                <Label Text="{Binding ErrorMessage}" FontSize="20"/>
+            </StackLayout>
+        </DataTemplate>
+
+        <calq:LogListViewItemTemplateSelector
+            x:Key="LogListViewItemSelector"
+            ShowError="{StaticResource ShowError}"
+            ShowLatex="{StaticResource ShowLatex}"/>
 
     </Application.Resources>
 </Application>

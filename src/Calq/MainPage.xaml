@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:m="clr-namespace:CSharpMath.Forms;assembly=CSharpMath.Forms"
              xmlns:c="clr-namespace:Calq"
              mc:Ignorable="d"
              x:Class="Calq.MainPage">
@@ -18,16 +19,20 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
+        
         <Grid BackgroundColor="{Binding OnlineColor}"
               Grid.Column="0">
             <Label Text="{Binding OnlineText}"
                    VerticalOptions="CenterAndExpand"
                    HorizontalOptions="CenterAndExpand"/>
         </Grid>
-        
-        <ListView ItemsSource="{Binding Log}"
-                  Grid.Row="1"/>
+
+
+
+        <c:LogListView ItemsSource="{Binding Log}"
+                       Grid.Row="1"
+                       ItemTemplateSelector="{StaticResource Key=LogListViewItemSelector}">
+        </c:LogListView>
 
         <Entry Text="{Binding Expression}"
                Grid.Row="2"/>

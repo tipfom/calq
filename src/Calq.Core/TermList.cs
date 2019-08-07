@@ -77,5 +77,9 @@ namespace Calq.Core
         {
             throw new NotImplementedException();
         }
+        public override string ToLaTeX()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

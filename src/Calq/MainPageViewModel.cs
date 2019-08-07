@@ -27,7 +27,7 @@ namespace Calq
                 _Expression = value;
             }
         }
-        public ObservableCollection<string> Log { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<object> Log { get; set; } = new ObservableCollection<object>();
 
         public Command EvaluateExpressionCommand { get; private set; }
 
@@ -51,6 +51,7 @@ namespace Calq
                 if (Term.CheckBracketCount(Expression))
                 {
                     Term t = Term.TermFromMixedString(Expression);
+                    string expLat = t.ToLaTeX();
                     var exp = t.GetAsExpression();
                     if (WebHelper.IsOnline && false)
                     {
@@ -62,7 +63,7 @@ namespace Calq
                     string normal = Infix.Format(exp);
                     string expandet = Infix.Format(Algebraic.Expand(exp));
 
-                    Log.Add($"\"{Expression}\": {(normal.Length < expandet.Length ? normal : expandet)}");
+                    Log.Add(new Logging.ExpressionResult() { ExpressionLaTeX =  expLat, ResultLaTeX= Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX()});
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }

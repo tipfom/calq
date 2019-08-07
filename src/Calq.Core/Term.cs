@@ -13,6 +13,7 @@ namespace Calq.Core
         public abstract IEnumerable<string> GetVariableNames();
         public abstract Term Differentiate(string argument);
 
+        public abstract string ToLaTeX();
         public static bool CheckBracketCount(string s)
         {
             Stack<char> brackets = new Stack<char>();
