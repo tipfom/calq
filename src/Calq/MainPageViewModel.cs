@@ -53,17 +53,16 @@ namespace Calq
                     Term t = Term.TermFromMixedString(Expression);
                     string expLat = t.ToLaTeX();
                     var exp = t.GetAsExpression();
-                    if (WebHelper.IsOnline && false)
+                    if (WebHelper.IsOnline)
                     {
                         t = Term.TermFromMixedString(Infix.Format(exp));
                         exp = t.Evaluate();
-
                     }
 
                     string normal = Infix.Format(exp);
                     string expandet = Infix.Format(Algebraic.Expand(exp));
 
-                    Log.Add(new Logging.ExpressionResult() { ExpressionLaTeX =  expLat, ResultLaTeX= Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX()});
+                    Log.Add(new Logging.ExpressionResult() { ExpressionLaTeX =  expLat + "\\\\", ResultLaTeX = Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX() });
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }

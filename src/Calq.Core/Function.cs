@@ -404,7 +404,7 @@ namespace Calq.Core
                 case Operator.Operators.Multiplication:
                     res = Parameter[0].ToLaTeX();
                     for (int i = 1; i < Parameter.Count; i++)
-                        res += "*" + Parameter[i].ToLaTeX();
+                        res += "\\cdot " + Parameter[i].ToLaTeX();
                     return res;
                 case Operator.Operators.Division:
                     return $@"\frac{"{"+Parameter[0].ToLaTeX()+"}"}{"{"+Parameter[1].ToLaTeX()+"}"}";
