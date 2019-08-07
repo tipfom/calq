@@ -66,6 +66,11 @@ namespace Calq.Core
             }
         }
 
+        public override IEnumerable<string> GetVariableNames()
+        {
+            yield return Name;
+        }
+
         public override string ToString()
         {
             return Name;

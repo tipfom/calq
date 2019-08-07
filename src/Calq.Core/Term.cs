@@ -9,6 +9,8 @@ namespace Calq.Core
     {
         public abstract Expression Evaluate();
 
+        public abstract IEnumerable<string> GetVariableNames();
+
         public static Term TermFromMixedString(string s)
         {
             s = s.Replace(" ", "");

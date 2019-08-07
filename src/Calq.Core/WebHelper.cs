@@ -8,24 +8,24 @@ namespace Calq.Core
 {
     public static class WebHelper
     {
-        public static string GetIntegral(string prefixExpression, List<string> variables, string variable)
+        public static string GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
             return Request($"method=int&function={base64Expression}&vars={string.Join("&vars=", variables)}&delta={variable}");
         }
 
-        public static string GetIntegral(string prefixExpression, List<string> variables, string variable, string lowerLimit, string upperLimit)
+        public static string GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable, string lowerLimit, string upperLimit)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
             return Request($"method=int&function={base64Expression}&vars={string.Join("&vars=", variables)}&delta={variable}&lim1={lowerLimit}&lim2={upperLimit}");
         }
 
-        public static string GetLimit(string prefixExpression, List<string> variables, string argument, string valueApproaching)
+        public static string GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching)
         {
             return GetLimit(prefixExpression, variables, argument, valueApproaching, "+-");
         }
 
-        public static string GetLimit(string prefixExpression, List<string> variables, string argument, string valueApproaching, string direction)
+        public static string GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching, string direction)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
             return Request($"method=lim&function={base64Expression}&vars={string.Join("&vars=", variables)}&arg={argument}&lim={valueApproaching}&dir={((direction == "r") ? "1" : (direction == "l" ? "2" : "3"))}");
