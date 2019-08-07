@@ -9,14 +9,16 @@ namespace Calq.Core
     {
         public enum Operators
         {
+            //Infix
             Equals,
             Addition, Subtraktion,
             Multiplication, Division,
             Power,
 
+            //Prefix
             Sqrt, Log, Sin, Cos,
 
-            //PythonDinger
+            //Python-commands
             Lim, Int,
             Solve,
 
@@ -55,7 +57,6 @@ namespace Calq.Core
                 bool possible = true;
                 if (s.StartsWith(PrefixOperators[i]))
                 {
-
                     int bracketDepth = 0;
                     for(int j = PrefixOperators[i].Length; j < s.Length - 1; j++)
                     {
@@ -72,7 +73,6 @@ namespace Calq.Core
                     if (possible)
                     {
                         s = s.Substring(PrefixOperators[i].Length);
-                        s = s.Substring(1, s.Length - 2);
 
                         return new Function((Operators)(i + InfixOperators.Length), s.Split(',').Select(x => TermFromMixedString(x)).ToList());
                     }
@@ -93,7 +93,13 @@ namespace Calq.Core
 
                     if (s[j] == InfixOperators[i] && bracketDepth == 0)
                     {
-                        pos.Add(j);
+                        if(InfixOperators[i] == '-')
+                        {
+                            if(j > 0)
+                                if (!InfixOperators.Contains(s[j - 1]))
+                                    pos.Add(j);
+                        }
+                        else pos.Add(j);
                     }
                 }
 
@@ -111,6 +117,7 @@ namespace Calq.Core
                 }
             }
 
+            //5x or 0.5x
             const string numbers = "0123456789.";
             if (numbers.Contains(s[0]))
             {
@@ -124,6 +131,11 @@ namespace Calq.Core
 
                 if (s.Length > counter)
                     return new Function(Operators.Multiplication, new List<Term>(2) { new Variable(s.Substring(0, counter)), TermFromMixedString(s.Substring(counter)) });
+            }
+
+            if(s[0] == '-')
+            {
+                return new Function(Operators.Multiplication, new List<Term>(2) { new Variable("-1"), TermFromMixedString(s.Substring(1)) });
             }
 
             if (s[0] == '(' && s[s.Length - 1] == ')')
