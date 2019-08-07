@@ -49,7 +49,7 @@ namespace Calq.Core
         public static Function FunctionFromMixedString(string s)
         {
             List<Term> paras = new List<Term>();
-            
+
             for (int i = 0; i < PrefixOperators.Length; i++)
             {
                 bool possible = true;
@@ -109,6 +109,21 @@ namespace Calq.Core
 
                     return new Function((Operators)i, paras);
                 }
+            }
+
+            const string numbers = "0123456789.";
+            if (numbers.Contains(s[0]))
+            {
+                int counter = 1;
+                while (counter < s.Length)
+                {
+                    if (!numbers.Contains(s[counter])) break;
+
+                    counter++;
+                }
+
+                if (s.Length > counter)
+                    return new Function(Operators.Multiplication, new List<Term>(2) { new Variable(s.Substring(0, counter)), TermFromMixedString(s.Substring(counter)) });
             }
 
             if (s[0] == '(' && s[s.Length - 1] == ')')
@@ -267,6 +282,7 @@ namespace Calq.Core
             }
         }
 
+        //Returns prefixString
         public override string ToString()
         {
             if ((int)Name < InfixOperators.Length)
