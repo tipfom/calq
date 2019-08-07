@@ -10,8 +10,23 @@ namespace Calq
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string Expression { get; set; }
+        const string ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyz()π1234567890,.*/-+^{}";
 
+        private string _Expression;
+        public string Expression {
+            get { return _Expression; }
+            set {
+                foreach (char c in value)
+                {
+                    if (!ALLOWED_CHARACTERS.Contains(c.ToString()))
+                    {
+                        PropertyChanged.Invoke(this, new PropertyChangedEventArgs("Expression"));
+                        return;
+                    }
+                }
+                _Expression = value;
+            }
+        }
         public ObservableCollection<string> Log { get; set; } = new ObservableCollection<string>();
 
         public Command EvaluateExpressionCommand { get; private set; }
