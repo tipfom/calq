@@ -8,7 +8,7 @@ namespace Calq.Core
     public class Function : Term
     {
 
-        private static Operator[] InfixOperators = new Operator[]
+        private static readonly Operator[] InfixOperators = new Operator[]
         {
             new Operator(Operator.Operators.Equals, true, new string[]{"==", "="}, null),
             new Operator(Operator.Operators.Addition, true, new string[]{"+"}, null),
@@ -17,8 +17,7 @@ namespace Calq.Core
             new Operator(Operator.Operators.Division, true, new string[]{"/"}, null),
             new Operator(Operator.Operators.Power, true, new string[]{"^"}, null),
         };
-
-        private static Operator[] PrefixOperators = new Operator[]
+        private static readonly Operator[] PrefixOperators = new Operator[]
         {
             new Operator(Operator.Operators.Sqrt, false, new string[]{"sqrt"}, new List<int>(){ 1 }),
             new Operator(Operator.Operators.Log, false, new string[]{"ln"}, new List<int>(){ 1 }),
@@ -31,7 +30,6 @@ namespace Calq.Core
 
             new Operator(Operator.Operators.Solve, false, new string[]{"solve"}, new List<int>(){ 2 })
         };
-
 
         public readonly Operator Operator;
         public readonly List<Term> Parameter;
@@ -169,6 +167,73 @@ namespace Calq.Core
             }
 
             return null;
+        }
+
+        public override Expression GetAsExpression()
+        {
+            Expression buffer;
+            switch (Operator.Name)
+            {
+                case Operator.Operators.Equals:
+                    return Infix.Format(Parameter[0].Evaluate()) == Infix.Format(Parameter[1].Evaluate()) ? Expression.Symbol("True") : Expression.Symbol("False");
+
+                case Operator.Operators.Int:
+                    return Expression.Symbol(ToString());
+                case Operator.Operators.Lim:
+                    return Expression.Symbol(ToString());
+                case Operator.Operators.Solve:
+                    return Expression.Symbol(ToString());
+
+                case Operator.Operators.Addition:
+                    buffer = Parameter[0].GetAsExpression();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer += Parameter[i].GetAsExpression();
+                    return buffer;
+                case Operator.Operators.Subtraktion:
+                    buffer = Parameter[0].GetAsExpression();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer -= Parameter[i].GetAsExpression();
+                    return buffer;
+                case Operator.Operators.Multiplication:
+                    buffer = Parameter[0].GetAsExpression();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer *= Parameter[i].GetAsExpression();
+                    return buffer;
+                case Operator.Operators.Division:
+                    buffer = Parameter[0].GetAsExpression();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer /= Parameter[i].GetAsExpression();
+                    return buffer;
+                case Operator.Operators.Power:
+                    buffer = Parameter[0].GetAsExpression();
+                    for (int i = 1; i < Parameter.Count; i++)
+                        buffer = Expression.Pow(buffer, Parameter[i].GetAsExpression());
+                    return buffer;
+
+                case Operator.Operators.Sqrt:
+                    return Expression.Sqrt(Parameter[0].GetAsExpression());
+                case Operator.Operators.Log:
+                    if (Parameter.Count == 1) return Expression.Ln(Parameter[0].GetAsExpression());
+                    else return Expression.Log(Parameter[0].GetAsExpression(), Parameter[1].GetAsExpression());
+                case Operator.Operators.Sin:
+                    return Expression.Sin(Parameter[0].GetAsExpression());
+                case Operator.Operators.Cos:
+                    return Expression.Cos(Parameter[0].GetAsExpression());
+            }
+
+            return null;
+        }
+
+        public override string GetInfix()
+        {
+            if (Operator.IsInfix)
+            {
+                return string.Join(Operator.StringRep[0], Parameter.Select(x => x.GetInfix()));
+            }
+            else
+            {
+                return Operator.StringRep[0] +  "(" + string.Join(",", Parameter.Select(x => x.GetInfix())) + ")";
+            }
         }
 
         public override IEnumerable<string> GetVariableNames()

@@ -43,7 +43,7 @@ namespace Calq
                 if (Term.CheckBracketCount(Expression))
                 {
                     Term t = Term.TermFromMixedString(Expression);
-                    var exp = Infix.ParseOrThrow(Infix.Format(t.Evaluate()));
+                    var exp = t.GetAsExpression();
                     Log.Add($"\"{Expression}\": {Infix.Format(exp)}");
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");

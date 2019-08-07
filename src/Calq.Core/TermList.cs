@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MathNet.Symbolics;
 
@@ -46,6 +47,16 @@ namespace Calq.Core
         public override Expression Evaluate()
         {
             throw new NotEvaluateableException("Lists cant be evaluated (yet)");
+        }
+
+        public override Expression GetAsExpression()
+        {
+            return Expression.Symbol(ToString());
+        }
+
+        public override string GetInfix()
+        {
+            return "{" + string.Join(",", terms.Select(x => x.GetInfix())) + "}";
         }
 
         public override IEnumerable<string> GetVariableNames()

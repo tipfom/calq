@@ -8,7 +8,8 @@ namespace Calq.Core
     public abstract class Term
     {
         public abstract Expression Evaluate();
-
+        public abstract Expression GetAsExpression();
+        public abstract string GetInfix();
         public abstract IEnumerable<string> GetVariableNames();
 
         public static bool CheckBracketCount(string s)
