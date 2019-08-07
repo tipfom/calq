@@ -28,7 +28,8 @@ namespace Calq.Core
             new Operator(Operator.Operators.Lim, false, new string[]{ "limes", "lim" }, new List<int>(){ 3, 4 }),
             new Operator(Operator.Operators.Int, false, new string[]{ "∫", "integral", "int", }, new List<int>(){ 2, 4 }),
 
-            new Operator(Operator.Operators.Solve, false, new string[]{"solve"}, new List<int>(){ 2 })
+            new Operator(Operator.Operators.Solve, false, new string[]{"solve"}, new List<int>(){ 2 }),
+            new Operator(Operator.Operators.Erf, false, new string[]{"erf"}, new List<int>(){ 2 })
         };
 
         public readonly Operator Operator;
