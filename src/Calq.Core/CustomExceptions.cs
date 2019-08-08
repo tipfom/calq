@@ -15,7 +15,7 @@ namespace Calq.Core
     public class MissingArgumentException : Exception
     {
         public MissingArgumentException(string message) : base(message)
-        {
+        {   
 
         }
     }

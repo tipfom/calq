@@ -6,12 +6,20 @@ namespace Calq.Core
 {
     public abstract class Term : IComparable<Term>
     {
+        [Flags]
+        public enum TermTag
+        {
+            None = 0,
+            Inverse = 1,
+        }
+
         public enum TermType
         {
             Symbol, Function, TermList, Vector
         }
 
         public TermType Type;
+        public TermTag Tag;
 
         protected Term(TermType type)
         {
@@ -44,7 +52,7 @@ namespace Calq.Core
                 {
                     if (brackets.Count == 0) return false;
 
-                    if(s[i] == ')')
+                    if (s[i] == ')')
                     {
                         if (brackets.Pop() != '(') return false;
                     }
@@ -64,17 +72,55 @@ namespace Calq.Core
 
         public static Term operator +(Term a, Term b)
         {
-            return new Addition(a, b);
+            List<Term> r = new List<Term>();
+
+            Addition cast_a = a as Addition;
+            if (cast_a != null)
+                r.AddRange(cast_a.Parameters);
+            else
+                r.Add(a);
+
+            Addition cast_b = b as Addition;
+            if (cast_b != null)
+                r.AddRange(cast_b.Parameters);
+            else
+                r.Add(b);
+
+
+            return new Addition(r.ToArray());
         }
 
         public static Term operator -(Term a, Term b)
         {
-            return new Substraction(a, b);
+            if (b.Tag.HasFlag(TermTag.Inverse)) b.Tag &= ~TermTag.Inverse;
+            else b.Tag |= TermTag.Inverse;
+            return a + b;
         }
 
         public static Term operator *(Term a, Term b)
         {
+            List<Term> r = new List<Term>();
+
+            Multiplication cast_a = a as Multiplication;
+            if (cast_a != null)
+                r.AddRange(cast_a.Parameters);
+            else
+                r.Add(a);
+
+            Multiplication cast_b = b as Multiplication;
+            if (cast_b != null)
+                r.AddRange(cast_b.Parameters);
+            else
+                r.Add(b);
+
             return new Multiplication(a, b);
+        }
+
+        public static Term operator /(Term a, Term b)
+        {
+            if (b.Tag.HasFlag(TermTag.Inverse)) b.Tag &= ~TermTag.Inverse;
+            else b.Tag |= TermTag.Inverse;
+            return a * b;
         }
 
         //public static Term operator -(Term a)

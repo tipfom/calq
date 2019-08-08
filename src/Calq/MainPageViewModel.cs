@@ -49,7 +49,7 @@ namespace Calq
             {
                 if (Term.CheckBracketCount(Expression))
                 {
-                    Term t = new Real(1) + new Real(2);
+                    Term t = new Real(1) - new Real(1) + new Real(2) - new Real(3) + new Real(5);
                     string expLat = t.ToLaTeX();
                     t = t.Evaluate();
 

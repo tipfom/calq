@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Calq.Core
+﻿namespace Calq.Core
 {
     public class Addition : Function
     {
