@@ -7,7 +7,7 @@ namespace Calq.Core
 {
     public abstract class Term
     {
-        public abstract Expression Evaluate();
+        public abstract Term Evaluate();
         public abstract Expression GetAsExpression();
         public abstract string ToInfix();
         public abstract IEnumerable<string> GetVariableNames();

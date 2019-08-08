@@ -12,7 +12,7 @@ namespace Calq.Core
         {
             //Infix
             Equals,
-            Addition, Subtraktion,
+            Addition, Subtraction,
             Multiplication, Division,
             Power,
 

@@ -7,21 +7,23 @@ namespace Calq.Core
 {
     public class Function : Term
     {
-        public static Operator Add { get { return InfixOperators[1]; } }
-        public static Operator Sub { get { return InfixOperators[2]; } }
-        public static Operator Mul { get { return InfixOperators[3]; } }
-        public static Operator Div { get { return InfixOperators[4]; } }
-        public static Operator Pow { get { return InfixOperators[5]; } }
-        
-        public static Operator Log { get { return PrefixOperators[1]; } }
-        public static Operator Sin { get { return PrefixOperators[3]; } }
-        public static Operator Cos { get { return PrefixOperators[4]; } }
+        private static Operator Add { get { return InfixOperators[1]; } }
+        private static Operator Sub { get { return InfixOperators[2]; } }
+        private static Operator Mul { get { return InfixOperators[3]; } }
+        private static Operator Div { get { return InfixOperators[4]; } }
+        private static Operator Pow { get { return InfixOperators[5]; } }
+
+
+        private static Operator Sqrt { get { return PrefixOperators[0]; } }
+        private static Operator Log { get { return PrefixOperators[1]; } }
+        private static Operator Sin { get { return PrefixOperators[3]; } }
+        private static Operator Cos { get { return PrefixOperators[4]; } }
 
         private static readonly Operator[] InfixOperators = new Operator[]
         {
             new Operator(Operator.Operators.Equals, true, new string[]{"==", "="}, null),
             new Operator(Operator.Operators.Addition, true, new string[]{"+"}, null),
-            new Operator(Operator.Operators.Subtraktion, true, new string[]{"-"}, null),
+            new Operator(Operator.Operators.Subtraction, true, new string[]{"-"}, null),
             new Operator(Operator.Operators.Multiplication, true, new string[]{"*"}, null),
             new Operator(Operator.Operators.Division, true, new string[]{"/"}, null),
             new Operator(Operator.Operators.Power, true, new string[]{"^"}, null),
@@ -105,13 +107,12 @@ namespace Calq.Core
             return null;
         }
 
-        public override Expression Evaluate()
+        public override Term Evaluate()
         {
-            Expression buffer;
             switch (Operator.Name)
             {
                 case Operator.Operators.Equals:
-                    return Infix.Format(Parameter[0].Evaluate()) == Infix.Format(Parameter[1].Evaluate()) ? Expression.Symbol("True") : Expression.Symbol("False");
+                //    return Infix.Format(Parameter[0].Evaluate()) == Infix.Format(Parameter[1].Evaluate()) ? Expression.Symbol("True") : Expression.Symbol("False");
 
                 case Operator.Operators.Int:
                     // TODO:
@@ -121,14 +122,14 @@ namespace Calq.Core
                     {
                         string pExpr;
                         WebHelper.GetIntegral(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^"));
                     }
                     else if (Parameter.Count == 4)
                     {
 
                         string pExpr;
                         WebHelper.GetIntegral(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^"));
                     }
                     return null;
                 case Operator.Operators.Lim:
@@ -136,55 +137,77 @@ namespace Calq.Core
                     {
                         string pExpr;
                         WebHelper.GetLimit(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^"));
                     }
                     else if (Parameter.Count == 4)
                     {
 
                         string pExpr;
                         WebHelper.GetLimit(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^"));
                     }
                     return null;
                 case Operator.Operators.Solve:
-                    //python stuff
+                    if (Parameter.Count == 2)
+                    {
+                        List<string> stringExpressions = new List<string>();
+                        List<string> variables = new List<string>();
+                        List<string> solveFors = new List<string>();
+                        if (Parameter[0].GetType() == typeof(TermList))
+                        {
+                            TermList termList = Parameter[0] as TermList;
+                            foreach (Term t in termList.Terms)
+                            {
+                                stringExpressions.Add(t.ToString());
+                                variables.AddRange(t.GetVariableNames());
+                            }
+                        }
+                        else
+                        {
+                            stringExpressions.Add(Parameter[0].ToString());
+                            variables.AddRange(Parameter[0].GetVariableNames());
+                        }
+
+                        if (Parameter[1].GetType() == typeof(TermList))
+                        {
+                            TermList termList = Parameter[1] as TermList;
+                            foreach (Term t in termList.Terms)
+                            {
+                                solveFors.Add(t.ToString());
+                            }
+                        }
+                        else
+                        {
+                            solveFors.Add(Parameter[1].ToString());
+                        }
+
+
+                        string pExpr;
+                        WebHelper.GetSolve(stringExpressions, variables.Distinct(), solveFors, out pExpr);
+                        System.Diagnostics.Debug.Print(pExpr);
+                        var pExpr2 = pExpr.Replace(" ","").Replace("[(", "{{").Replace(")]", "}}").Replace("),(", "},{");
+                        return TermFromMixedString(pExpr2);
+                    }
                     return null;
 
                 case Operator.Operators.Addition:
-                    buffer = Parameter[0].Evaluate();
-                    for (int i = 1; i < Parameter.Count; i++)
-                        buffer += Parameter[i].Evaluate();
-                    return buffer;
-                case Operator.Operators.Subtraktion:
-                    buffer = Parameter[0].Evaluate();
-                    for (int i = 1; i < Parameter.Count; i++)
-                        buffer -= Parameter[i].Evaluate();
-                    return buffer;
+                    return new Function(Function.Add, Parameter.Select(x => x.Evaluate()).ToList());
+                case Operator.Operators.Subtraction:
+                    return new Function(Function.Sub, Parameter.Select(x => x.Evaluate()).ToList());
                 case Operator.Operators.Multiplication:
-                    buffer = Parameter[0].Evaluate();
-                    for (int i = 1; i < Parameter.Count; i++)
-                        buffer *= Parameter[i].Evaluate();
-                    return buffer;
+                    return new Function(Function.Mul, Parameter.Select(x => x.Evaluate()).ToList());
                 case Operator.Operators.Division:
-                    buffer = Parameter[0].Evaluate();
-                    for (int i = 1; i < Parameter.Count; i++)
-                        buffer /= Parameter[i].Evaluate();
-                    return buffer;
+                    return new Function(Function.Div, Parameter.Select(x => x.Evaluate()).ToList());
                 case Operator.Operators.Power:
-                    buffer = Parameter[0].Evaluate();
-                    for (int i = 1; i < Parameter.Count; i++)
-                        buffer = Expression.Pow(buffer, Parameter[i].Evaluate());
-                    return buffer;
-
+                    return new Function(Function.Pow, Parameter.Select(x => x.Evaluate()).ToList());
                 case Operator.Operators.Sqrt:
-                    return Expression.Sqrt(Parameter[0].Evaluate());
+                    return new Function(Function.Sqrt, Parameter.Select(x => x.Evaluate()).ToList());
                 case Operator.Operators.Log:
-                    if (Parameter.Count == 1) return Expression.Ln(Parameter[0].Evaluate());
-                    else return Expression.Log(Parameter[0].Evaluate(), Parameter[1].Evaluate());
+                    return new Function(Function.Log, Parameter.Select(x => x.Evaluate()).ToList());
                 case Operator.Operators.Sin:
-                    return Expression.Sin(Parameter[0].Evaluate());
+                    return new Function(Function.Sin, Parameter.Select(x => x.Evaluate()).ToList());
                 case Operator.Operators.Cos:
-                    return Expression.Cos(Parameter[0].Evaluate());
+                    return new Function(Function.Cos, Parameter.Select(x => x.Evaluate()).ToList());
             }
 
             return null;
@@ -196,7 +219,7 @@ namespace Calq.Core
             switch (Operator.Name)
             {
                 case Operator.Operators.Equals:
-                    return Infix.Format(Parameter[0].Evaluate()) == Infix.Format(Parameter[1].Evaluate()) ? Expression.Symbol("True") : Expression.Symbol("False");
+                    return Infix.Format(Parameter[0].GetAsExpression()) == Infix.Format(Parameter[1].GetAsExpression()) ? Expression.Symbol("True") : Expression.Symbol("False");
 
                 case Operator.Operators.Int:
                     return Expression.Symbol(ToInfix());
@@ -206,7 +229,7 @@ namespace Calq.Core
                     return Expression.Symbol(ToInfix());
 
                 case Operator.Operators.Differentiate:
-                    if(Parameter.Count == 2) return Parameter[0].Differentiate(Parameter[1].ToString()).GetAsExpression();
+                    if (Parameter.Count == 2) return Parameter[0].Differentiate(Parameter[1].ToString()).GetAsExpression();
                     else
                     {
                         Term t = Parameter[0];
@@ -216,13 +239,13 @@ namespace Calq.Core
 
                         return t.GetAsExpression();
                     }
-                    
+
                 case Operator.Operators.Addition:
                     buffer = Parameter[0].GetAsExpression();
                     for (int i = 1; i < Parameter.Count; i++)
                         buffer += Parameter[i].GetAsExpression();
                     return buffer;
-                case Operator.Operators.Subtraktion:
+                case Operator.Operators.Subtraction:
                     buffer = Parameter[0].GetAsExpression();
                     for (int i = 1; i < Parameter.Count; i++)
                         buffer -= Parameter[i].GetAsExpression();
@@ -287,7 +310,7 @@ namespace Calq.Core
             {
                 case Operator.Operators.Addition:
                     return new Function(Operator, Parameter.Select(x => x.Differentiate(argument)).ToList());
-                case Operator.Operators.Subtraktion:
+                case Operator.Operators.Subtraction:
                     return new Function(Operator, Parameter.Select(x => x.Differentiate(argument)).ToList());
 
                 case Operator.Operators.Multiplication:
@@ -390,19 +413,39 @@ namespace Calq.Core
                     {
                         // TODO : +-
                         string dirLatex = Parameter[3].ToLaTeX() == "l" ? "^{-}" : ((Parameter[3].ToLaTeX() == "r") ? "^{+}" : "");
-                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()} \to {Parameter[2].ToLaTeX() +dirLatex+"}"} {Parameter[0].ToLaTeX()}";
+                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()} \to {Parameter[2].ToLaTeX() + dirLatex + "}"} {Parameter[0].ToLaTeX()}";
                     }
                     return null;
                 case Operator.Operators.Solve:
-                    //python stuff
-                    return null;
+                    string solveString = "";
+                    if (Parameter[0].GetType() == typeof(TermList))
+                    {
+                        TermList termList = Parameter[0] as TermList;
+                        solveString = string.Join(@"\\", termList.Terms.Select(x => x.ToLaTeX() + " = 0"));
+                    }
+                    else
+                    {
+                        solveString = Parameter[0].ToLaTeX();
+                    }
+                    string solveForString = "";
+                    if (Parameter[1].GetType() == typeof(TermList))
+                    {
+                        TermList termList = Parameter[1] as TermList;
+                        solveForString = string.Join(@",", termList.Terms.Select(x => x.ToLaTeX()));
+                    }
+                    else
+                    {
+                        solveForString = Parameter[1].ToLaTeX();
+                    }
+
+                    return @"solve \: { \begin{cases} " + solveString + @" \end{cases} } \;\;for\: (" + solveForString + ")";
 
                 case Operator.Operators.Addition:
                     string res = Parameter[0].ToLaTeX();
                     for (int i = 1; i < Parameter.Count; i++)
                         res += "+" + Parameter[i].ToLaTeX();
                     return res;
-                case Operator.Operators.Subtraktion:
+                case Operator.Operators.Subtraction:
                     res = Parameter[0].ToLaTeX();
                     for (int i = 1; i < Parameter.Count; i++)
                         res += "-" + Parameter[i].ToLaTeX();
@@ -438,10 +481,10 @@ namespace Calq.Core
                 case Operator.Operators.Cos:
                     return $@"\cos ({Parameter[0].ToLaTeX()})";
                 case Operator.Operators.Differentiate:
-                    if(Parameter.Count == 2)
+                    if (Parameter.Count == 2)
                         return @"\frac{d" + Parameter[0].ToLaTeX() + "}{d" + Parameter[1].ToLaTeX() + "}";
-                    else 
-                        return @"\frac{d^" + Parameter[2].ToLaTeX()+ " " + Parameter[0].ToLaTeX() + "}{d" + Parameter[1].ToLaTeX() + "^"+ Parameter[2].ToLaTeX() + "}";
+                    else
+                        return @"\frac{d^" + Parameter[2].ToLaTeX() + " " + Parameter[0].ToLaTeX() + "}{d" + Parameter[1].ToLaTeX() + "^" + Parameter[2].ToLaTeX() + "}";
             }
 
             return null;
