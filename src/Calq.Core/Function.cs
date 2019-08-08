@@ -14,6 +14,8 @@ namespace Calq.Core
         private static Operator Pow { get { return InfixOperators[5]; } }
 
         private static Operator Log { get { return PrefixOperators[1]; } }
+        private static Operator Sin { get { return PrefixOperators[3]; } }
+        private static Operator Cos { get { return PrefixOperators[4]; } }
 
         private static readonly Operator[] InfixOperators = new Operator[]
         {
@@ -204,7 +206,7 @@ namespace Calq.Core
                     return Expression.Symbol(ToInfix());
 
                 case Operator.Operators.Differentiate:
-                    return Parameter[1].Differentiate(Parameter[0].ToString()).GetAsExpression();
+                    return Parameter[0].Differentiate(Parameter[1].ToString()).GetAsExpression();
                 case Operator.Operators.Addition:
                     buffer = Parameter[0].GetAsExpression();
                     for (int i = 1; i < Parameter.Count; i++)
@@ -309,16 +311,11 @@ namespace Calq.Core
                     }
 
                     ret = new Function(Div, new List<Term>());
-                    ret.Parameter.Add(new Function(Sub, new List<Term>(2)
-                    {
-                        new Function(Mul, new List<Term>(2) { Parameter[0].Differentiate(argument), g}),
-                        new Function(Mul, new List<Term>(2) { Parameter[0], g.Differentiate(argument)})
-                    }));
-                    ret.Parameter.Add(new Function(Pow, new List<Term>(2)
-                    {
-                        Parameter[1],
-                        new Variable("2")
-                    }));
+                    ret.Parameter.Add(new Function(Sub,
+                        new Function(Mul, Parameter[0].Differentiate(argument), g),
+                        new Function(Mul, Parameter[0], g.Differentiate(argument))
+                    ));
+                    ret.Parameter.Add(new Function(Pow, Parameter[1], new Variable("2")));
 
                     return ret;
                 case Operator.Operators.Power:
@@ -345,6 +342,17 @@ namespace Calq.Core
                         new Function(Mul, t, new Function(Log, t), g.Differentiate(argument))));
 
                     return ret;
+                case Operator.Operators.Sin:
+                    return new Function(Mul, Parameter[0].Differentiate(argument),
+                        new Function(Cos, Parameter[0]));
+                case Operator.Operators.Cos:
+                    return new Function(Mul, Parameter[0].Differentiate(argument),
+                        new Function(Sub, new Variable("0"), new Function(Sin, Parameter[0])));
+                case Operator.Operators.Log:
+                    return new Function(Div, Parameter[0].Differentiate(argument), Parameter[0]);
+
+                case Operator.Operators.Differentiate:
+                    return Parameter[0].Differentiate(Parameter[1].ToString()).Differentiate(argument);
             }
 
             return null;
@@ -432,6 +440,8 @@ namespace Calq.Core
                     return $@"\sin ({Parameter[0].ToLaTeX()})";
                 case Operator.Operators.Cos:
                     return $@"\cos ({Parameter[0].ToLaTeX()})";
+                case Operator.Operators.Differentiate:
+                    return @"\frac{d" + Parameter[0].ToLaTeX() + "}{d" + Parameter[1].ToLaTeX() + "}";
             }
 
             return null;
