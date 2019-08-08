@@ -8,17 +8,17 @@ namespace Calq.Core
 {
     class TermList : Term
     {
-        List<Term> terms;
+        public List<Term> Terms;
 
 
         public TermList(List<Term> terms)
         {
-            this.terms = terms;
+            this.Terms = terms;
         }
 
         public TermList(string s)
         {
-            terms = new List<Term>();
+            Terms = new List<Term>();
             s = s.Substring(1, s.Length - 2);
 
             List<int> splits = new List<int>();
@@ -39,7 +39,7 @@ namespace Calq.Core
 
             for (int j = 1; j < splits.Count; j++)
             {
-                terms.Add(TermFromMixedString(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1)));
+                Terms.Add(TermFromMixedString(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1)));
             }
             
         }
@@ -56,12 +56,12 @@ namespace Calq.Core
 
         public override string ToInfix()
         {
-            return "{" + string.Join(",", terms.Select(x => x.ToInfix())) + "}";
+            return "{" + string.Join(",", Terms.Select(x => x.ToInfix())) + "}";
         }
 
         public override IEnumerable<string> GetVariableNames()
         {
-            foreach (Term param in terms)
+            foreach (Term param in Terms)
             {
                 foreach (string variable in param.GetVariableNames())
                     yield return variable;
@@ -70,7 +70,7 @@ namespace Calq.Core
 
         public override string ToString()
         {
-            return "{" + string.Join(",", terms) + "}";
+            return "{" + string.Join(",", Terms) + "}";
         }
 
         public override Term Differentiate(string argument)

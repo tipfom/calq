@@ -74,11 +74,11 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.replyResult(limitExpression(txt_expression, txt_variables, txt_argument, txt_value, txt_dir))
     
             elif params["method"][0] == "sol":
-                if not params.__contains__("expr")  or not params.__contains__("var") or not params.__contains__("arg") or len(params["arg"]) != 1 or not params.__contains__("val") or len(params["val"]) != 1 or not params.__contains__("solve"):
+                if not params.__contains__("expr")  or not params.__contains__("var") or not params.__contains__("solve"):
                     return self.replyError("invalid parameters for limit")
                 
                 txts_expression = []
-                for func in params["function"]:
+                for func in params["expr"]:
                     txts_expression.append(base64.b64decode(func.encode()).decode("utf-8"))
                 txt_variables = params["var"]
                 txt_solve = params["solve"]

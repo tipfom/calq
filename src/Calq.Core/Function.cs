@@ -145,7 +145,44 @@ namespace Calq.Core
                     }
                     return null;
                 case Operator.Operators.Solve:
-                    //python stuff
+                    if (Parameter.Count == 2)
+                    {
+                        List<string> stringExpressions = new List<string>();
+                        List<string> variables = new List<string>();
+                        List<string> solveFors = new List<string>();
+                        if (Parameter[0].GetType() == typeof(TermList))
+                        {
+                            TermList termList = Parameter[0] as TermList;
+                            foreach (Term t in termList.Terms)
+                            {
+                                stringExpressions.Add(t.ToString());
+                                variables.AddRange(t.GetVariableNames());
+                            }
+                        }
+                        else
+                        {
+                            stringExpressions.Add(Parameter[0].ToString());
+                            variables.AddRange(Parameter[0].GetVariableNames());
+                        }
+
+                        if (Parameter[1].GetType() == typeof(TermList))
+                        {
+                            TermList termList = Parameter[1] as TermList;
+                            foreach (Term t in termList.Terms)
+                            {
+                                solveFors.Add(t.ToString());
+                            }
+                        }
+                        else
+                        {
+                            solveFors.Add(Parameter[1].ToString());
+                        }
+
+
+                        string pExpr;
+                        WebHelper.GetSolve(stringExpressions, variables.Distinct(), solveFors, out pExpr);
+                        System.Diagnostics.Debug.Print(pExpr);
+                    }
                     return null;
 
                 case Operator.Operators.Addition:
@@ -386,11 +423,11 @@ namespace Calq.Core
                     {
                         // TODO : +-
                         string dirLatex = Parameter[3].ToLaTeX() == "l" ? "^{-}" : ((Parameter[3].ToLaTeX() == "r") ? "^{+}" : "");
-                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()} \to {Parameter[2].ToLaTeX() +dirLatex+"}"} {Parameter[0].ToLaTeX()}";
+                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()} \to {Parameter[2].ToLaTeX() + dirLatex + "}"} {Parameter[0].ToLaTeX()}";
                     }
                     return null;
                 case Operator.Operators.Solve:
-                    //python stuff
+
                     return null;
 
                 case Operator.Operators.Addition:
