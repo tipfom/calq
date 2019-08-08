@@ -119,14 +119,14 @@ namespace Calq.Core
                     {
                         string pExpr;
                         WebHelper.GetIntegral(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
                     }
                     else if (Parameter.Count == 4)
                     {
 
                         string pExpr;
                         WebHelper.GetIntegral(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
                     }
                     return null;
                 case Operator.Operators.Lim:
@@ -134,14 +134,14 @@ namespace Calq.Core
                     {
                         string pExpr;
                         WebHelper.GetLimit(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
                     }
                     else if (Parameter.Count == 4)
                     {
 
                         string pExpr;
                         WebHelper.GetLimit(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
-                        return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
+                        return TermFromMixedString(pExpr.Replace("**", "^")).Evaluate();
                     }
                     return null;
                 case Operator.Operators.Solve:
