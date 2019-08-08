@@ -72,6 +72,11 @@ namespace Calq.Core
             return new Substraction(a, b);
         }
 
+        public static Term operator *(Term a, Term b)
+        {
+            return new Multiplication(a, b);
+        }
+
         //public static Term operator -(Term a)
         //{
         //    return new Symbol(-1) * a;
