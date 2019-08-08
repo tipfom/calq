@@ -105,13 +105,13 @@ namespace Calq.Core
                     if(Parameter.Count == 2)
                     {
                         string pExpr;
-                        WebHelper.GetIntegral(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString(), out pExpr);
+                        WebHelper.GetIntegral(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), out pExpr);
                         return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
                     } else if (Parameter.Count == 4)
                     {
 
                         string pExpr;
-                        WebHelper.GetIntegral(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
+                        WebHelper.GetIntegral(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
                         return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
                     }
                     return null;
@@ -119,14 +119,14 @@ namespace Calq.Core
                     if (Parameter.Count == 3)
                     {
                         string pExpr;
-                        WebHelper.GetLimit(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), out pExpr);
+                        WebHelper.GetLimit(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), out pExpr);
                         return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
                     }
                     else if (Parameter.Count == 4)
                     {
 
                         string pExpr;
-                        WebHelper.GetLimit(Parameter[0].ToString(), Parameter[0].GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
+                        WebHelper.GetLimit(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), Parameter[2].ToString(), Parameter[3].ToString(), out pExpr);
                         return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
                     }
                     return null;
