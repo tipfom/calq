@@ -37,7 +37,8 @@ namespace Calq
         public MainPageViewModel()
         {
             EvaluateExpressionCommand = new Command(EvaluateExpression);
-            WebHelper.IsOnlineChanged += () => {
+            WebHelper.IsOnlineChanged += () =>
+            {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineText"));
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineColor"));
             };
@@ -49,7 +50,7 @@ namespace Calq
             {
                 if (Term.CheckBracketCount(Expression))
                 {
-                    Term t = new Real(1) - new Real(1) + new Real(2) - new Real(3) + new Real(5) * new Real(10) / new Real(9);
+                    Term t = new Real(1) - new Real(1) + new Real(2) - new Real(3) + new Real(5) * new Real(10) / new Real(9) - new Real(3) / (new Variable("x") ^ new Real(4));
                     string expLat = t.ToString();
                     t = t.Evaluate();
 
@@ -60,11 +61,11 @@ namespace Calq
                     Log.Insert(0, new Logging.ErrorResult() { ErrorMessage = "Bracket Missmatch" });
                 }
             }
-            catch(InvalidParameterCountException e)
+            catch (InvalidParameterCountException e)
             {
                 Log.Insert(0, new Logging.ErrorResult() { ErrorMessage = "Invalid parameter count at " + e.Message });
             }
-            catch(MissingArgumentException)
+            catch (MissingArgumentException)
             {
                 Log.Insert(0, new Logging.ErrorResult() { ErrorMessage = "Missing Argument" });
             }

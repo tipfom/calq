@@ -92,9 +92,7 @@ namespace Calq.Core
 
         public static Term operator -(Term a, Term b)
         {
-            if (b.Tag.HasFlag(TermTag.Inverse)) b.Tag &= ~TermTag.Inverse;
-            else b.Tag |= TermTag.Inverse;
-            return a + b;
+            return a + -b;
         }
 
         public static Term operator *(Term a, Term b)
@@ -121,6 +119,19 @@ namespace Calq.Core
             if (b.Tag.HasFlag(TermTag.Inverse)) b.Tag &= ~TermTag.Inverse;
             else b.Tag |= TermTag.Inverse;
             return a * b;
+
+        }
+
+        public static Term operator -(Term a)
+        {
+            if (a.Tag.HasFlag(TermTag.Inverse)) a.Tag &= ~TermTag.Inverse;
+            else a.Tag |= TermTag.Inverse;
+            return a;
+        }
+
+        public static Term operator ^(Term a, Term b)
+        {
+            return new Power(a, b);
         }
 
         //public static Term operator -(Term a)
