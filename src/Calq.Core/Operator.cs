@@ -17,7 +17,7 @@ namespace Calq.Core
             Power,
 
             //Prefix
-            Sqrt, Log, Sin, Cos,
+            Sqrt, Log, Sin, Cos, Differentiate,
 
             //Python-commands
             Lim, Int,

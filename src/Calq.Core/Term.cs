@@ -11,10 +11,17 @@ namespace Calq.Core
         public abstract Expression GetAsExpression();
         public abstract string ToInfix();
         public abstract IEnumerable<string> GetVariableNames();
+        public abstract Term Differentiate(string argument);
 
         public abstract string ToLaTeX();
         public static bool CheckBracketCount(string s)
         {
+            if (s == null)
+                throw new MissingArgumentException("");
+            s = s.Replace(" ", "");
+            if (s == "")
+                throw new MissingArgumentException("");
+
             Stack<char> brackets = new Stack<char>();
             for (int i = 0; i < s.Length; i++)
             {

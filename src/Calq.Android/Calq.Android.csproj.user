@@ -2,7 +2,7 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AndroidDesignerPreferredTheme>Theme.AppCompat.Light.NoActionBar</AndroidDesignerPreferredTheme>
-    <SelectedDevice>Nexus_5_API_26</SelectedDevice>
+    <SelectedDevice>OnePlus A6003</SelectedDevice>
     <DefaultDevice>Nexus_5_API_26</DefaultDevice>
   </PropertyGroup>
 </Project>

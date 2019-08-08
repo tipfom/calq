@@ -73,6 +73,10 @@ namespace Calq.Core
             return "{" + string.Join(",", terms) + "}";
         }
 
+        public override Term Differentiate(string argument)
+        {
+            throw new NotImplementedException();
+        }
         public override string ToLaTeX()
         {
             throw new NotImplementedException();

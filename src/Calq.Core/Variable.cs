@@ -86,6 +86,11 @@ namespace Calq.Core
             return Name;
         }
 
+        public override Term Differentiate(string argument)
+        {
+            if (Name == argument) return new Variable("1");
+            else return new Variable("0");
+        }
         public override string ToLaTeX()
         {
             return Name;
