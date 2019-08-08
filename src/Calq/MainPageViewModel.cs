@@ -55,14 +55,13 @@ namespace Calq
                     var exp = t.GetAsExpression();
                     if (WebHelper.IsOnline)
                     {
-                        t = Term.TermFromMixedString(Infix.Format(exp));
-                        exp = t.Evaluate();
+                        t = Term.TermFromMixedString(Infix.Format(exp)).Evaluate();
                     }
-
+                    exp = t.GetAsExpression();
                     string normal = Infix.Format(exp);
                     string expandet = Infix.Format(Algebraic.Expand(exp));
 
-                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX() });
+                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });
                 }
                 else
                 {

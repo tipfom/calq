@@ -44,9 +44,9 @@ namespace Calq.Core
             
         }
 
-        public override Expression Evaluate()
+        public override Term Evaluate()
         {
-            throw new NotEvaluateableException("Lists cant be evaluated (yet)");
+            return this;
         }
 
         public override Expression GetAsExpression()
@@ -79,7 +79,7 @@ namespace Calq.Core
         }
         public override string ToLaTeX()
         {
-            throw new NotImplementedException();
+            return @"\{" + string.Join(", ", Terms.Select(t => t.ToLaTeX())) + @"\}";
         }
     }
 }

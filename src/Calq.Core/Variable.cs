@@ -23,7 +23,8 @@ namespace Calq.Core
             { "pi", VarType.Pi },
             { "π", VarType.Euler },
 
-            { "i", VarType.Euler },
+            { "i", VarType.Imaginary },
+            { "I", VarType.Imaginary },
 
             { "oo", VarType.PositiveInfinity },
             { "pinf", VarType.PositiveInfinity },
@@ -61,7 +62,12 @@ namespace Calq.Core
             
         }
 
-        public override Expression Evaluate()
+        public override Term Evaluate()
+        {
+            return this;
+        }
+
+        public override Expression GetAsExpression()
         {
             switch (Type)
             {
@@ -74,11 +80,6 @@ namespace Calq.Core
                 case VarType.Double: return Expression.Real(double.Parse(Name));
                 default: return Expression.Symbol(Name);
             }
-        }
-
-        public override Expression GetAsExpression()
-        {
-            return Evaluate();
         }
 
         public override IEnumerable<string> GetVariableNames()
@@ -103,6 +104,7 @@ namespace Calq.Core
         }
         public override string ToLaTeX()
         {
+            if (Type == VarType.Imaginary) return @"i";
             return Name;
         }
     }
