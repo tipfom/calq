@@ -50,7 +50,9 @@ namespace Calq
             {
                 if (Term.CheckBracketCount(Expression))
                 {
-                    Term t = new Real(1) - new Real(1) + new Real(2) - new Real(3) + new Real(5) * new Real(10) / new Real(9) - new Real(3) / (new Variable("x") ^ new Real(4));
+                    var x = new Variable("x");
+                    Term t = new Logarithm(x) / x;
+                    var k2 = t.Differentiate("x");
                     string expLat = t.ToString();
                     t = t.Evaluate();
 

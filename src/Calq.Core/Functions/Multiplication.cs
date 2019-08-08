@@ -6,6 +6,8 @@ namespace Calq.Core
 {
     public class Multiplication : Function
     {
+        private HashSet<Term> inverseTerms = new HashSet<Term>();
+
         public Multiplication(params Term[] p) : base(FuncType.Multiplication, p)
         {
             if (p.Length < 2)
@@ -18,15 +20,30 @@ namespace Calq.Core
 
             for (int i = 0; i < Parameters.Length; i++)
             {
-                Term r = Parameters[i].Differentiate(argument);
-                for(int j = 0; j < Parameters.Length; j++)
+                Term r = Parameters[i];
+                if (IsInverse(r))
+                {
+                    r = r ^ (-new Real(1));
+                }
+                r = r.Differentiate(argument);
+                for (int j = 0; j < Parameters.Length; j++)
                 {
                     if (i == j) continue;
-                    r *= Parameters[j].Differentiate(argument);
+                    r *= Parameters[j];
                 }
                 sums.Add(r);
             }
             return new Addition(sums.ToArray());
+        }
+
+        public void MarkInverse(Term t)
+        {
+            inverseTerms.Add(t);
+        }
+
+        public bool IsInverse(Term t)
+        {
+            return inverseTerms.Contains(t);
         }
 
         //[TODO] zusammenfassen/vereinfachen
@@ -73,7 +90,7 @@ namespace Calq.Core
 
         private void AppendPrefixTermToString(Term t, StringBuilder builder)
         {
-            if (t.Tag.HasFlag(TermTag.Inverse))
+            if (IsInverse(t))
             {
                 // TODO: hässlich, besser support mit nur einem Argument
                 builder.Append("/[1," + t.ToPrefix() + "]");
