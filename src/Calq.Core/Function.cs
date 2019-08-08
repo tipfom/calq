@@ -58,7 +58,7 @@ namespace Calq.Core
         {
             for (int i = 0; i < PrefixOperators.Length; i++)
             {
-                if(PrefixOperators[i].TryParse(s, out Function t))
+                if (PrefixOperators[i].TryParse(s, out Function t))
                 {
                     return t;
                 }
@@ -90,7 +90,7 @@ namespace Calq.Core
             }
 
             //-sign
-            if(s[0] == '-')
+            if (s[0] == '-')
             {
                 return new Function(InfixOperators[3], new List<Term>(2) { new Variable("-1"), TermFromMixedString(s.Substring(1)) });
             }
@@ -115,12 +115,13 @@ namespace Calq.Core
                     // TODO:
                     // - bessere Unterstützung der Python Formattierung (** ist dort ^, pinf ist oo, ninf ist -oo)
                     // - unbekannte Funktionen zulassen oder alle von Python (inverse Gaus usw) hinzufügen, oder beides am besten
-                    if(Parameter.Count == 2)
+                    if (Parameter.Count == 2)
                     {
                         string pExpr;
                         WebHelper.GetIntegral(Parameter[0].ToString(), GetVariableNames().Distinct(), Parameter[1].ToString(), out pExpr);
                         return TermFromMixedString(pExpr.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf")).Evaluate();
-                    } else if (Parameter.Count == 4)
+                    }
+                    else if (Parameter.Count == 4)
                     {
 
                         string pExpr;
@@ -164,7 +165,7 @@ namespace Calq.Core
                     return buffer;
                 case Operator.Operators.Division:
                     buffer = Parameter[0].Evaluate();
-                    for(int i = 1; i < Parameter.Count; i++)
+                    for (int i = 1; i < Parameter.Count; i++)
                         buffer /= Parameter[i].Evaluate();
                     return buffer;
                 case Operator.Operators.Power:
@@ -252,13 +253,13 @@ namespace Calq.Core
             }
             else
             {
-                return Operator.StringRep[0] +  "(" + string.Join(",", Parameter.Select(x => x.ToInfix())) + ")";
+                return Operator.StringRep[0] + "(" + string.Join(",", Parameter.Select(x => x.ToInfix())) + ")";
             }
         }
 
         public override IEnumerable<string> GetVariableNames()
         {
-            foreach(Term param in Parameter)
+            foreach (Term param in Parameter)
             {
                 foreach (string variable in param.GetVariableNames())
                     yield return variable;
@@ -278,10 +279,10 @@ namespace Calq.Core
 
                 case Operator.Operators.Multiplication:
                     ret = new Function(Add, new List<Term>());
-                    for(int i = 0; i < Parameter.Count; i++)
+                    for (int i = 0; i < Parameter.Count; i++)
                     {
                         Function f = new Function(Mul, new List<Term>());
-                        for(int j = 0; j < Parameter.Count; j++)
+                        for (int j = 0; j < Parameter.Count; j++)
                         {
                             if (i == j) f.Parameter.Add(Parameter[j].Differentiate(argument));
                             else f.Parameter.Add(Parameter[j]);
@@ -293,7 +294,7 @@ namespace Calq.Core
                 case Operator.Operators.Division:
                     Term g = new Function(Mul, new List<Term>());
 
-                    if(Parameter.Count == 2)
+                    if (Parameter.Count == 2)
                     {
                         g = Parameter[1];
                     }
@@ -301,7 +302,7 @@ namespace Calq.Core
                     {
                         g = new Function(Mul, new List<Term>());
 
-                        for(int i = 1; 1 < Parameter.Count; i++)
+                        for (int i = 1; 1 < Parameter.Count; i++)
                         {
                             ((Function)g).Parameter.Add(Parameter[i]);
                         }
@@ -339,7 +340,7 @@ namespace Calq.Core
 
                     ret = new Function(Mul, new List<Term>());
                     ret.Parameter.Add(new Function(Pow, t, new Function(Sub, g, new Variable("1"))));
-                    ret.Parameter.Add(new Function(Add, 
+                    ret.Parameter.Add(new Function(Add,
                         new Function(Mul, g, t.Differentiate(argument)),
                         new Function(Mul, t, new Function(Log, t), g.Differentiate(argument))));
 
@@ -373,13 +374,13 @@ namespace Calq.Core
                     }
                     else if (Parameter.Count == 4)
                     {
-                        return $@"\int_{Parameter[2].ToLaTeX()}^{Parameter[3].ToLaTeX()} {Parameter[0].ToLaTeX()} d{Parameter[1].ToLaTeX()}";
+                        return $@"\int_{"{" + Parameter[2].ToLaTeX() + "}"}^{"{" + Parameter[3].ToLaTeX() + "}"} {Parameter[0].ToLaTeX()} d{Parameter[1].ToLaTeX()}";
                     }
                     return null;
                 case Operator.Operators.Lim:
                     if (Parameter.Count == 3)
                     {
-                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()}\to{Parameter[2].ToLaTeX()+"}"} {Parameter[0].ToLaTeX()}";
+                        return $@"\lim_{"{" + Parameter[1].ToLaTeX()}\to{Parameter[2].ToLaTeX() + "}"} {Parameter[0].ToLaTeX()}";
                     }
                     else if (Parameter.Count == 4)
                     {
@@ -394,7 +395,7 @@ namespace Calq.Core
                 case Operator.Operators.Addition:
                     string res = Parameter[0].ToLaTeX();
                     for (int i = 1; i < Parameter.Count; i++)
-                        res += "+" + Parameter[i].ToLaTeX(); 
+                        res += "+" + Parameter[i].ToLaTeX();
                     return res;
                 case Operator.Operators.Subtraktion:
                     res = Parameter[0].ToLaTeX();
@@ -402,14 +403,25 @@ namespace Calq.Core
                         res += "-" + Parameter[i].ToLaTeX();
                     return res;
                 case Operator.Operators.Multiplication:
+                    if (Parameter.Count == 2)
+                    {
+                        if (Parameter[0].ToInfix() == "-1")
+                        {
+                            return "-" + Parameter[1].ToLaTeX();
+                        }
+                        if (Parameter[1].ToInfix() == "-1")
+                        {
+                            return "-" + Parameter[0].ToLaTeX();
+                        }
+                    }
                     res = Parameter[0].ToLaTeX();
                     for (int i = 1; i < Parameter.Count; i++)
                         res += "\\cdot " + Parameter[i].ToLaTeX();
                     return res;
                 case Operator.Operators.Division:
-                    return $@"\frac{"{"+Parameter[0].ToLaTeX()+"}"}{"{"+Parameter[1].ToLaTeX()+"}"}";
+                    return $@"\frac{"{" + Parameter[0].ToLaTeX() + "}"}{"{" + Parameter[1].ToLaTeX() + "}"}";
                 case Operator.Operators.Power:
-                    return $@"{Parameter[0].ToLaTeX()}^{"{"+Parameter[1].ToLaTeX()+"}"}";
+                    return $@"{Parameter[0].ToLaTeX()}^{"{" + Parameter[1].ToLaTeX() + "}"}";
 
                 case Operator.Operators.Sqrt:
                     return $@"\sqrt{"{" + Parameter[0].ToLaTeX() + "}"}";
