@@ -73,7 +73,7 @@ namespace Calq.Core
         public static bool GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching, string direction, out string result)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
-            return Request($"/math?method=lim&expr={base64Expression}&var={string.Join("&var=", variables)}&arg={argument}&val={valueApproaching}&dir={((direction == "r") ? "1" : (direction == "l" ? "2" : "3"))}", out result);
+            return Request($"/math?method=lim&expr={base64Expression}&var={string.Join("&var=", variables)}&arg={argument}&val={valueApproaching}&dir={((direction == "l") ? "1" : (direction == "r" ? "2" : "3"))}", out result);
         }
 
         private static bool Request(string path, out string value)
