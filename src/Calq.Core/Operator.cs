@@ -50,8 +50,8 @@ namespace Calq.Core
                     List<int> splits = new List<int>();
                     for (int j = 0; j < s.Length; j++)
                     {
-                        if (s[j] == '(') bracketDepth++;
-                        if (s[j] == ')') bracketDepth--;
+                        if (s[j] == '(' || s[j] == '{') bracketDepth++;
+                        if (s[j] == ')' || s[j] == '}') bracketDepth--;
 
                         if (s[j] == StringRep[i][0] && bracketDepth == 0)
                         {
@@ -91,8 +91,8 @@ namespace Calq.Core
                         s = s.Substring(StringRep[i].Length);
                         for (int j = 0; j < s.Length - 1; j++)
                         {
-                            if (s[j] == '(') bracketDepth++;
-                            if (s[j] == ')') bracketDepth--;
+                            if (s[j] == '(' || s[j] == '{') bracketDepth++;
+                            if (s[j] == ')' || s[j] == '}') bracketDepth--;
 
                             if (bracketDepth == 0)
                             {
