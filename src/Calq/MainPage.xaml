@@ -31,7 +31,8 @@
 
         <c:LogListView ItemsSource="{Binding Log}"
                        Grid.Row="1"
-                       ItemTemplateSelector="{StaticResource Key=LogListViewItemSelector}">
+                       ItemTemplateSelector="{StaticResource Key=LogListViewItemSelector}"
+                       VerticalScrollBarVisibility="Never">
         </c:LogListView>
 
         <Entry Text="{Binding Expression}"

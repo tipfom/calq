@@ -62,7 +62,7 @@ namespace Calq
                     string normal = Infix.Format(exp);
                     string expandet = Infix.Format(Algebraic.Expand(exp));
 
-                    Log.Add(new Logging.ExpressionResult() { ExpressionLaTeX =  expLat + "\\\\", ResultLaTeX = Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX() });
+                    Log.Insert(0,new Logging.ExpressionResult() { ExpressionLaTeX =  expLat,  ResultLaTeX = Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX() });
                 }
                 else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
             }
