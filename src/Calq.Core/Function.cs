@@ -33,7 +33,7 @@ namespace Calq.Core
             new Operator(Operator.Operators.Log, false, new string[]{"log"}, new List<int>(){ 1, 2 }),
             new Operator(Operator.Operators.Sin, false, new string[]{"sin"}, new List<int>(){ 1 }),
             new Operator(Operator.Operators.Cos, false, new string[]{"cos"}, new List<int>(){ 1 }),
-            new Operator(Operator.Operators.Differentiate, false, new string[]{"dif"}, new List<int>(){ 2 }),
+            new Operator(Operator.Operators.Differentiate, false, new string[]{"dif"}, new List<int>(){ 2, 3 }),
 
             new Operator(Operator.Operators.Lim, false, new string[]{ "limes", "lim" }, new List<int>(){ 3, 4 }),
             new Operator(Operator.Operators.Int, false, new string[]{ "∫", "integral", "int", }, new List<int>(){ 2, 4 }),
@@ -206,7 +206,17 @@ namespace Calq.Core
                     return Expression.Symbol(ToInfix());
 
                 case Operator.Operators.Differentiate:
-                    return Parameter[0].Differentiate(Parameter[1].ToString()).GetAsExpression();
+                    if(Parameter.Count == 2) return Parameter[0].Differentiate(Parameter[1].ToString()).GetAsExpression();
+                    else
+                    {
+                        Term t = Parameter[0];
+                        int n = int.Parse(Parameter[2].ToString());
+
+                        for (int i = 0; i < n; i++) t = t.Differentiate(Parameter[1].ToString());
+
+                        return t.GetAsExpression();
+                    }
+                    
                 case Operator.Operators.Addition:
                     buffer = Parameter[0].GetAsExpression();
                     for (int i = 1; i < Parameter.Count; i++)
@@ -442,7 +452,10 @@ namespace Calq.Core
                 case Operator.Operators.Cos:
                     return $@"\cos ({Parameter[0].ToLaTeX()})";
                 case Operator.Operators.Differentiate:
-                    return @"\frac{d" + Parameter[0].ToLaTeX() + "}{d" + Parameter[1].ToLaTeX() + "}";
+                    if(Parameter.Count == 2)
+                        return @"\frac{d" + Parameter[0].ToLaTeX() + "}{d" + Parameter[1].ToLaTeX() + "}";
+                    else 
+                        return @"\frac{d^" + Parameter[2].ToLaTeX()+ " " + Parameter[0].ToLaTeX() + "}{d" + Parameter[1].ToLaTeX() + "^"+ Parameter[2].ToLaTeX() + "}";
             }
 
             return null;
