@@ -30,8 +30,8 @@
         </DataTemplate>
         <DataTemplate x:Key="ShowError" x:DataType="log:ErrorResult">
             <StackLayout Orientation="Horizontal">
-                <Label Text="!" FontSize="20" TextColor="Red"/>
-                <Label Text="{Binding ErrorMessage}" FontSize="20"/>
+                <Label Text="Error: " FontSize="20" TextColor="Red"/>
+                <Label Text="{Binding ErrorMessage}" FontSize="20" TextColor="Red"/>
             </StackLayout>
         </DataTemplate>
 

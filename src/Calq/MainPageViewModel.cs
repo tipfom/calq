@@ -62,17 +62,20 @@ namespace Calq
                     string normal = Infix.Format(exp);
                     string expandet = Infix.Format(Algebraic.Expand(exp));
 
-                    Log.Insert(0,new Logging.ExpressionResult() { ExpressionLaTeX =  expLat,  ResultLaTeX = Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX() });
+                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = Term.TermFromMixedString(Infix.Format(exp)).ToLaTeX() });
                 }
-                else System.Diagnostics.Debug.WriteLine("Bracket Missmatch");
+                else
+                {
+                    Log.Insert(0, new Logging.ErrorResult() { ErrorMessage = "Bracket Missmatch" });
+                }
             }
             catch(InvalidParameterCountException e)
             {
-                System.Diagnostics.Debug.WriteLine("Invalid parameter count at " + e.Message);
+                Log.Insert(0, new Logging.ErrorResult() { ErrorMessage = "Invalid parameter count at " + e.Message });
             }
-            catch(MissingArgumentException e)
+            catch(MissingArgumentException)
             {
-                System.Diagnostics.Debug.WriteLine("Missing argument");
+                Log.Insert(0, new Logging.ErrorResult() { ErrorMessage = "Missing Argument" });
             }
         }
     }
