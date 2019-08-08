@@ -85,5 +85,9 @@ namespace Calq.Core
         {
             return new Function(Function.Pow, a, b);
         }
+        public static Term operator -(Term a)
+        {
+            return new Variable(-1) * a;
+        }
     }
 }

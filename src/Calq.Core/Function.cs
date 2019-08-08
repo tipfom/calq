@@ -7,17 +7,16 @@ namespace Calq.Core
 {
     public class Function : Term
     {
-        private static Operator Add { get { return InfixOperators[1]; } }
-        private static Operator Sub { get { return InfixOperators[2]; } }
-        private static Operator Mul { get { return InfixOperators[3]; } }
-        private static Operator Div { get { return InfixOperators[4]; } }
-        private static Operator Pow { get { return InfixOperators[5]; } }
+        public static Operator Add { get { return InfixOperators[1]; } }
+        public static Operator Sub { get { return InfixOperators[2]; } }
+        public static Operator Mul { get { return InfixOperators[3]; } }
+        public static Operator Div { get { return InfixOperators[4]; } }
+        public static Operator Pow { get { return InfixOperators[5]; } }
 
-
-        private static Operator Sqrt { get { return PrefixOperators[0]; } }
-        private static Operator Log { get { return PrefixOperators[1]; } }
-        private static Operator Sin { get { return PrefixOperators[3]; } }
-        private static Operator Cos { get { return PrefixOperators[4]; } }
+        public static Operator Sqrt { get { return PrefixOperators[0]; } }
+        public static Operator Log { get { return PrefixOperators[1]; } }
+        public static Operator Sin { get { return PrefixOperators[3]; } }
+        public static Operator Cos { get { return PrefixOperators[4]; } }
 
         private static readonly Operator[] InfixOperators = new Operator[]
         {
@@ -314,11 +313,11 @@ namespace Calq.Core
                     return new Function(Operator, Parameter.Select(x => x.Differentiate(argument)).ToList());
 
                 case Operator.Operators.Multiplication:
-                    f = new Variable(1);
+                    f = new Variable(0);
 
                     for (int i = 0; i < Parameter.Count; i++)
                     {
-                        g = new Variable(0);
+                        g = new Variable(1);
                         for (int j = 0; j < Parameter.Count; j++)
                         {
                             if (i == j) g *= Parameter[j].Differentiate(argument);
@@ -362,13 +361,11 @@ namespace Calq.Core
                         new Function(Log, f) * g.Differentiate(argument)); 
 
                 case Operator.Operators.Sin:
-                    return new Function(Mul, Parameter[0].Differentiate(argument),
-                        new Function(Cos, Parameter[0]));
+                    return Parameter[0].Differentiate(argument) * new Function(Cos, Parameter[0]);
                 case Operator.Operators.Cos:
-                    return new Function(Mul, Parameter[0].Differentiate(argument),
-                        new Function(Sub, new Variable("0"), new Function(Sin, Parameter[0])));
+                    return Parameter[0].Differentiate(argument) * -new Function(Sin, Parameter[0]);
                 case Operator.Operators.Log:
-                    return new Function(Div, Parameter[0].Differentiate(argument), Parameter[0]);
+                    return Parameter[0].Differentiate(argument) / Parameter[0];
 
                 case Operator.Operators.Differentiate:
                     return Parameter[0].Differentiate(Parameter[1].ToString()).Differentiate(argument);
