@@ -20,11 +20,19 @@ namespace Calq.Core
         //[TODO] zusammenfassen/vereinfachen
         public override Term Evaluate()
         {
-            return Parameters[0].Evaluate() + Parameters[1].Evaluate();
+            Term sum = Parameters[0];
+
+            for (int i = 1; i < Parameters.Length; i++)
+                sum += Parameters[i].Evaluate();
+            return sum;
         }
         public override Term Approximate()
         {
-            return Parameters[0].Evaluate() + Parameters[1].Evaluate();
+            Term sum = Parameters[0];
+
+            for (int i = 1; i < Parameters.Length; i++)
+                sum += Parameters[i].Approximate();
+            return sum;
         }
 
         public override string ToLaTeX()
