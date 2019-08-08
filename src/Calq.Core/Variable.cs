@@ -9,15 +9,26 @@ namespace Calq.Core
     {
         public enum VarType
         {
-            E, Pi, I,
+            Euler, Pi, Imaginary,
             Integer, Double,
+            PositiveInfinity, NegativeInfinity,
             Variable
         }
 
         public VarType Type;
-        private static string[] ConstantsRep = new string[]
+        private static Dictionary<string, VarType> ConstantsRepresentations = new Dictionary<string, VarType>()
         {
-            "e", "π", "i"
+            { "e", VarType.Euler },
+
+            { "pi", VarType.Pi },
+            { "π", VarType.Euler },
+
+            { "i", VarType.Euler },
+
+            { "oo", VarType.PositiveInfinity },
+            { "pinf", VarType.PositiveInfinity },
+            { "ninf", VarType.NegativeInfinity },
+
         };
 
         public readonly string Name;
@@ -27,13 +38,10 @@ namespace Calq.Core
             Name = name;
 
             Type = VarType.Variable;
-            for(int i = 0; i < ConstantsRep.Length; i++)
+            if (ConstantsRepresentations.ContainsKey(name))
             {
-                if (Name == ConstantsRep[i])
-                {
-                    Type = (VarType)i;
-                    return;
-                }
+                Type = ConstantsRepresentations[name];
+                return;
             }
 
             const string Alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -57,9 +65,11 @@ namespace Calq.Core
         {
             switch (Type)
             {
-                case VarType.E: return Expression.E;
+                case VarType.Euler: return Expression.E;
                 case VarType.Pi: return Expression.Pi;
-                case VarType.I: return Expression.I;
+                case VarType.Imaginary: return Expression.I;
+                case VarType.PositiveInfinity: return Expression.PositiveInfinity;
+                case VarType.NegativeInfinity: return Expression.NegativeInfinity;
                 case VarType.Integer: return Expression.FromInt64(long.Parse(Name));
                 case VarType.Double: return Expression.Real(double.Parse(Name));
                 default: return Expression.Symbol(Name);

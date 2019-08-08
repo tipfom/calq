@@ -14,13 +14,8 @@ def integrateExpression(txt_expression, txt_variables, txt_delta, txt_limit):
         if txt_limit == None:
             result = integrate(sympy_expression, delta)
         else:
-            lower_limit = getConstant(txt_limit[0])
-            if lower_limit == None:
-                lower_limit = sympy_variables[txt_limit[0]]
-
-            upper_limit = getConstant(txt_limit[1])
-            if upper_limit == None:
-                upper_limit = sympy_variables[txt_limit[1]]
+            lower_limit = buildFunctionFromTree(parseToTree(txt_limit[0]), sympy_variables)
+            upper_limit = buildFunctionFromTree(parseToTree(txt_limit[1]), sympy_variables)
             result = integrate(sympy_expression, (delta, lower_limit, upper_limit))
         
         return [True, str(result)]

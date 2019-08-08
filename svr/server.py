@@ -54,7 +54,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 txt_delta = params["d"][0]
                 txt_limit = None
                 if params.__contains__("llim") and params.__contains__("ulim"):
-                    txt_limit = (params["llim"][0], params["ulim"][0])
+                    txt_limit = (base64.b64decode((params["llim"][0]).encode()).decode("utf-8"), base64.b64decode((params["ulim"][0]).encode()).decode("utf-8"))
                 self.replyResult(integrateExpression(txt_expression, txt_variables, txt_delta, txt_limit))
 
             elif params["method"][0] == "lim":
