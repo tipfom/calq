@@ -4,11 +4,25 @@ using System.Text;
 
 namespace Calq.Core
 {
-    public abstract class Term
+    public abstract class Term : IComparable<Term>
     {
+        public enum TermType
+        {
+            Symbol, Function, TermList, Vector
+        }
+
+        public TermType Type;
+
+        protected Term(TermType type)
+        {
+            Type = type;
+        }
+
         public abstract Term Evaluate();
-        public abstract HashSet<string> GetVariableNames();
+        public abstract Term Approximate();
         public abstract Term Differentiate(string argument);
+
+        public abstract HashSet<string> GetVariableNames();
 
         public abstract string ToPrefix();
         public abstract string ToLaTeX();
@@ -43,29 +57,35 @@ namespace Calq.Core
             return brackets.Count == 0;
         }
 
+        public int CompareTo(Term other)
+        {
+            throw new NotImplementedException();
+        }
+
         public static Term operator +(Term a, Term b)
         {
-            return new Function(Function.Add, a, b);
+            return new Addition(a, b);
         }
-        public static Term operator -(Term a)
-        {
-            return new Variable(-1) * a;
-        }
-        public static Term operator -(Term a, Term b)
-        {
-            return new Function(Function.Sub, a, b);
-        }
-        public static Term operator *(Term a, Term b)
-        {
-            return new Function(Function.Mul, a, b);
-        }
-        public static Term operator /(Term a, Term b)
-        {
-            return new Function(Function.Div, a, b);
-        }
-        public static Term operator ^(Term a, Term b)
-        {
-            return new Function(Function.Pow, a, b);
-        }
+
+        //public static Term operator -(Term a)
+        //{
+        //    return new Symbol(-1) * a;
+        //}
+        //public static Term operator -(Term a, Term b)
+        //{
+        //    return new Function(Function.Sub, a, b);
+        //}
+        //public static Term operator *(Term a, Term b)
+        //{
+        //    return new Function(Function.Mul, a, b);
+        //}
+        //public static Term operator /(Term a, Term b)
+        //{
+        //    return new Function(Function.Div, a, b);
+        //}
+        //public static Term operator ^(Term a, Term b)
+        //{
+        //    return new Function(Function.Pow, a, b);
+        //}
     }
 }

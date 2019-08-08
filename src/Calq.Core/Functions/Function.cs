@@ -24,11 +24,12 @@ namespace Calq.Core
 
         public readonly FuncType Name;
         public readonly Term[] Parameters;
-
-        protected Function(FuncType name)
+        protected Function(FuncType name, Term[] paras) : base(TermType.Function)
         {
             Name = name;
+            Parameters = paras;
         }
+
         protected abstract string GetStringRep();
 
         public override HashSet<string> GetVariableNames()
