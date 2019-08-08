@@ -49,8 +49,8 @@ namespace Calq
             {
                 if (Term.CheckBracketCount(Expression))
                 {
-                    Term t = new Real(1) - new Real(1) + new Real(2) - new Real(3) + new Real(5);
-                    string expLat = t.ToLaTeX();
+                    Term t = new Real(1) - new Real(1) + new Real(2) - new Real(3) + new Real(5) * new Real(10) / new Real(9);
+                    string expLat = t.ToString();
                     t = t.Evaluate();
 
                     Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });

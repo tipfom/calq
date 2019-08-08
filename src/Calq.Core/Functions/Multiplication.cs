@@ -6,7 +6,7 @@ namespace Calq.Core
 {
     public class Multiplication : Function
     {
-        public Multiplication(params Term[] p) : base(FuncType.Subtraction, p)
+        public Multiplication(params Term[] p) : base(FuncType.Multiplication, p)
         {
             if (p.Length < 2)
                 throw new InvalidParameterCountException("Multiplication needs at least 2 arguments");
@@ -43,9 +43,37 @@ namespace Calq.Core
             return ToString();
         }
 
-        protected override string GetStringRep()
+        public override string ToString()
         {
-            return "*";
+            return ToPrefix();
+        }
+
+        public override string ToPrefix()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append("*[");
+            AppendPrefixTermToString(Parameters[0], builder);
+            for (int i = 1; i < Parameters.Length; i++)
+            {
+                builder.Append(",");
+                AppendPrefixTermToString(Parameters[i], builder);
+            }
+            builder.Append("]");
+            return builder.ToString();
+        }
+
+        private void AppendPrefixTermToString(Term t, StringBuilder builder)
+        {
+            if (t.Tag.HasFlag(TermTag.Inverse))
+            {
+                // TODO: hässlich, besser support mit nur einem Argument
+                builder.Append("/[1," + t.ToPrefix() + "]");
+            }
+            else
+            {
+
+                builder.Append(t.ToPrefix());
+            }
         }
     }
 }

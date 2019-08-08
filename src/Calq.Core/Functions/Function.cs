@@ -8,8 +8,8 @@ namespace Calq.Core
         public enum FuncType
         {
             Equals,
-            Addition, Subtraction,
-            Multiplication, Division,
+            Addition, 
+            Multiplication, 
             Power,
 
             Sqrt, Log, Sin, Cos, Differentiate,
@@ -20,8 +20,6 @@ namespace Calq.Core
             Unknown
         }
 
-        public bool IsInfix { get { return ((int)Name) < 6; } }
-
         public readonly FuncType Name;
         public readonly Term[] Parameters;
         protected Function(FuncType name, Term[] paras) : base(TermType.Function)
@@ -29,8 +27,6 @@ namespace Calq.Core
             Name = name;
             Parameters = paras;
         }
-
-        protected abstract string GetStringRep();
 
         public override HashSet<string> GetVariableNames()
         {
@@ -41,22 +37,7 @@ namespace Calq.Core
 
             return ret;
         }
-
-        public override string ToPrefix()
-        {
-            return GetStringRep() + "[" + string.Join(",", Parameters.Select(x => x.ToString())) + "]";
-        }
-
-        public override string ToString()
-        {
-            if (IsInfix)
-            {
-                return string.Join(GetStringRep(), Parameters.Select(x => x.ToPrefix()));
-            }
-            else
-            {
-                return GetStringRep() + "(" + string.Join(",", Parameters.Select(x => x.ToPrefix())) + ")";
-            }
-        }
+        
+        public abstract override string ToString();
     }
 }

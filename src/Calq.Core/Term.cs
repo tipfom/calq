@@ -86,7 +86,7 @@ namespace Calq.Core
             else
                 r.Add(b);
 
-
+            // TODO performance
             return new Addition(r.ToArray());
         }
 
@@ -113,7 +113,7 @@ namespace Calq.Core
             else
                 r.Add(b);
 
-            return new Multiplication(a, b);
+            return new Multiplication(r.ToArray());
         }
 
         public static Term operator /(Term a, Term b)

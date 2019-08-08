@@ -1,4 +1,6 @@
-﻿namespace Calq.Core
+﻿using System.Text;
+
+namespace Calq.Core
 {
     public class Addition : Function
     {
@@ -39,9 +41,37 @@
             return ToString();
         }
 
-        protected override string GetStringRep()
+        public override string ToPrefix()
         {
-            return "+";
+            StringBuilder builder = new StringBuilder();
+            builder.Append("+[");
+            AppendPrefixTermToString(Parameters[0], builder);
+            for(int i = 1; i < Parameters.Length; i++)
+            {
+                builder.Append(",");
+                AppendPrefixTermToString(Parameters[i], builder);
+            }
+            builder.Append("]");
+            return builder.ToString();
+        }
+
+        private void AppendPrefixTermToString(Term t, StringBuilder builder)
+        {
+            if (t.Tag.HasFlag(TermTag.Inverse))
+            {
+                // TODO: hässlich, besser support mit nur einem Argument
+                builder.Append("-[0," + t.ToPrefix() + "]");
+            }
+            else
+            {
+
+                builder.Append(t.ToPrefix());
+            }
+        }
+
+        public override string ToString()
+        {
+            return ToPrefix();
         }
     }
 }
