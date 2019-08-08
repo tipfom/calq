@@ -8,7 +8,7 @@ namespace Calq.Core
     {
         public string Name;
 
-        public Variable(string name) : base(VarType.Variable)
+        public Variable(string name) : base(SymbolType.Variable)
         {
             Name = name;
         }
@@ -27,8 +27,7 @@ namespace Calq.Core
             if (Name == argument)
                 return new Real(1);
             else
-                return new Real(0);
-            
+                return new Real(0);      
         }
 
         public override HashSet<string> GetVariableNames()

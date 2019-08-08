@@ -70,6 +70,25 @@ namespace Calq.Core
             throw new NotImplementedException();
         }
 
+        public static bool operator ==(Term a, Term b)
+        {
+            if (a.Type != b.Type) return false;
+
+            switch (a.Type)
+            {
+                case TermType.Symbol: return (Symbol)a == (Symbol)b;
+                case TermType.Function: return (Function)a == (Function)b;
+                case TermType.TermList: return (TermList)a == (TermList)b;
+            }
+
+            return false;
+        }
+
+        public static bool operator !=(Term a, Term b)
+        {
+            return !(a == b);
+        }
+
         public static Term operator +(Term a, Term b)
         {
             List<Term> r = new List<Term>();
@@ -133,26 +152,5 @@ namespace Calq.Core
         {
             return new Power(a, b);
         }
-
-        //public static Term operator -(Term a)
-        //{
-        //    return new Symbol(-1) * a;
-        //}
-        //public static Term operator -(Term a, Term b)
-        //{
-        //    return new Function(Function.Sub, a, b);
-        //}
-        //public static Term operator *(Term a, Term b)
-        //{
-        //    return new Function(Function.Mul, a, b);
-        //}
-        //public static Term operator /(Term a, Term b)
-        //{
-        //    return new Function(Function.Div, a, b);
-        //}
-        //public static Term operator ^(Term a, Term b)
-        //{
-        //    return new Function(Function.Pow, a, b);
-        //}
     }
 }

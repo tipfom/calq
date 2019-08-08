@@ -8,9 +8,18 @@ namespace Calq.Core
     {
         public readonly double Value;
 
-        public Real(double value) : base(VarType.Real)
+        public Real(double value) : base(SymbolType.Real)
         {
             Value = value;
+        }
+
+        public static bool operator ==(Real a, Real b)
+        {
+            return a.Value == b.Value;
+        }
+        public static bool operator !=(Real a, Real b)
+        {
+            return !(a == b);
         }
 
         public static explicit operator Real(double v)
