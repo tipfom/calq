@@ -104,7 +104,7 @@ namespace Calq.Core
             return Name;
         }
 
-        public override string ToInfix()
+        public override string ToPrefix()
         {
             return Name;
         }

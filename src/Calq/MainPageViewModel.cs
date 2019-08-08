@@ -1,5 +1,4 @@
 ﻿using Calq.Core;
-using MathNet.Symbolics;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Xamarin.Forms;
@@ -50,16 +49,9 @@ namespace Calq
             {
                 if (Term.CheckBracketCount(Expression))
                 {
-                    Term t = Term.TermFromMixedString(Expression);
+                    Term t = new Variable(1) + new Variable(2);
                     string expLat = t.ToLaTeX();
-                    var exp = t.GetAsExpression();
-                    if (WebHelper.IsOnline)
-                    {
-                        t = Term.TermFromMixedString(Infix.Format(exp)).Evaluate();
-                    }
-                    exp = t.GetAsExpression();
-                    string normal = Infix.Format(exp);
-                    string expandet = Infix.Format(Algebraic.Expand(exp));
+                    t = t.Evaluate();
 
                     Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });
                 }

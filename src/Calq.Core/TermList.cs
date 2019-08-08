@@ -54,9 +54,9 @@ namespace Calq.Core
             return Expression.Symbol(ToString());
         }
 
-        public override string ToInfix()
+        public override string ToPrefix()
         {
-            return "{" + string.Join(",", Terms.Select(x => x.ToInfix())) + "}";
+            return "{" + string.Join(",", Terms.Select(x => x.ToPrefix())) + "}";
         }
 
         public override IEnumerable<string> GetVariableNames()
