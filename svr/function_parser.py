@@ -37,8 +37,7 @@ def parseToTree(function, start=0):
     return Node(k, start, len(function), [])
 
 def buildFunctionFromTree(tree, sympy_vars):
-    expr = 0
-
+    expr = None
     if tree.isConstant():
         expr = tree.const
 
@@ -46,13 +45,16 @@ def buildFunctionFromTree(tree, sympy_vars):
         expr = sympy_vars[tree.key]
 
     elif tree.key == "+":
+        expr = 0
         for ch in tree.childs:
             expr += buildFunctionFromTree(ch, sympy_vars)
     elif tree.key == "-":
+        expr = 0
         for ch in tree.childs:
             expr -= buildFunctionFromTree(ch, sympy_vars)
     
     elif tree.key == "*":
+        expr = 1
         for ch in tree.childs:
             expr *= buildFunctionFromTree(ch, sympy_vars)
     

@@ -59,7 +59,10 @@ namespace Calq.Core
         public static bool GetIntegral(string prefixExpression, IEnumerable<string> variables, string variable, string lowerLimit, string upperLimit, out string result)
         {
             string base64Expression = Convert.ToBase64String(Encoding.UTF8.GetBytes(prefixExpression));
-            return Request($"/math?method=int&expr={base64Expression}&var={string.Join("&var=", variables)}&d={variable}&ulim={upperLimit}&llim={lowerLimit}", out result);
+            string base64LowerLimit = Convert.ToBase64String(Encoding.UTF8.GetBytes(lowerLimit));
+            string base64UpperLimit = Convert.ToBase64String(Encoding.UTF8.GetBytes(upperLimit));
+
+            return Request($"/math?method=int&expr={base64Expression}&var={string.Join("&var=", variables)}&d={variable}&ulim={base64UpperLimit}&llim={base64LowerLimit}", out result);
         }
 
         public static bool GetLimit(string prefixExpression, IEnumerable<string> variables, string argument, string valueApproaching, out string result)
