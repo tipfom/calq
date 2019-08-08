@@ -14,10 +14,19 @@ namespace Calq.Core
 
         public override Term Differentiate(string argument)
         {
-            Term sum = Parameters[0].Differentiate(argument);
-            for (int i = 1; i < Parameters.Length; i++)
-                sum *= Parameters[i].Differentiate(argument);
-            return sum;
+            List<Term> sums = new List<Term>();
+
+            for (int i = 0; i < Parameters.Length; i++)
+            {
+                Term r = Parameters[i].Differentiate(argument);
+                for(int j = 0; j < Parameters.Length; j++)
+                {
+                    if (i == j) continue;
+                    r *= Parameters[j].Differentiate(argument);
+                }
+                sums.Add(r);
+            }
+            return new Addition(sums.ToArray());
         }
 
         //[TODO] zusammenfassen/vereinfachen
