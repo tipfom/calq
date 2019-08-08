@@ -7,15 +7,15 @@ namespace Calq.Core
 {
     public class Function : Term
     {
-        private static Operator Add { get { return InfixOperators[1]; } }
-        private static Operator Sub { get { return InfixOperators[2]; } }
-        private static Operator Mul { get { return InfixOperators[3]; } }
-        private static Operator Div { get { return InfixOperators[4]; } }
-        private static Operator Pow { get { return InfixOperators[5]; } }
-
-        private static Operator Log { get { return PrefixOperators[1]; } }
-        private static Operator Sin { get { return PrefixOperators[3]; } }
-        private static Operator Cos { get { return PrefixOperators[4]; } }
+        public static Operator Add { get { return InfixOperators[1]; } }
+        public static Operator Sub { get { return InfixOperators[2]; } }
+        public static Operator Mul { get { return InfixOperators[3]; } }
+        public static Operator Div { get { return InfixOperators[4]; } }
+        public static Operator Pow { get { return InfixOperators[5]; } }
+        
+        public static Operator Log { get { return PrefixOperators[1]; } }
+        public static Operator Sin { get { return PrefixOperators[3]; } }
+        public static Operator Cos { get { return PrefixOperators[4]; } }
 
         private static readonly Operator[] InfixOperators = new Operator[]
         {
@@ -280,7 +280,8 @@ namespace Calq.Core
 
         public override Term Differentiate(string argument)
         {
-            Function ret;
+            Term f;
+            Term g;
 
             switch (Operator.Name)
             {
@@ -290,21 +291,22 @@ namespace Calq.Core
                     return new Function(Operator, Parameter.Select(x => x.Differentiate(argument)).ToList());
 
                 case Operator.Operators.Multiplication:
-                    ret = new Function(Add, new List<Term>());
+                    f = new Variable(1);
+
                     for (int i = 0; i < Parameter.Count; i++)
                     {
-                        Function f = new Function(Mul, new List<Term>());
+                        g = new Variable(0);
                         for (int j = 0; j < Parameter.Count; j++)
                         {
-                            if (i == j) f.Parameter.Add(Parameter[j].Differentiate(argument));
-                            else f.Parameter.Add(Parameter[j]);
+                            if (i == j) g *= Parameter[j].Differentiate(argument);
+                            else  g *= Parameter[j];
                         }
 
-                        ret.Parameter.Add(f);
+                        f += g;
                     }
-                    return ret;
+                    return f;
                 case Operator.Operators.Division:
-                    Term g = new Function(Mul, new List<Term>());
+                    f = Parameter[0];
 
                     if (Parameter.Count == 2)
                     {
@@ -312,46 +314,30 @@ namespace Calq.Core
                     }
                     else
                     {
-                        g = new Function(Mul, new List<Term>());
+                        g = new Variable(1);
 
                         for (int i = 1; 1 < Parameter.Count; i++)
                         {
-                            ((Function)g).Parameter.Add(Parameter[i]);
+                            g *= Parameter[i];
                         }
                     }
 
-                    ret = new Function(Div, new List<Term>());
-                    ret.Parameter.Add(new Function(Sub,
-                        new Function(Mul, Parameter[0].Differentiate(argument), g),
-                        new Function(Mul, Parameter[0], g.Differentiate(argument))
-                    ));
-                    ret.Parameter.Add(new Function(Pow, Parameter[1], new Variable("2")));
+                    return (f.Differentiate(argument) * g - f * g.Differentiate(argument)) / (g ^ new Variable(2));
 
-                    return ret;
                 case Operator.Operators.Power:
-                    Term t = Parameter[0];
-                    g = new Function(Mul, new List<Term>());
-                    if (Parameter.Count == 2)
+                    f = Parameter[0];
+                    g = Parameter[1];
+                    if (Parameter.Count > 2)
                     {
-                        g = Parameter[1];
-                    }
-                    else
-                    {
-                        g = new Function(Pow, new List<Term>());
-
-                        for (int i = 1; 1 < Parameter.Count; i++)
+                        for (int i = 2; 1 < Parameter.Count; i++)
                         {
-                            ((Function)g).Parameter.Add(Parameter[i]);
+                            g ^= Parameter[i];
                         }
                     }
 
-                    ret = new Function(Mul, new List<Term>());
-                    ret.Parameter.Add(new Function(Pow, t, new Function(Sub, g, new Variable("1"))));
-                    ret.Parameter.Add(new Function(Add,
-                        new Function(Mul, g, t.Differentiate(argument)),
-                        new Function(Mul, t, new Function(Log, t), g.Differentiate(argument))));
+                    return (f ^ (g - new Variable(1))) * (g * f.Differentiate(argument) + f *
+                        new Function(Log, f) * g.Differentiate(argument)); 
 
-                    return ret;
                 case Operator.Operators.Sin:
                     return new Function(Mul, Parameter[0].Differentiate(argument),
                         new Function(Cos, Parameter[0]));

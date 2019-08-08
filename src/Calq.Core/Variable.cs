@@ -10,7 +10,7 @@ namespace Calq.Core
         public enum VarType
         {
             Euler, Pi, Imaginary,
-            Integer, Double,
+            Integer, Real,
             PositiveInfinity, NegativeInfinity,
             Variable
         }
@@ -55,10 +55,22 @@ namespace Calq.Core
             }
 
             if (name.Contains("."))
-                Type = VarType.Double;
+                Type = VarType.Real;
             else
                 Type = VarType.Integer;
             
+        }
+        public Variable(int val)
+        {
+            Name = val.ToString();
+
+            Type = VarType.Integer;
+        }
+        public Variable(double val)
+        {
+            Name = val.ToString();
+
+            Type = VarType.Real;
         }
 
         public override Expression Evaluate()
@@ -71,7 +83,7 @@ namespace Calq.Core
                 case VarType.PositiveInfinity: return Expression.PositiveInfinity;
                 case VarType.NegativeInfinity: return Expression.NegativeInfinity;
                 case VarType.Integer: return Expression.FromInt64(long.Parse(Name));
-                case VarType.Double: return Expression.Real(double.Parse(Name));
+                case VarType.Real: return Expression.Real(double.Parse(Name));
                 default: return Expression.Symbol(Name);
             }
         }

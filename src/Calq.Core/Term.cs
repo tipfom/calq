@@ -64,5 +64,26 @@ namespace Calq.Core
                 else return new Variable(s);
             }
         }
+
+        public static Term operator +(Term a, Term b)
+        {
+            return new Function(Function.Add, a, b);
+        }
+        public static Term operator -(Term a, Term b)
+        {
+            return new Function(Function.Sub, a, b);
+        }
+        public static Term operator *(Term a, Term b)
+        {
+            return new Function(Function.Mul, a, b);
+        }
+        public static Term operator /(Term a, Term b)
+        {
+            return new Function(Function.Div, a, b);
+        }
+        public static Term operator ^(Term a, Term b)
+        {
+            return new Function(Function.Pow, a, b);
+        }
     }
 }
