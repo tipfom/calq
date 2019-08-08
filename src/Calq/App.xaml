@@ -10,28 +10,21 @@
              x:Class="Calq.App">
     <Application.Resources>
         <DataTemplate x:Key="ShowLatex" x:DataType="log:ExpressionResult">
-            <Grid HeightRequest="160">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <math:MathView LaTeX="{Binding ExpressionLaTeX}"
-                               Grid.Row="0"
-                               HorizontalOptions="Start">
-                </math:MathView>
+            <StackLayout Orientation="Vertical">
+                <calq:LogMathView LaTeX="{Binding ExpressionLaTeX}"
+                                  Grid.Row="0"
+                                  HorizontalOptions="Start">
+                </calq:LogMathView>
 
 
                 <ScrollView Orientation="Horizontal"
                             Grid.Row="1"
                             HorizontalOptions="End">
-                    <math:MathView LaTeX="{Binding ResultLaTeX}"
-                                   FontSize="40"
-                                   HeightRequest="120"
-                                   HorizontalOptions="End">
-                    </math:MathView>
+                    <calq:LogMathView LaTeX="{Binding ResultLaTeX}"
+                                      HorizontalOptions="End">
+                    </calq:LogMathView>
                 </ScrollView>
-            </Grid>
+            </StackLayout>
         </DataTemplate>
         <DataTemplate x:Key="ShowError" x:DataType="log:ErrorResult">
             <StackLayout Orientation="Horizontal">
