@@ -11,7 +11,7 @@ namespace Calq.Core
             Symbol, Function, TermList, Vector
         }
 
-        public TermType Type;
+        public readonly TermType Type;
 
         protected Term(TermType type)
         {
@@ -26,6 +26,38 @@ namespace Calq.Core
         {
             return ToString() == "1";
         }
+
+
+        public static Term FromInfix(string s)
+        {
+            s = s.Replace(" ", "");
+            return FromInfix(s, out s);
+        }
+        private static Term FromInfix(string s, out string rest)
+        {
+            if(s == "") throw new MissingArgumentException("InfixString was Empty");
+            rest = s;
+
+            Term tree = null;
+            while(s != "")
+            {
+                //Check Term(), Infix-Prefix Function, Termlist, Vector
+                if (s[0] == '{')
+                {
+                    tree = new TermList(s, out s);
+                }
+                else if(s[0] == '(')
+                {
+                    Function f = Function.GetPrefix(s, out s);
+
+                    
+                }
+            }
+
+            return tree;
+        }
+
+
 
         public abstract Term Evaluate();
         public abstract Term Approximate();
@@ -74,8 +106,8 @@ namespace Calq.Core
 
         public static bool operator ==(Term a, Term b)
         {
-            if ((object)a == null || (object)a == null)
-                return (object)a == null && (object)a == null;
+            if (a is null || a is null)
+                return a is null && a is null;
             if (a.Type != b.Type) return false;
 
             switch (a.Type)
@@ -172,7 +204,7 @@ namespace Calq.Core
         public static Term operator -(Term a)
         {
             Addition cast_a = a as Addition;
-            if ((object)cast_a != null)
+            if (cast_a != null)
             {
                 Addition add = new Addition(cast_a.Parameters);
                 if (cast_a != null) { foreach (Term t in cast_a.Parameters) if (!cast_a.IsInverse(t)) add.MarkInverse(t); }

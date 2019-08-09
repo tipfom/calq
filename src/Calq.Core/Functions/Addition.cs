@@ -10,6 +10,7 @@ namespace Calq.Core
 
         public Addition(params Term[] p) : base(FuncType.Addition, p)
         {
+
         }
 
         public override Term Differentiate(string argument)
