@@ -20,28 +20,24 @@ namespace Calq.Core
             SType = type;
         }
 
-        public override Term Reduce()
-        {
-            return this;
-        }
-
         public static bool operator ==(Symbol a, Symbol b)
         {
+            if ((object)a == null || (object)a == null)
+                return (object)a == null && (object)a == null;
+
             if (a.SType != b.SType) return false;
 
-            switch (a.SType)
-            {
-                case SymbolType.Const: return (Constant)a == (Constant)b;
-                case SymbolType.Real: return (Real)a == (Real)b;
-                case SymbolType.Variable: return (Variable)a == (Variable)b;
-            }
-
-            return false;
+            return a.ToString() == b.ToString();
         }
-        
+
         public static bool operator !=(Symbol a, Symbol b)
         {
             return !(a == b);
+        }
+
+        public override Term Reduce()
+        {
+            return this;
         }
 
 

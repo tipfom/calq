@@ -30,6 +30,9 @@ namespace Calq.Core
         //[TODO] Reihenfolge checken
         public static bool operator ==(Function a, Function b)
         {
+            if ((object)a == null || (object)a == null)
+                return (object)a == null && (object)a == null;
+
             if (a.Name != b.Name) return false;
             if (a.Parameters.Length != b.Parameters.Length) return false;
 

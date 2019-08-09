@@ -74,6 +74,8 @@ namespace Calq.Core
 
         public static bool operator ==(Term a, Term b)
         {
+            if ((object)a == null || (object)a == null)
+                return (object)a == null && (object)a == null;
             if (a.Type != b.Type) return false;
 
             switch (a.Type)
@@ -170,7 +172,7 @@ namespace Calq.Core
         public static Term operator -(Term a)
         {
             Addition cast_a = a as Addition;
-            if (cast_a != null)
+            if ((object)cast_a != null)
             {
                 Addition add = new Addition(cast_a.Parameters);
                 if (cast_a != null) { foreach (Term t in cast_a.Parameters) if (!cast_a.IsInverse(t)) add.MarkInverse(t); }
