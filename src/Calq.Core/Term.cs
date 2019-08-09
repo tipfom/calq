@@ -170,6 +170,9 @@ namespace Calq.Core
             return new Power(a, b);
         }
 
+        public static  implicit operator Term(double d) => new Real(d);
+        public static implicit operator Term(int i) => new Real(i);
+
         //public static Term operator -(Term a)
         //{
         //    return new Symbol(-1) * a;
