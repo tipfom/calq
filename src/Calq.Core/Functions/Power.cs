@@ -12,7 +12,9 @@ namespace Calq.Core
 
         public override Term Differentiate(string argument)
         {
-            return Parameters[0] ^ Parameters[1] * (Parameters[1] * Parameters[0].Differentiate(argument) / Parameters[0] + new Logarithm(Parameters[0]) * Parameters[1].Differentiate(argument));
+            Term f = Parameters[0];
+            Term g = Parameters[1];
+            return (f ^ (g - new Real(1))) * (g * f.Differentiate(argument) + f * new Logarithm(f) * g.Differentiate(argument));
         }
 
         //[TODO] zusammenfassen/vereinfachen
@@ -28,7 +30,7 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return ToString();
+            return $@"({"{"+Parameters[0].ToLaTeX()+"}"}^{"{" + Parameters[1].ToLaTeX() + "}"})";
         }
 
         public override string ToPrefix()

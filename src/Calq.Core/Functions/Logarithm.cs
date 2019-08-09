@@ -29,12 +29,13 @@ namespace Calq.Core
 
         public override Term Evaluate()
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override string ToLaTeX()
         {
-            throw new NotImplementedException();
+            if (Parameters.Length == 1) return $@"\log{"{" + Parameters[0].ToLaTeX() + "}"}";
+            return $@"\log_{"{" + Parameters[1].ToLaTeX() + "}"} {Parameters[0].ToLaTeX()}";
         }
 
         public override string ToPrefix()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Calq.Core
@@ -17,7 +18,7 @@ namespace Calq.Core
         public override Term Differentiate(string argument)
         {
             List<Term> sums = new List<Term>();
-
+            
             for (int i = 0; i < Parameters.Length; i++)
             {
                 Term r = Parameters[i];
@@ -30,6 +31,7 @@ namespace Calq.Core
                 {
                     if (i == j) continue;
                     r *= Parameters[j];
+                    if (IsInverse(Parameters[j])) ((Multiplication)r).MarkInverse(Parameters[j]);
                 }
                 sums.Add(r);
             }
@@ -66,7 +68,14 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return ToString();
+            if (inverseTerms.Count > 0)
+            {
+                return $@"\frac{"{" + string.Join(@"\cdot ", Parameters.Where(t => !IsInverse(t)).Select(t=>t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", Parameters.Where(t => IsInverse(t)).Select(t => t.ToLaTeX())) + "}"}";
+            }
+            else
+            {
+                return "(" + string.Join(@"\cdot ", Parameters.Select(t => t.ToLaTeX())) + ")";
+            }
         }
 
         public override string ToString()

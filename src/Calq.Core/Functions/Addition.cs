@@ -39,18 +39,35 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return ToString();
+            StringBuilder builder = new StringBuilder();
+            void append(Term t, bool addPlus = true)
+            {
+                // TODO: hässlich, besser support mit nur einem Argument
+                if (IsInverse(t)) builder.Append("-" + t.ToLaTeX());
+                else builder.Append((addPlus ? "+" : "") + t.ToLaTeX());
+            };
+
+            append(Parameters[0],false);
+            for (int i = 1; i < Parameters.Length; i++) { append(Parameters[i]); }
+            return "(" + builder.ToString() + ")";
         }
 
         public override string ToPrefix()
         {
             StringBuilder builder = new StringBuilder();
+            void append(Term t)
+            {
+                // TODO: hässlich, besser support mit nur einem Argument
+                if (IsInverse(t)) builder.Append("-[0," + t.ToPrefix() + "]");
+                else builder.Append(t.ToPrefix());
+            };
+
             builder.Append("+[");
-            AppendPrefixTermToString(Parameters[0], builder);
+            append(Parameters[0]);
             for (int i = 1; i < Parameters.Length; i++)
             {
                 builder.Append(",");
-                AppendPrefixTermToString(Parameters[i], builder);
+                append(Parameters[i]);
             }
             builder.Append("]");
             return builder.ToString();
@@ -64,20 +81,6 @@ namespace Calq.Core
         public bool IsInverse(Term t)
         {
             return inverseTerms.Contains(t);
-        }
-
-        private void AppendPrefixTermToString(Term t, StringBuilder builder)
-        {
-            if (IsInverse(t))
-            {
-                // TODO: hässlich, besser support mit nur einem Argument
-                builder.Append("-[0," + t.ToPrefix() + "]");
-            }
-            else
-            {
-
-                builder.Append(t.ToPrefix());
-            }
         }
 
         public override string ToString()
