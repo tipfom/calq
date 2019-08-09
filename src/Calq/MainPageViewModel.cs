@@ -50,12 +50,10 @@ namespace Calq
             {
                 if (Term.CheckBracketCount(Expression))
                 {
-                    var x = new Variable("x");
-                    Term kek = x - x;
-                    var t = (x^2) - 3*x + x + x + new Logarithm(x) / x * 3;
+                    Term t = Term.FromInfix(Expression);
                     //Term t = 3 *x-new Real(2)*x;
                     string expLat = t.ToLaTeX();
-                    t = t.Differentiate("x");
+                    //t = t.Differentiate("x");
 
                     Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.Reduce().ToLaTeX() });
                 }

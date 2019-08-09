@@ -8,9 +8,48 @@ namespace Calq.Core
     {
         private HashSet<Term> inverseTerms = new HashSet<Term>();
 
-        public Addition(params Term[] p) : base(FuncType.Addition, p)
+        public Addition(params Term[] p) : base(FuncType.Addition, p) { }
+
+        public bool IsInverse(Term t)
+        {
+            return inverseTerms.Contains(t);
+        }
+
+        public void MarkInverse(Term t)
+        {
+            inverseTerms.Add(t);
+        }
+
+        public override Term Reduce()
         {
 
+            IEnumerable<(Term, bool)> reducedParameter = Parameters.Select(t => (t.Reduce(), IsInverse(t)));
+            double addedValue = 0;
+            foreach ((Term, bool) t in reducedParameter.Where(t => t.Item1.GetType() == typeof(Real)))
+                addedValue += (t.Item2 ? -1 : 1) * ((Real)t.Item1).Value;
+
+            List<(Term, bool)> remainingTerms = reducedParameter.Where(t => t.Item1.GetType() != typeof(Real)).ToList();
+            if (addedValue != 0) remainingTerms.Add((new Real(addedValue), false));
+
+            if (remainingTerms.Count == 0) return new Real(0);
+            if (remainingTerms.Count == 1)
+            {
+                (Term, bool) remainingTerm = remainingTerms.First(x => true);
+                if(remainingTerm.Item1.GetType() == typeof(Real))
+                {
+                    return new Real((remainingTerm.Item2 ? -1 : 1) * ((Real)remainingTerm.Item1).Value);
+                }
+                if(!remainingTerm.Item2)
+                {
+                    return remainingTerm.Item1;
+                }
+            }
+
+            // nicht impl if (remainingTerms.Count == 1 ) return remainingTerms[0];
+
+            Addition add = new Addition(remainingTerms.Select(t => t.Item1).ToArray());
+            foreach ((Term, bool) t in remainingTerms) if (t.Item2) add.MarkInverse(t.Item1);
+            return add;
         }
 
         public override Term Differentiate(string argument)
@@ -35,6 +74,7 @@ namespace Calq.Core
         {
             return this;
         }
+
         public override Term Approximate()
         {
             return this;
@@ -76,51 +116,10 @@ namespace Calq.Core
             return builder.ToString();
         }
 
-        public void MarkInverse(Term t)
-        {
-            inverseTerms.Add(t);
-        }
-
-        public bool IsInverse(Term t)
-        {
-            return inverseTerms.Contains(t);
-        }
-
         public override string ToString()
         {
             return ToPrefix();
         }
 
-        public override Term Reduce()
-        {
-
-            IEnumerable<(Term, bool)> reducedParameter = Parameters.Select(t => (t.Reduce(), IsInverse(t)));
-            double addedValue = 0;
-            foreach ((Term, bool) t in reducedParameter.Where(t => t.Item1.GetType() == typeof(Real)))
-                addedValue += (t.Item2 ? -1 : 1) * ((Real)t.Item1).Value;
-
-            List<(Term, bool)> remainingTerms = reducedParameter.Where(t => t.Item1.GetType() != typeof(Real)).ToList();
-            if (addedValue != 0) remainingTerms.Add((new Real(addedValue), false));
-
-            if (remainingTerms.Count == 0) return new Real(0);
-            if (remainingTerms.Count == 1)
-            {
-                (Term, bool) remainingTerm = remainingTerms.First(x => true);
-                if(remainingTerm.Item1.GetType() == typeof(Real))
-                {
-                    return new Real((remainingTerm.Item2 ? -1 : 1) * ((Real)remainingTerm.Item1).Value);
-                }
-                if(!remainingTerm.Item2)
-                {
-                    return remainingTerm.Item1;
-                }
-            }
-
-            // nicht impl if (remainingTerms.Count == 1 ) return remainingTerms[0];
-
-            Addition add = new Addition(remainingTerms.Select(t => t.Item1).ToArray());
-            foreach ((Term, bool) t in remainingTerms) if (t.Item2) add.MarkInverse(t.Item1);
-            return add;
-        }
     }
 }

@@ -19,6 +19,19 @@ namespace Calq.Core
             Name = name;
         }
 
+        public static Constant FromName(string name)
+        {
+            switch (name)
+            {
+                case "pi": return new Constant(ConstType.Pi);
+                case "e": return new Constant(ConstType.E);
+                case "i": return new Constant(ConstType.I);
+                case "inf": return new Constant(ConstType.Inf);
+            }
+
+            return null;
+        }
+
         public static bool operator ==(Constant a, Constant b)
         {
             return a.Name == b.Name;

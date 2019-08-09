@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Calq.Core
 {
@@ -33,30 +32,6 @@ namespace Calq.Core
             s = s.Replace(" ", "");
             return FromInfix(s, out s);
         }
-        private static Term FromInfix(string s, out string rest)
-        {
-            if(s == "") throw new MissingArgumentException("InfixString was Empty");
-            rest = s;
-
-            Term tree = null;
-            while(s != "")
-            {
-                //Check Term(), Infix-Prefix Function, Termlist, Vector
-                if (s[0] == '{')
-                {
-                    tree = new TermList(s, out s);
-                }
-                else if(s[0] == '(')
-                {
-                    Function f = Function.GetPrefix(s, out s);
-
-                    
-                }
-            }
-
-            return tree;
-        }
-
 
 
         public abstract Term Evaluate();
@@ -97,6 +72,76 @@ namespace Calq.Core
             }
 
             return brackets.Count == 0;
+        }
+        private static Term FromInfix(string s, out string rest)
+        {
+            if (s == "") throw new MissingArgumentException("InfixString was Empty");
+            rest = s;
+
+            Term tree = null;
+            while (s != "")
+            {
+                //Check Term(), Infix-Prefix Function, Termlist, Vector
+                if (s[0] == '{')
+                {
+                    tree = new TermList(s, out s);
+                }
+                else if (s[0] == '(')
+                {
+                    int bracketDepth = 0;
+                    int breakPoint = 0;
+                    for (int i = 0; i < s.Length; i++)
+                    {
+                        if (s[i] == '(' || s[i] == '{') bracketDepth++;
+                        if (s[i] == ')' || s[i] == '}') bracketDepth--;
+
+                        breakPoint = i;
+
+                        if (bracketDepth == 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    s = s.Substring(1, breakPoint);
+
+                }
+                else
+                {
+                    Function f = Function.GetPrefix(s, out s);
+
+                    if (f is null)
+                    {
+                        if (tree is null)
+                        {
+                            if (s[0] == '-')
+                                tree = Function.GetInfix(s, out s);
+                            else
+                            {
+                                rest = "";
+                                tree = Symbol.FromString(s);
+                            }
+                        }
+                        else if (s[0] == '+' || s[0] == '-')
+                            tree += Function.GetInfix(s, out s);
+                        else if (s[0] == '*' || s[0] == '/')
+                            tree *= Function.GetInfix(s, out s);
+                        else if (s[0] == '^')
+                            tree ^= Function.GetInfix(s, out s);
+                        else
+                        {
+                            //?
+                        }
+
+                    }
+                    else
+                        tree = f;
+                }
+
+
+            }
+
+            return tree;
         }
 
         public int CompareTo(Term other)
@@ -153,6 +198,22 @@ namespace Calq.Core
         {
             return a + -b;
         }
+        public static Term operator -(Term a)
+        {
+            Addition cast_a = a as Addition;
+            if (!(cast_a is null))
+            {
+                Addition add = new Addition(cast_a.Parameters);
+                if (cast_a != null) { foreach (Term t in cast_a.Parameters) if (!cast_a.IsInverse(t)) add.MarkInverse(t); }
+                return add;
+            }
+            else
+            {
+                Addition add = new Addition(a);
+                add.MarkInverse(a);
+                return add;
+            }
+        }
 
         public static Term operator *(Term a, Term b)
         {
@@ -201,29 +262,13 @@ namespace Calq.Core
             return mult;
         }
 
-        public static Term operator -(Term a)
-        {
-            Addition cast_a = a as Addition;
-            if (cast_a != null)
-            {
-                Addition add = new Addition(cast_a.Parameters);
-                if (cast_a != null) { foreach (Term t in cast_a.Parameters) if (!cast_a.IsInverse(t)) add.MarkInverse(t); }
-                return add;
-            }
-            else
-            {
-                Addition add = new Addition(a);
-                add.MarkInverse(a);
-                return add;
-            }
-        }
 
         public static Term operator ^(Term a, Term b)
         {
             return new Power(a, b);
         }
 
-        public static  implicit operator Term(double d) => new Real(d);
+        public static implicit operator Term(double d) => new Real(d);
         public static implicit operator Term(int i) => new Real(i);
     }
 }
