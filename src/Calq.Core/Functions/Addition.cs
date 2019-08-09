@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Calq.Core
@@ -86,6 +87,25 @@ namespace Calq.Core
         public override string ToString()
         {
             return ToPrefix();
+        }
+
+        public override Term Reduce()
+        {
+            if(Parameters.Length == 1 && Parameters[0].GetType() == typeof(Real))
+                return new Real(((IsInverse(Parameters[0])) ? -1 : 1) * ((Real)Parameters[0]).Value);
+
+            IEnumerable<Term> reducedParameter = Parameters.Select(t => t.Reduce());
+            double addedValue = 0;
+            foreach (Term t in reducedParameter.Where(t => t.GetType() == typeof(Real)))
+                addedValue += ((IsInverse(t)) ? -1 : 1) * ((Real)t).Value;
+
+            List<Term> remainingTerms = reducedParameter.Where(t => t.GetType() != typeof(Real)).ToList();
+            if (addedValue != 0) remainingTerms.Add(new Real(addedValue));
+            if (remainingTerms.Count == 1) return remainingTerms[0];
+
+            Addition add =new Addition(remainingTerms.ToArray());
+            foreach (Term t in remainingTerms) if (IsInverse(t)) add.MarkInverse(t);
+            return add;
         }
     }
 }

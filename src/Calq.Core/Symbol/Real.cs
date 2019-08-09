@@ -7,7 +7,7 @@ namespace Calq.Core
     public class Real : Symbol
     {
         public readonly double Value;
-
+        
         public Real(double value) : base(VarType.Real)
         {
             Value = value;

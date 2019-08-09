@@ -39,6 +39,11 @@ namespace Calq.Core
             return ret;
         }
 
+        public override Term Reduce()
+        {
+            throw new NotImplementedException();
+        }
+
         public override string ToLaTeX()
         {
             return @"\left{" + string.Join(",", Terms.Select(x => x.ToLaTeX())) + @"\right}";

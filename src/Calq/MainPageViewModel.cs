@@ -51,12 +51,12 @@ namespace Calq
                 if (Term.CheckBracketCount(Expression))
                 {
                     var x = new Variable("x");
-                    Term t = new Real(1)/(x ^new Real(2));
+                    var t = ((x^new Real(2))) + x + x + x;
+                    //Term t = new Real(1)/(x ^new Real(2));
                     string expLat = t.ToLaTeX();
-                    var k2 = t.Differentiate("x");
                     t = t.Differentiate("x");
 
-                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });
+                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.Reduce().ToLaTeX() });
                 }
                 else
                 {

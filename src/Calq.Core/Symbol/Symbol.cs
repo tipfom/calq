@@ -20,6 +20,11 @@ namespace Calq.Core
             Type = type;
         }
 
+        public override Term Reduce()
+        {
+            return this;
+        }
+
         public override string ToPrefix()
         {
             return ToString();

@@ -42,5 +42,19 @@ namespace Calq.Core
         {
             return ToPrefix();
         }
+        public override Term Reduce()
+        {
+            Term reducedBase = Parameters[0].Reduce();
+            Term reducedExponent = Parameters[1].Reduce();
+            if (reducedExponent.IsOne()) return reducedBase;
+
+            Power arg0_parsed = reducedBase as Power;
+            if (arg0_parsed != null)
+            {
+                return new Power(arg0_parsed.Parameters[0], arg0_parsed.Parameters[1] * reducedExponent).Reduce();
+            }
+
+            return new Power(reducedBase, Parameters[1].Reduce());
+        }
     }
 }

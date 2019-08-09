@@ -45,7 +45,12 @@ namespace Calq.Core
 
         public override string ToString()
         {
-            throw new NotImplementedException();
+            return ToPrefix();
+        }
+
+        public override Term Reduce()
+        {
+            return this;
         }
     }
 }

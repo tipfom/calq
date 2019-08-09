@@ -18,9 +18,19 @@ namespace Calq.Core
             Type = type;
         }
 
+        public bool IsZero()
+        {
+            return ToString() == "0";
+        }
+        public bool IsOne()
+        {
+            return ToString() == "1";
+        }
+
         public abstract Term Evaluate();
         public abstract Term Approximate();
         public abstract Term Differentiate(string argument);
+        public abstract Term Reduce();
 
         public abstract HashSet<string> GetVariableNames();
 
