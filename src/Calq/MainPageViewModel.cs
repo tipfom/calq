@@ -51,8 +51,8 @@ namespace Calq
                 if (Term.CheckBracketCount(Expression))
                 {
                     var x = new Variable("x");
-                    var t = ((x^new Real(2))) + x + x + x;
-                    //Term t = new Real(1)/(x ^new Real(2));
+                   var t = (x^2) - 3*x + x + x + new Logarithm(x) / x * 3;
+                    //Term t = 3 *x-new Real(2)*x;
                     string expLat = t.ToLaTeX();
                     t = t.Differentiate("x");
 

@@ -6,7 +6,7 @@ namespace Calq.Core
 {
     class Sin : Function
     {
-        public Sin(params Term[] p) : base(FuncType.Power, p)
+        public Sin(params Term[] p) : base(FuncType.Sin, p)
         {
             if (p.Length != 1)
                 throw new InvalidParameterCountException("Sin takes exactly one arguments");

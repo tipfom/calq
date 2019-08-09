@@ -14,28 +14,29 @@ namespace Calq.Core
 
         public override Term Differentiate(string argument)
         {
-            Term sum = Parameters[0].Differentiate(argument);
-            for (int i = 1; i < Parameters.Length; i++)
-                sum += Parameters[i].Differentiate(argument);
+            List<Term> diffTerms = new List<Term>();
+            List<Term> invTerms = new List<Term>();
+            foreach (Term t in Parameters)
+            {
+                Term d = t.Differentiate(argument);
+                diffTerms.Add(d);
+                if (IsInverse(t)) invTerms.Add(d);
+            }
+
+            Addition sum = new Addition(diffTerms.ToArray());
+            foreach (Term t in invTerms)
+                sum.MarkInverse(t);
             return sum;
         }
 
         //[TODO] zusammenfassen/vereinfachen
         public override Term Evaluate()
         {
-            Term sum = Parameters[0];
-
-            for (int i = 1; i < Parameters.Length; i++)
-                sum += Parameters[i].Evaluate();
-            return sum;
+            return this;
         }
         public override Term Approximate()
         {
-            Term sum = Parameters[0];
-
-            for (int i = 1; i < Parameters.Length; i++)
-                sum += Parameters[i].Approximate();
-            return sum;
+            return this;
         }
 
         public override string ToLaTeX()
@@ -48,7 +49,7 @@ namespace Calq.Core
                 else builder.Append((addPlus ? "+" : "") + t.ToLaTeX());
             };
 
-            append(Parameters[0],false);
+            append(Parameters[0], false);
             for (int i = 1; i < Parameters.Length; i++) { append(Parameters[i]); }
             return "(" + builder.ToString() + ")";
         }
@@ -91,20 +92,33 @@ namespace Calq.Core
 
         public override Term Reduce()
         {
-            if(Parameters.Length == 1 && Parameters[0].GetType() == typeof(Real))
-                return new Real(((IsInverse(Parameters[0])) ? -1 : 1) * ((Real)Parameters[0]).Value);
 
-            IEnumerable<Term> reducedParameter = Parameters.Select(t => t.Reduce());
+            IEnumerable<(Term, bool)> reducedParameter = Parameters.Select(t => (t.Reduce(), IsInverse(t)));
             double addedValue = 0;
-            foreach (Term t in reducedParameter.Where(t => t.GetType() == typeof(Real)))
-                addedValue += ((IsInverse(t)) ? -1 : 1) * ((Real)t).Value;
+            foreach ((Term, bool) t in reducedParameter.Where(t => t.Item1.GetType() == typeof(Real)))
+                addedValue += (t.Item2 ? -1 : 1) * ((Real)t.Item1).Value;
 
-            List<Term> remainingTerms = reducedParameter.Where(t => t.GetType() != typeof(Real)).ToList();
-            if (addedValue != 0) remainingTerms.Add(new Real(addedValue));
-            if (remainingTerms.Count == 1) return remainingTerms[0];
+            List<(Term, bool)> remainingTerms = reducedParameter.Where(t => t.Item1.GetType() != typeof(Real)).ToList();
+            if (addedValue != 0) remainingTerms.Add((new Real(addedValue), false));
 
-            Addition add =new Addition(remainingTerms.ToArray());
-            foreach (Term t in remainingTerms) if (IsInverse(t)) add.MarkInverse(t);
+            if (remainingTerms.Count == 0) return new Real(0);
+            if (remainingTerms.Count == 1)
+            {
+                (Term, bool) remainingTerm = remainingTerms.First(x => true);
+                if(remainingTerm.Item1.GetType() == typeof(Real))
+                {
+                    return new Real((remainingTerm.Item2 ? -1 : 1) * ((Real)remainingTerm.Item1).Value);
+                }
+                if(!remainingTerm.Item2)
+                {
+                    return remainingTerm.Item1;
+                }
+            }
+
+            // nicht impl if (remainingTerms.Count == 1 ) return remainingTerms[0];
+
+            Addition add = new Addition(remainingTerms.Select(t => t.Item1).ToArray());
+            foreach ((Term, bool) t in remainingTerms) if (t.Item2) add.MarkInverse(t.Item1);
             return add;
         }
     }
