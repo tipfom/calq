@@ -27,6 +27,24 @@ namespace Calq.Core
             Parameters = paras;
         }
 
+        //[TODO] Reihenfolge checken
+        public static bool operator ==(Function a, Function b)
+        {
+            if (a.Name != b.Name) return false;
+            if (a.Parameters.Length != b.Parameters.Length) return false;
+
+            for(int i = 0; i < a.Parameters.Length; i++)
+            {
+                if (a.Parameters[i] != b.Parameters[i]) return false;
+            }
+
+            return true;
+        }
+        public static bool operator !=(Function a, Function b)
+        {
+            return !(a == b);
+        }
+
         public override HashSet<string> GetVariableNames()
         {
             HashSet<string> ret = new HashSet<string>();
@@ -36,7 +54,6 @@ namespace Calq.Core
 
             return ret;
         }
-        
-        public abstract override string ToString();
+       
     }
 }

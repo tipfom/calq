@@ -14,6 +14,22 @@ namespace Calq.Core
             Terms = terms;
         }
 
+        public static bool operator ==(TermList a, TermList b)
+        {
+            if (a.Terms.Length != b.Terms.Length) return false;
+
+            for (int i = 0; i < a.Terms.Length; i++)
+            {
+                if (a.Terms[i] != b.Terms[i]) return false;
+            }
+
+            return true;
+        }
+        public static bool operator !=(TermList a, TermList b)
+        {
+            return !(a == b);
+        }
+
         public override Term Approximate()
         {
             return new TermList(Terms.Select(x => x.Approximate()).ToArray());

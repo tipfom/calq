@@ -14,9 +14,18 @@ namespace Calq.Core
 
         public ConstType Name;
 
-        public Constant(ConstType name) : base(VarType.Const)
+        public Constant(ConstType name) : base(SymbolType.Const)
         {
             Name = name;
+        }
+
+        public static bool operator ==(Constant a, Constant b)
+        {
+            return a.Name == b.Name;
+        }
+        public static bool operator !=(Constant a, Constant b)
+        {
+            return !(a == b);
         }
 
         //[TODO] nur bei funktionen approximieren/wenn nötig
