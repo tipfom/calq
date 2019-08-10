@@ -27,55 +27,33 @@ namespace Calq.Core
             Parameters = paras;
         }
 
-        public static Function GetPrefix(string s, out string rest)
+        public static Function PrefixFuncFromString(string s)
         {
-            rest = s;
-
             string fName = "";
             if (s.Contains("("))
                 fName = s.Split('(')[0];           
             else
                 return null;
             
-
             FuncType type = FuncType.Unknown;
             switch (fName)
             {
                 case "sin": type = FuncType.Sin; break;
                 case "cos": type = FuncType.Cos; break;
+                default: return null;
             }
-
-            if (type == FuncType.Unknown)
-                return null;
 
             s = s.Substring(fName.Length);
-
-            int bracketDepth = 0;
-            int breakPoint = 0;
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i] == '(' || s[i] == '{') bracketDepth++;
-                if (s[i] == ')' || s[i] == '}') bracketDepth--;
-
-                breakPoint = i;
-
-                if (bracketDepth == 0)
-                {
-                    break;
-                }
-            }
-
-            rest = s.Substring(breakPoint + 1);
-            s = s.Substring(0, breakPoint + 1);
-
             s.Substring(1, s.Length - 2);
+
             List<int> splits = new List<int>(6);
+            int bracketDepth = 0;
             for (int i = 0; i < s.Length; i++)
             {
                 if (s[i] == '(' || s[i] == '{') bracketDepth++;
                 if (s[i] == ')' || s[i] == '}') bracketDepth--;
 
-                if (s[i] == ',' && bracketDepth == 1)
+                if (s[i] == ',' && bracketDepth == 0)
                 {
                     splits.Add(i);
                 }
@@ -88,7 +66,7 @@ namespace Calq.Core
 
             for (int j = 1; j < splits.Count; j++)
             {
-                paras[j - 1] = FromInfix(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1));
+                paras[j - 1] = Parse(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1));
             }
 
             switch (type)
@@ -99,40 +77,46 @@ namespace Calq.Core
 
             return null;
         }
-        public static Term GetInfix(string s, out string rest)
+        public static Function InfixFuncFromString(string s)
         {
-            //[TODO] Lässt nur 1 zeichen lange strings für infix operatoren zu (bis jetzt)
-            FuncType type = InfixOperator(s[0].ToString());
-
-            bool isInvers = s[0] == '-' || s[0] == '/';
-            int order = Function.GetOrder(s);
-
-            s = s.Substring(1);
-
+            string name = "";
+            int smalestOrder = int.MaxValue;
+            int charPos = -1;
             int bracketDepth = 0;
-            int breakPoint = 0;
             for (int i = 0; i < s.Length; i++)
             {
                 if (s[i] == '(' || s[i] == '{') bracketDepth++;
                 if (s[i] == ')' || s[i] == '}') bracketDepth--;
 
-                breakPoint = i;
-
-                if (bracketDepth == 0 && Function.GetOrder(s) < order)
+                if (bracketDepth == 0)
                 {
-                    break;
+                    int order = Function.GetOrder(s[i].ToString());
+                    if (order < smalestOrder)
+                    {
+                        smalestOrder = order;
+                        charPos = i;
+                        name = s[i].ToString();
+                    }
                 }
             }
 
-            rest = s.Substring(breakPoint);
-            s = s.Substring(0, breakPoint);
+            if (smalestOrder == int.MaxValue)
+                return null;
 
-            if(type == FuncType.Addition)
-                return isInvers ? -Term.FromInfix(s) : Term.FromInfix(s);
-            if (type == FuncType.Multiplication)
-                return isInvers ? 1 / Term.FromInfix(s) : Term.FromInfix(s);
+            switch (name)
+            {
+                case "+": return Parse(s.Substring(0, charPos)) + Parse(s.Substring(charPos + 1));
+                case "-":
+                    if (charPos == 0)
+                        return -Parse(s.Substring(1));
+                    else
+                        return Parse(s.Substring(0, charPos)) - Parse(s.Substring(charPos + 1));
+                case "*": return Parse(s.Substring(0, charPos)) * Parse(s.Substring(charPos + 1));
+                case "/": return Parse(s.Substring(0, charPos)) / Parse(s.Substring(charPos + 1));
+                case "^": return Parse(s.Substring(0, charPos)) ^ Parse(s.Substring(charPos + 1));
+            }
 
-            return Term.FromInfix(s);
+            throw new System.FormatException();
         }
         //[TODO] Reihenfolge checken
         public static bool operator ==(Function a, Function b)
@@ -179,6 +163,10 @@ namespace Calq.Core
 
             return FuncType.Unknown;
         }
+        public static bool IsInverseOperator(string name)
+        {
+            return name == "-" || name == "/";
+        }
         public static int GetOrder(FuncType func)
         {
             switch (func)
@@ -192,17 +180,7 @@ namespace Calq.Core
         }
         public static int GetOrder(string name)
         {
-            switch (name)
-            {
-                case "=": return 0;
-                case "+": return 1;
-                case "-": return 1;
-                case "*": return 2;
-                case "/": return 2;
-                case "^": return 3;
-            }
-
-            return int.MaxValue;
+            return GetOrder(InfixOperator(name));
         }
     }
 }

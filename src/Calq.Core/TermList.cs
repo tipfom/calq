@@ -14,30 +14,12 @@ namespace Calq.Core
             Terms = terms;
         }
 
-        public TermList(string s, out string rest) : base(TermType.TermList)
+        public TermList(string s) : base(TermType.TermList)
         {
+            s = s.Substring(1, s.Length - 2);
+
             List<int> splits = new List<int>();
-
-            //find bounds
             int bracketDepth = 0;
-            int breakPoint = 0;
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i] == '(' || s[i] == '{') bracketDepth++;
-                if (s[i] == ')' || s[i] == '}') bracketDepth--;
-
-                breakPoint = i;
-
-                if (bracketDepth == 0)
-                {
-                    break;
-                }
-            }
-
-            rest = s.Substring(breakPoint + 1);
-            s = s.Substring(0, breakPoint + 1);
-
-            s.Substring(1, s.Length - 2);
             for (int i = 0; i < s.Length; i++)
             {
                 if (s[i] == '(' || s[i] == '{') bracketDepth++;
@@ -56,7 +38,7 @@ namespace Calq.Core
 
             for (int j = 1; j < splits.Count; j++)
             {
-                Terms[j - 1] = FromInfix(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1));
+                Terms[j - 1] = Parse(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1));
             }
         }
 

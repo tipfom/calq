@@ -26,14 +26,6 @@ namespace Calq.Core
             return ToString() == "1";
         }
 
-
-        public static Term FromInfix(string s)
-        {
-            s = s.Replace(" ", "");
-            return FromInfix(s, out s);
-        }
-
-
         public abstract Term Evaluate();
         public abstract Term Approximate();
         public abstract Term Differentiate(string argument);
@@ -73,75 +65,21 @@ namespace Calq.Core
 
             return brackets.Count == 0;
         }
-        private static Term FromInfix(string s, out string rest)
+        public static Term Parse(string s)
         {
+            s = s.Replace(" ", "");
             if (s == "") throw new MissingArgumentException("InfixString was Empty");
-            rest = s;
 
-            Term tree = null;
-            while (s != "")
-            {
-                //Check Term(), Infix-Prefix Function, Termlist, Vector
-                if (s[0] == '{')
-                {
-                    tree = new TermList(s, out s);
-                }
-                else if (s[0] == '(')
-                {
-                    int bracketDepth = 0;
-                    int breakPoint = 0;
-                    for (int i = 0; i < s.Length; i++)
-                    {
-                        if (s[i] == '(' || s[i] == '{') bracketDepth++;
-                        if (s[i] == ')' || s[i] == '}') bracketDepth--;
+            Term t = Function.InfixFuncFromString(s);
 
-                        breakPoint = i;
+            if (!(t is null)) return t;
 
-                        if (bracketDepth == 0)
-                        {
-                            break;
-                        }
-                    }
+            t = Function.PrefixFuncFromString(s);
+            if (!(t is null)) return t;
 
-                    s = s.Substring(1, breakPoint);
+            if (s[0] == '{') return new TermList(s);
 
-                }
-                else
-                {
-                    Function f = Function.GetPrefix(s, out s);
-
-                    if (f is null)
-                    {
-                        if (tree is null)
-                        {
-                            if (s[0] == '-')
-                                tree = Function.GetInfix(s, out s);
-                            else
-                            {
-                                rest = "";
-                                tree = Symbol.FromString(s);
-                            }
-                        }
-                        else if (s[0] == '+' || s[0] == '-')
-                            tree += Function.GetInfix(s, out s);
-                        else if (s[0] == '*' || s[0] == '/')
-                            tree *= Function.GetInfix(s, out s);
-                        else if (s[0] == '^')
-                            tree ^= Function.GetInfix(s, out s);
-                        else
-                        {
-                            //?
-                        }
-
-                    }
-                    else
-                        tree = f;
-                }
-
-
-            }
-
-            return tree;
+            return Symbol.FromString(s);
         }
 
         public int CompareTo(Term other)
@@ -170,7 +108,7 @@ namespace Calq.Core
             return !(a == b);
         }
 
-        public static Term operator +(Term a, Term b)
+        public static Addition operator +(Term a, Term b)
         {
             List<Term> r = new List<Term>();
 
@@ -194,11 +132,11 @@ namespace Calq.Core
             return add;
         }
 
-        public static Term operator -(Term a, Term b)
+        public static Addition operator -(Term a, Term b)
         {
             return a + -b;
         }
-        public static Term operator -(Term a)
+        public static Addition operator -(Term a)
         {
             Addition cast_a = a as Addition;
             if (!(cast_a is null))
@@ -215,7 +153,7 @@ namespace Calq.Core
             }
         }
 
-        public static Term operator *(Term a, Term b)
+        public static Multiplication operator *(Term a, Term b)
         {
             List<Term> r = new List<Term>();
 
@@ -238,7 +176,7 @@ namespace Calq.Core
             return mult;
         }
 
-        public static Term operator /(Term a, Term b)
+        public static Multiplication operator /(Term a, Term b)
         {
             List<Term> r = new List<Term>();
 
@@ -262,8 +200,7 @@ namespace Calq.Core
             return mult;
         }
 
-
-        public static Term operator ^(Term a, Term b)
+        public static Power operator ^(Term a, Term b)
         {
             return new Power(a, b);
         }
