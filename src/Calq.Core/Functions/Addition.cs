@@ -6,24 +6,17 @@ namespace Calq.Core
 {
     public class Addition : Function
     {
-        private HashSet<Term> inverseTerms = new HashSet<Term>();
-
         public Addition(params Term[] p) : base(FuncType.Addition, p) { }
-
-        public bool IsInverse(Term t)
+        public Addition(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Addition, p)
         {
-            return inverseTerms.Contains(t);
-        }
-
-        public void MarkInverse(Term t)
-        {
-            inverseTerms.Add(t);
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
         }
 
         public override Term Reduce()
         {
 
-            IEnumerable<(Term, bool)> reducedParameter = Parameters.Select(t => (t.Reduce(), IsInverse(t)));
+            IEnumerable<(Term, bool)> reducedParameter = Parameters.Select(t => (t.Reduce(), t.IsAddInverse));
             double addedValue = 0;
             foreach ((Term, bool) t in reducedParameter.Where(t => t.Item1.GetType() == typeof(Real)))
                 addedValue += (t.Item2 ? -1 : 1) * ((Real)t.Item1).Value;
@@ -48,25 +41,12 @@ namespace Calq.Core
             // nicht impl if (remainingTerms.Count == 1 ) return remainingTerms[0];
 
             Addition add = new Addition(remainingTerms.Select(t => t.Item1).ToArray());
-            foreach ((Term, bool) t in remainingTerms) if (t.Item2) add.MarkInverse(t.Item1);
             return add;
         }
 
         public override Term Differentiate(string argument)
         {
-            List<Term> diffTerms = new List<Term>();
-            List<Term> invTerms = new List<Term>();
-            foreach (Term t in Parameters)
-            {
-                Term d = t.Differentiate(argument);
-                diffTerms.Add(d);
-                if (IsInverse(t)) invTerms.Add(d);
-            }
-
-            Addition sum = new Addition(diffTerms.ToArray());
-            foreach (Term t in invTerms)
-                sum.MarkInverse(t);
-            return sum;
+            return new Addition(IsAddInverse, IsMulInverse, Parameters.Select(x => x.Differentiate(argument)).ToArray());
         }
 
         //[TODO] zusammenfassen/vereinfachen
@@ -86,7 +66,7 @@ namespace Calq.Core
             void append(Term t, bool addPlus = true)
             {
                 // TODO: hässlich, besser support mit nur einem Argument
-                if (IsInverse(t)) builder.Append("-" + t.ToLaTeX());
+                if (t.IsAddInverse) builder.Append("-" + t.ToLaTeX());
                 else builder.Append((addPlus ? "+" : "") + t.ToLaTeX());
             };
 
@@ -101,7 +81,7 @@ namespace Calq.Core
             void append(Term t)
             {
                 // TODO: hässlich, besser support mit nur einem Argument
-                if (IsInverse(t)) builder.Append("-[0," + t.ToPrefix() + "]");
+                if (t.IsAddInverse) builder.Append("-[0," + t.ToPrefix() + "]");
                 else builder.Append(t.ToPrefix());
             };
 

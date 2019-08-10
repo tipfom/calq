@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Calq.Core
 {
@@ -11,6 +12,8 @@ namespace Calq.Core
         }
 
         public readonly TermType Type;
+        public bool IsAddInverse = false;
+        public bool IsMulInverse = false;
 
         protected Term(TermType type)
         {
@@ -87,6 +90,8 @@ namespace Calq.Core
             throw new NotImplementedException();
         }
 
+        public abstract Term Clone();
+
         public static bool operator ==(Term a, Term b)
         {
             if (a is null || a is null)
@@ -110,99 +115,36 @@ namespace Calq.Core
 
         public static Addition operator +(Term a, Term b)
         {
-            List<Term> r = new List<Term>();
-
-            Addition cast_a = a as Addition;
-            if (cast_a != null)
-                r.AddRange(cast_a.Parameters);
-            else
-                r.Add(a);
-
-            Addition cast_b = b as Addition;
-            if (cast_b != null)
-                r.AddRange(cast_b.Parameters);
-            else
-                r.Add(b);
-
-            // TODO: Performance
-            Addition add = new Addition(r.ToArray());
-            if (cast_a != null) foreach (Term t in cast_a.Parameters) if (cast_a.IsInverse(t)) add.MarkInverse(t);
-            if (cast_b != null) foreach (Term t in cast_b.Parameters) if (cast_b.IsInverse(t)) add.MarkInverse(t);
-
-            return add;
+            return new Addition(a.Clone(), b.Clone());
         }
 
         public static Addition operator -(Term a, Term b)
         {
             return a + -b;
         }
-        public static Addition operator -(Term a)
+        public static Term operator -(Term a)
         {
-            Addition cast_a = a as Addition;
-            if (!(cast_a is null))
-            {
-                Addition add = new Addition(cast_a.Parameters);
-                if (cast_a != null) { foreach (Term t in cast_a.Parameters) if (!cast_a.IsInverse(t)) add.MarkInverse(t); }
-                return add;
-            }
-            else
-            {
-                Addition add = new Addition(a);
-                add.MarkInverse(a);
-                return add;
-            }
+            Term t = a.Clone();
+            t.IsAddInverse = !t.IsAddInverse;
+            return t;            
         }
 
         public static Multiplication operator *(Term a, Term b)
         {
-            List<Term> r = new List<Term>();
-
-            Multiplication cast_a = a as Multiplication;
-            if (cast_a != null)
-                r.AddRange(cast_a.Parameters);
-            else
-                r.Add(a);
-
-            Multiplication cast_b = b as Multiplication;
-            if (cast_b != null)
-                r.AddRange(cast_b.Parameters);
-            else
-                r.Add(b);
-
-            Multiplication mult = new Multiplication(r.ToArray());
-            if (cast_a != null) foreach (Term t in cast_a.Parameters) if (cast_a.IsInverse(t)) mult.MarkInverse(t);
-            if (cast_b != null) foreach (Term t in cast_b.Parameters) if (cast_b.IsInverse(t)) mult.MarkInverse(t);
-
-            return mult;
+            return new Multiplication(a.Clone(), b.Clone());
         }
 
         public static Multiplication operator /(Term a, Term b)
         {
-            List<Term> r = new List<Term>();
+            Term b1 = b.Clone();
+            b1.IsMulInverse = !b1.IsMulInverse;
 
-            Multiplication cast_a = a as Multiplication;
-            if (cast_a != null)
-                r.AddRange(cast_a.Parameters);
-            else
-                r.Add(a);
-
-            Multiplication cast_b = b as Multiplication;
-            if (cast_b != null)
-                r.AddRange(cast_b.Parameters);
-            else
-                r.Add(b);
-
-            Multiplication mult = new Multiplication(r.ToArray());
-            if (cast_a != null) { foreach (Term t in cast_a.Parameters) if (cast_a.IsInverse(t)) mult.MarkInverse(t); }
-            if (cast_b != null) { foreach (Term t in cast_b.Parameters) if (!cast_b.IsInverse(t)) mult.MarkInverse(t); }
-            else mult.MarkInverse(b);
-
-            return mult;
+            return a * b;
         }
 
         public static Power operator ^(Term a, Term b)
         {
-            return new Power(a, b);
+            return new Power(a.Clone(), b.Clone());
         }
 
         public static implicit operator Term(double d) => new Real(d);

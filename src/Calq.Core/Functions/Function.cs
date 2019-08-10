@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Calq.Core
 {
@@ -77,7 +78,7 @@ namespace Calq.Core
 
             return null;
         }
-        public static Function InfixFuncFromString(string s)
+        public static Term InfixFuncFromString(string s)
         {
             string name = "";
             int smalestOrder = int.MaxValue;
@@ -148,7 +149,32 @@ namespace Calq.Core
 
             return ret;
         }
- 
+        public override Term Clone()
+        {
+            Function ret = null;
+            Term[] paras = Parameters.Select(x => (Term)x.Clone()).ToArray();
+            switch (Name)
+            {
+                case FuncType.Addition:
+                    ret = new Addition(paras); break;
+                case FuncType.Multiplication:
+                    ret = new Multiplication(paras); break;
+                case FuncType.Power:
+                    ret = new Power(paras); break;
+                case FuncType.Sin:
+                    ret = new Sin(paras); break;
+                case FuncType.Cos:
+                    ret = new Cos(paras); break;
+                case FuncType.Log:
+                    ret = new Logarithm(paras); break;
+            }
+
+            ret.IsAddInverse = IsAddInverse;
+            ret.IsMulInverse = IsMulInverse;
+
+            return ret;
+        }
+
         public static FuncType InfixOperator(string name)
         {
             switch (name)

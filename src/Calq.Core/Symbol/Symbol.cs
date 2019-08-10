@@ -49,6 +49,11 @@ namespace Calq.Core
             return !(a == b);
         }
 
+        public override Term Clone()
+        {
+            return FromString(ToString());
+        }
+
         public override Term Reduce()
         {
             return this;

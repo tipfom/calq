@@ -7,12 +7,18 @@ namespace Calq.Core
 {
     public class Multiplication : Function
     {
-        private HashSet<Term> inverseTerms = new HashSet<Term>();
-
         public Multiplication(params Term[] p) : base(FuncType.Multiplication, p)
         {
             if (p.Length < 2)
                 throw new InvalidParameterCountException("Multiplication needs at least 2 arguments");
+        }
+        public Multiplication(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Multiplication, p)
+        {
+            if (p.Length < 2)
+                throw new InvalidParameterCountException("Multiplication needs at least 2 arguments");
+
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMultInverse;
         }
 
         public override Term Differentiate(string argument)
@@ -22,30 +28,21 @@ namespace Calq.Core
             for (int i = 0; i < Parameters.Length; i++)
             {
                 Term r = Parameters[i];
-                if (IsInverse(r))
-                {
-                    r = r ^ (-new Real(1));
-                }
-                r = r.Differentiate(argument);
+
+                if (r.IsMulInverse)
+                    r = r.Differentiate(argument) / (r ^ 2);
+                else
+                    r = r.Differentiate(argument);
+
                 for (int j = 0; j < Parameters.Length; j++)
                 {
                     if (i == j) continue;
                     r *= Parameters[j];
-                    if (IsInverse(Parameters[j])) ((Multiplication)r).MarkInverse(Parameters[j]);
                 }
                 sums.Add(r);
             }
+
             return new Addition(sums.ToArray());
-        }
-
-        public void MarkInverse(Term t)
-        {
-            inverseTerms.Add(t);
-        }
-
-        public bool IsInverse(Term t)
-        {
-            return inverseTerms.Contains(t);
         }
 
         //[TODO] zusammenfassen/vereinfachen
@@ -68,9 +65,11 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            if (inverseTerms.Count > 0)
+            List<Term> inverse = Parameters.Where(t => t.IsMulInverse).ToList();
+
+            if (inverse.Count > 0)
             {
-                return $@"\frac{"{" + string.Join(@"\cdot ", Parameters.Where(t => !IsInverse(t)).Select(t => t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", Parameters.Where(t => IsInverse(t)).Select(t => t.ToLaTeX())) + "}"}";
+                return $@"\frac{"{" + string.Join(@"\cdot ", Parameters.Where(t => !t.IsMulInverse).Select(t => t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
             }
             else
             {
@@ -99,7 +98,7 @@ namespace Calq.Core
 
         private void AppendPrefixTermToString(Term t, StringBuilder builder)
         {
-            if (IsInverse(t))
+            if (t.IsMulInverse)
             {
                 // TODO: hässlich, besser support mit nur einem Argument
                 builder.Append("/[1," + t.ToPrefix() + "]");
@@ -117,7 +116,7 @@ namespace Calq.Core
             var x = Parameters.FirstOrDefault(t => t.Reduce().Equals(new Constant(Constant.ConstType.Inf)));
             if (x != null)
             {
-                if (IsInverse(x))
+                if (x.IsMulInverse)
                 {
                     return new Real(0);
                 }
@@ -131,11 +130,11 @@ namespace Calq.Core
                 Real r = (Real)t;
                 if (r.Value == 0)
                 {
-                    if (IsInverse(t)) return new Constant(Constant.ConstType.Inf);
+                    if (t.IsMulInverse) return new Constant(Constant.ConstType.Inf);
                     return new Real(0);
                 }
 
-                if (IsInverse(t))
+                if (t.IsMulInverse)
                 {
                     addedValue /= ((Real)t).Value;
                 }
@@ -152,7 +151,7 @@ namespace Calq.Core
             if (remainingTerms.Count == 1) return remainingTerms[0];
 
             Multiplication mul = new Multiplication(remainingTerms.ToArray());
-            foreach (Term t in remainingTerms) if (IsInverse(t)) mul.MarkInverse(t);
+            
             return mul;
         }
     }

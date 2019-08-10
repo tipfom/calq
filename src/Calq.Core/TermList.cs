@@ -97,5 +97,10 @@ namespace Calq.Core
         {
             return "{" + string.Join(",", Terms.Select(x => x.ToLaTeX())) + "}";
         }
+
+        public override Term Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
