@@ -69,12 +69,13 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
+            string sign = IsAddInverse ? "-" : "";
             switch (Name)
             {
-                case ConstType.Pi: return @"\pi";
-                case ConstType.E: return "e";
-                case ConstType.Inf: return @"\infty";
-                case ConstType.I: return "i";
+                case ConstType.Pi: return sign + @"\pi";
+                case ConstType.E: return sign + "e";
+                case ConstType.Inf: return sign + @"\infty";
+                case ConstType.I: return sign + "i";
             }
 
             return null;
@@ -82,12 +83,13 @@ namespace Calq.Core
 
         public override string ToString()
         {
+            string sign = IsAddInverse ? "-" : "";
             switch (Name)
             {
-                case ConstType.Pi: return "π";
-                case ConstType.E: return "e";
-                case ConstType.Inf: return "∞";
-                case ConstType.I: return "i";
+                case ConstType.Pi: return sign + "π";
+                case ConstType.E: return sign + "e";
+                case ConstType.Inf: return sign + "∞";
+                case ConstType.I: return sign + "i";
             }
 
             return null;

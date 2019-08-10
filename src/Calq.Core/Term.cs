@@ -33,6 +33,7 @@ namespace Calq.Core
         public abstract Term Approximate();
         public abstract Term Differentiate(string argument);
         public abstract Term Reduce();
+        public abstract Term MergeBranches();
 
         public abstract HashSet<string> GetVariableNames();
 
@@ -139,7 +140,7 @@ namespace Calq.Core
             Term b1 = b.Clone();
             b1.IsMulInverse = !b1.IsMulInverse;
 
-            return a * b;
+            return a * b1;
         }
 
         public static Power operator ^(Term a, Term b)

@@ -48,12 +48,12 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return Value.ToString();
+            return (IsAddInverse ? "-" : "") + Value.ToString();
         }
 
         public override string ToString()
         {
-            return Value.ToString();
+            return (IsAddInverse ? "-" : "") + Value.ToString();
         }
     }
 }

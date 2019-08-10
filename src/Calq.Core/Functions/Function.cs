@@ -92,7 +92,7 @@ namespace Calq.Core
                 if (bracketDepth == 0)
                 {
                     int order = Function.GetOrder(s[i].ToString());
-                    if (order < smalestOrder)
+                    if (order <= smalestOrder)
                     {
                         smalestOrder = order;
                         charPos = i;
@@ -173,6 +173,52 @@ namespace Calq.Core
             ret.IsMulInverse = IsMulInverse;
 
             return ret;
+        }
+        public override Term MergeBranches()
+        {
+            List<Term> paras = new List<Term>();
+            switch (Name)
+            {
+                case FuncType.Addition:
+                    foreach(Term t in Parameters.Select(x => x.MergeBranches()))
+                    {
+                        Addition cast = t as Addition;
+
+                        if (cast is null)
+                            paras.Add(t.Clone());
+                        else
+                            foreach(Term p in cast.Parameters)
+                            {
+                                if (cast.IsAddInverse)
+                                    paras.Add(-p.Clone());
+                                else
+                                    paras.Add(p.Clone());
+                            }
+                    }
+                    return new Addition(IsAddInverse, IsMulInverse, paras.ToArray());
+                case FuncType.Multiplication:
+                    foreach (Term t in Parameters.Select(x => x.MergeBranches()))
+                    {
+                        Multiplication cast = t as Multiplication;
+
+                        if (cast is null)
+                            paras.Add(t.Clone());
+                        else
+                            foreach (Term p in cast.Parameters)
+                            {
+                                if (cast.IsMulInverse)
+                                {
+                                    Term buffer = p.Clone();
+                                    p.IsMulInverse = !p.IsMulInverse;
+                                    paras.Add(p);
+                                }
+                                else
+                                    paras.Add(p.Clone());
+                            }
+                    }
+                    return new Multiplication(IsAddInverse, IsMulInverse, paras.ToArray());
+                default: return Clone();
+            }
         }
 
         public static FuncType InfixOperator(string name)

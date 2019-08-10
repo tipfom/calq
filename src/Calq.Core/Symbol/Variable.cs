@@ -38,12 +38,12 @@ namespace Calq.Core
         //[TODO] Latexcode phi, psi ...
         public override string ToLaTeX()
         {
-            return Name;
+            return (IsAddInverse ? "-" : "") + Name;
         }
 
         public override string ToString()
         {
-            return Name;
+            return (IsAddInverse ? "-" : "") + Name;
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Calq.Core
 {
@@ -51,7 +49,10 @@ namespace Calq.Core
 
         public override Term Clone()
         {
-            return FromString(ToString());
+            Term t = FromString(ToString());
+            t.IsAddInverse = IsAddInverse;
+            t.IsMulInverse = IsMulInverse;
+            return t;
         }
 
         public override Term Reduce()
@@ -59,10 +60,14 @@ namespace Calq.Core
             return this;
         }
 
-
         public override string ToPrefix()
         {
             return ToString();
+        }
+
+        public override Term MergeBranches()
+        {
+            return this;
         }
     }
 }

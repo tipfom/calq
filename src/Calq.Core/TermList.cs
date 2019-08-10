@@ -100,7 +100,12 @@ namespace Calq.Core
 
         public override Term Clone()
         {
-            throw new NotImplementedException();
+            return new TermList(Terms.Select(x => x.Clone()).ToArray());
+        }
+
+        public override Term MergeBranches()
+        {
+            return new TermList(Terms.Select(x => x.MergeBranches()).ToArray());
         }
     }
 }

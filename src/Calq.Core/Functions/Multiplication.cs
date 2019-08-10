@@ -112,47 +112,30 @@ namespace Calq.Core
 
         public override Term Reduce()
         {
-            // TODO help
-            var x = Parameters.FirstOrDefault(t => t.Reduce().Equals(new Constant(Constant.ConstType.Inf)));
-            if (x != null)
+            List<Term> paras = Parameters.Select(x => x.Reduce()).Where(x => !x.IsOne()).ToList();
+
+            List<Real> reals = paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>().ToList();
+            if (reals.Count > 1)
             {
-                if (x.IsMulInverse)
+                double product = 1;
+                for (int i = 0; i < reals.Count; i++)
                 {
-                    return new Real(0);
+                    if (reals[i].IsAddInverse)
+                        product /= reals[i].Value;
+                    else
+                        product *= reals[i].Value;
                 }
-                return new Constant(Constant.ConstType.Inf);
+
+                paras = paras.Where(x => x.GetType() != typeof(Real)).ToList();
+                if (product != 1) paras.Add(product);
             }
 
-            IEnumerable<Term> reducedParameter = Parameters.Select(t => t.Reduce());
-            double addedValue = 1;
-            foreach (Term t in reducedParameter.Where(t => t.GetType() == typeof(Real)))
+            switch (paras.Count)
             {
-                Real r = (Real)t;
-                if (r.Value == 0)
-                {
-                    if (t.IsMulInverse) return new Constant(Constant.ConstType.Inf);
-                    return new Real(0);
-                }
-
-                if (t.IsMulInverse)
-                {
-                    addedValue /= ((Real)t).Value;
-                }
-                else
-                {
-                    addedValue *= ((Real)t).Value;
-                }
+                case 0: return 0;
+                case 1: return paras[0];
+                default: return new Multiplication(IsAddInverse, IsMulInverse, paras.ToArray());
             }
-
-
-            List<Term> remainingTerms = reducedParameter.Where(t => t.GetType() != typeof(Real)).ToList();
-            if (addedValue != 0) remainingTerms.Add(new Real(addedValue));
-
-            if (remainingTerms.Count == 1) return remainingTerms[0];
-
-            Multiplication mul = new Multiplication(remainingTerms.ToArray());
-            
-            return mul;
         }
     }
 }

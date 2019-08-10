@@ -51,11 +51,10 @@ namespace Calq
                 if (Term.CheckBracketCount(Expression))
                 {
                     Term t = Term.Parse(Expression);
-                    //Term t = 3 *x-new Real(2)*x;
                     string expLat = t.ToLaTeX();
-                    //t = t.Differentiate("x");
-
-                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.Reduce().ToLaTeX() });
+                    t = t.MergeBranches();
+                    t = t.Reduce();
+                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });
                 }
                 else
                 {

@@ -15,33 +15,30 @@ namespace Calq.Core
 
         public override Term Reduce()
         {
+            List<Term> paras = Parameters.Select(x => x.Reduce()).Where(x => !x.IsZero()).ToList();
 
-            IEnumerable<(Term, bool)> reducedParameter = Parameters.Select(t => (t.Reduce(), t.IsAddInverse));
-            double addedValue = 0;
-            foreach ((Term, bool) t in reducedParameter.Where(t => t.Item1.GetType() == typeof(Real)))
-                addedValue += (t.Item2 ? -1 : 1) * ((Real)t.Item1).Value;
-
-            List<(Term, bool)> remainingTerms = reducedParameter.Where(t => t.Item1.GetType() != typeof(Real)).ToList();
-            if (addedValue != 0) remainingTerms.Add((new Real(addedValue), false));
-
-            if (remainingTerms.Count == 0) return new Real(0);
-            if (remainingTerms.Count == 1)
+            List<Real> reals = paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>().ToList();
+            if (reals.Count > 1)
             {
-                (Term, bool) remainingTerm = remainingTerms.First(x => true);
-                if(remainingTerm.Item1.GetType() == typeof(Real))
+                double sum = 0;
+                for (int i = 0; i < reals.Count; i++)
                 {
-                    return new Real((remainingTerm.Item2 ? -1 : 1) * ((Real)remainingTerm.Item1).Value);
+                    if(reals[i].IsAddInverse)
+                        sum -= reals[i].Value;
+                    else
+                        sum += reals[i].Value;
                 }
-                if(!remainingTerm.Item2)
-                {
-                    return remainingTerm.Item1;
-                }
+                    
+                paras = paras.Where(x => x.GetType() != typeof(Real)).ToList();
+                if(sum != 0) paras.Add(sum);
             }
 
-            // nicht impl if (remainingTerms.Count == 1 ) return remainingTerms[0];
-
-            Addition add = new Addition(remainingTerms.Select(t => t.Item1).ToArray());
-            return add;
+            switch (paras.Count)
+            {
+                case 0: return 0;
+                case 1: return paras[0];
+                default: return new Addition(IsAddInverse, IsMulInverse, paras.ToArray());
+            }
         }
 
         public override Term Differentiate(string argument)
@@ -62,17 +59,7 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            StringBuilder builder = new StringBuilder();
-            void append(Term t, bool addPlus = true)
-            {
-                // TODO: hässlich, besser support mit nur einem Argument
-                if (t.IsAddInverse) builder.Append("-" + t.ToLaTeX());
-                else builder.Append((addPlus ? "+" : "") + t.ToLaTeX());
-            };
-
-            append(Parameters[0], false);
-            for (int i = 1; i < Parameters.Length; i++) { append(Parameters[i]); }
-            return "(" + builder.ToString() + ")";
+            return string.Join(" + ", Parameters.Select(x => x.ToLaTeX()));
         }
 
         public override string ToPrefix()
