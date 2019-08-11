@@ -41,9 +41,9 @@ namespace Calq.Core
             }
         }
 
-        public override Term Differentiate(string argument)
+        public override Term GetDerivative(string argument)
         {
-            return new Addition(IsAddInverse, IsMulInverse, Parameters.Select(x => x.Differentiate(argument)).ToArray());
+            return new Addition(IsAddInverse, IsMulInverse, Parameters.Select(x => x.GetDerivative(argument)).ToArray());
         }
 
         //[TODO] zusammenfassen/vereinfachen

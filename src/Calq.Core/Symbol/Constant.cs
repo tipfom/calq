@@ -46,7 +46,7 @@ namespace Calq.Core
         {
             return this;
         }
-        public override Term Differentiate(string argument)
+        public override Term GetDerivative(string argument)
         {
             return new Real(0);
         }

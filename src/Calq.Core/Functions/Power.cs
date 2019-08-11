@@ -10,11 +10,11 @@ namespace Calq.Core
                 throw new InvalidParameterCountException("Power takes exactly two arguments");
         }
 
-        public override Term Differentiate(string argument)
+        public override Term GetDerivative(string argument)
         {
             Term f = Parameters[0];
             Term g = Parameters[1];
-            return (f ^ (g - new Real(1))) * (g * f.Differentiate(argument) + f * new Logarithm(f) * g.Differentiate(argument));
+            return (f ^ (g - new Real(1))) * (g * f.GetDerivative(argument) + f * new Logarithm(f) * g.GetDerivative(argument));
         }
 
         //[TODO] zusammenfassen/vereinfachen

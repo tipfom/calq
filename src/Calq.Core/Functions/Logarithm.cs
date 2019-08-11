@@ -15,15 +15,15 @@ namespace Calq.Core
             throw new NotImplementedException();
         }
 
-        public override Term Differentiate(string argument)
+        public override Term GetDerivative(string argument)
         {
             if (Parameters.Length == 1)
             {
-                return Parameters[0].Differentiate(argument) / Parameters[0];
+                return Parameters[0].GetDerivative(argument) / Parameters[0];
             }
             else
             {
-                return (new Logarithm(Parameters[0]) / new Logarithm(Parameters[1])).Differentiate(argument);
+                return (new Logarithm(Parameters[0]) / new Logarithm(Parameters[1])).GetDerivative(argument);
             }
         }
 

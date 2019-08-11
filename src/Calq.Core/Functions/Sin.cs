@@ -9,12 +9,12 @@ namespace Calq.Core
         public Sin(params Term[] p) : base(FuncType.Sin, p)
         {
             if (p.Length != 1)
-                throw new InvalidParameterCountException("Sin takes exactly one arguments");
+                throw new InvalidParameterCountException("Sin takes exactly one argument");
         }
 
-        public override Term Differentiate(string argument)
+        public override Term GetDerivative(string argument)
         {
-            return new Cos(Parameters[0]) * Parameters[0].Differentiate(argument);
+            return new Cos(Parameters[0]) * Parameters[0].GetDerivative(argument);
         }
 
         //[TODO] zusammenfassen/vereinfachen

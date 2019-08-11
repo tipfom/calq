@@ -63,9 +63,9 @@ namespace Calq.Core
             return new TermList(Terms.Select(x => x.Approximate()).ToArray());
         }
 
-        public override Term Differentiate(string argument)
+        public override Term GetDerivative(string argument)
         {
-            return new TermList(Terms.Select(x => x.Differentiate(argument)).ToArray());
+            return new TermList(Terms.Select(x => x.GetDerivative(argument)).ToArray());
         }
 
         public override Term Evaluate()

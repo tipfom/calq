@@ -31,7 +31,7 @@ namespace Calq.Core
 
         public abstract Term Evaluate();
         public abstract Term Approximate();
-        public abstract Term Differentiate(string argument);
+        public abstract Term GetDerivative(string argument);
         public abstract Term Reduce();
         public abstract Term MergeBranches();
 

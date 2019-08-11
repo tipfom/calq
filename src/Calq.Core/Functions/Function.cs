@@ -41,6 +41,8 @@ namespace Calq.Core
             {
                 case "sin": type = FuncType.Sin; break;
                 case "cos": type = FuncType.Cos; break;
+                case "log": type = FuncType.Log; break;
+                case "dif": type = FuncType.Differentiate; break;
                 default: return null;
             }
 
@@ -74,6 +76,8 @@ namespace Calq.Core
             {
                 case FuncType.Sin: return new Sin(paras);
                 case FuncType.Cos: return new Cos(paras);
+                case FuncType.Log: return new Logarithm(paras);
+                case FuncType.Differentiate: return new Differentiate(paras);
             }
 
             return null;
@@ -167,6 +171,8 @@ namespace Calq.Core
                     ret = new Cos(paras); break;
                 case FuncType.Log:
                     ret = new Logarithm(paras); break;
+                case FuncType.Differentiate:
+                    ret = new Differentiate(paras); break;
             }
 
             ret.IsAddInverse = IsAddInverse;

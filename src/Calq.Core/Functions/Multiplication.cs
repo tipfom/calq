@@ -21,7 +21,7 @@ namespace Calq.Core
             IsMulInverse = isMultInverse;
         }
 
-        public override Term Differentiate(string argument)
+        public override Term GetDerivative(string argument)
         {
             List<Term> sums = new List<Term>();
 
@@ -30,9 +30,9 @@ namespace Calq.Core
                 Term r = Parameters[i];
 
                 if (r.IsMulInverse)
-                    r = r.Differentiate(argument) / (r ^ 2);
+                    r = r.GetDerivative(argument) / (r ^ 2);
                 else
-                    r = r.Differentiate(argument);
+                    r = r.GetDerivative(argument);
 
                 for (int j = 0; j < Parameters.Length; j++)
                 {
