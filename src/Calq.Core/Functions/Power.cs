@@ -54,7 +54,7 @@ namespace Calq.Core
                 return new Power(arg0_parsed.Parameters[0], arg0_parsed.Parameters[1] * reducedExponent).Reduce();
             }
 
-            return new Power(reducedBase, Parameters[1].Reduce());
+            return new Power(reducedBase, reducedExponent);
         }
     }
 }

@@ -54,6 +54,8 @@ namespace Calq
                     string expLat = t.ToLaTeX();
                     t = t.MergeBranches();
                     t = t.Reduce();
+
+                    string ret = t.ToLaTeX();
                     Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });
                 }
                 else

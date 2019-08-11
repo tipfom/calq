@@ -45,7 +45,7 @@ namespace Calq.Core
             }
 
             s = s.Substring(fName.Length);
-            s.Substring(1, s.Length - 2);
+            s = s.Substring(1, s.Length - 2);
 
             List<int> splits = new List<int>(6);
             int bracketDepth = 0;
@@ -91,7 +91,7 @@ namespace Calq.Core
 
                 if (bracketDepth == 0)
                 {
-                    int order = Function.GetOrder(s[i].ToString());
+                    int order = GetOrder(s[i].ToString());
                     if (order <= smalestOrder)
                     {
                         smalestOrder = order;
@@ -245,14 +245,14 @@ namespace Calq.Core
             {
                 case FuncType.Equals: return 0;
                 case FuncType.Addition: return 1;
-                case FuncType.Multiplication: return 2;
-                case FuncType.Power: return 3;
+                case FuncType.Multiplication: return 3;
+                case FuncType.Power: return 4;
                 default: return int.MaxValue;
             }
         }
         public static int GetOrder(string name)
         {
-            return GetOrder(InfixOperator(name));
+            return GetOrder(InfixOperator(name) + (name == "-" ? 1 : 0));
         }
     }
 }

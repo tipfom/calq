@@ -83,6 +83,9 @@ namespace Calq.Core
 
             if (s[0] == '{') return new TermList(s);
 
+            if (s[0] == '(' && s[s.Length - 1] == ')')
+                return Parse(s.Substring(1, s.Length - 2));
+
             return Symbol.FromString(s);
         }
 
