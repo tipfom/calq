@@ -40,7 +40,7 @@ namespace Calq.Core
 
         public override string ToString()
         {
-            return ToPrefix();
+            return "(" + Parameters[0].ToPrefix() + ")^(" + Parameters[1].ToPrefix() + ")";
         }
         public override Term Reduce()
         {

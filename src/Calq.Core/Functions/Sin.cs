@@ -30,7 +30,7 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return $@"sin({"{" + Parameters[0].ToLaTeX() + "}"})";
+            return $"\\sin({"{" + Parameters[0].ToLaTeX() + "}"})";
         }
 
         public override string ToPrefix()
@@ -40,7 +40,7 @@ namespace Calq.Core
 
         public override string ToString()
         {
-            return ToPrefix();
+            return $"sin({Parameters[0].ToString()})";
         }
         public override Term Reduce()
         {

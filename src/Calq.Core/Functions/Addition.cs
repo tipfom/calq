@@ -15,7 +15,34 @@ namespace Calq.Core
 
         public override Term Reduce()
         {
-            List<Term> paras = Parameters.Select(x => x.Reduce()).Where(x => !x.IsZero()).ToList();
+            List<Term> paras = new List<Term>();
+            bool[] used = new bool[Parameters.Length];
+
+            for(int i = 0; i < Parameters.Length; i++)
+            {
+                if (used[i]) continue;
+
+                bool foundInverse = false;
+                for(int j = i + 1; j < Parameters.Length; j++)
+                {
+                    if (used[j]) continue;
+
+                    if (Parameters[i] == -Parameters[j])
+                    {
+                        foundInverse = true;
+                        used[j] = true;
+                        break;
+                    }
+                }
+
+                if (!foundInverse)
+                {
+                    paras.Add(Parameters[i]);
+                }
+            }
+
+            paras = paras.Select(x => x.Reduce()).Where(x => !x.IsZero()).ToList();
+
 
             List<Real> reals = paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>().ToList();
             if (reals.Count > 1)
@@ -46,7 +73,6 @@ namespace Calq.Core
             return new Addition(IsAddInverse, IsMulInverse, Parameters.Select(x => x.GetDerivative(argument)).ToArray());
         }
 
-        //[TODO] zusammenfassen/vereinfachen
         public override Term Evaluate()
         {
             return this;
@@ -59,34 +85,28 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return string.Join(" + ", Parameters.Select(x => x.ToLaTeX()));
+            return ToString();
         }
 
         public override string ToPrefix()
         {
-            StringBuilder builder = new StringBuilder();
-            void append(Term t)
-            {
-                // TODO: hässlich, besser support mit nur einem Argument
-                if (t.IsAddInverse) builder.Append("-[0," + t.ToPrefix() + "]");
-                else builder.Append(t.ToPrefix());
-            };
-
-            builder.Append("+[");
-            append(Parameters[0]);
-            for (int i = 1; i < Parameters.Length; i++)
-            {
-                builder.Append(",");
-                append(Parameters[i]);
-            }
-            builder.Append("]");
-            return builder.ToString();
+            return "+[" + string.Join(",", Parameters.Select(x => x.ToPrefix())) + "]";
         }
 
         public override string ToString()
         {
-            return ToPrefix();
-        }
+            string s = "";
 
+            s += Parameters[0].ToString();
+            for(int i = 1; i < Parameters.Length; i++)
+            {
+                if (Parameters[i].IsAddInverse)
+                    s += "-" + (-Parameters[i]).ToString();
+                else
+                    s += "+" + Parameters[i].ToString();
+            }
+
+            return s;
+        }
     }
 }

@@ -77,39 +77,26 @@ namespace Calq.Core
             }
         }
 
-        public override string ToString()
-        {
-            return ToPrefix();
-        }
-
         public override string ToPrefix()
         {
-            StringBuilder builder = new StringBuilder();
-            builder.Append("*[");
-            AppendPrefixTermToString(Parameters[0], builder);
+            return "*[" + string.Join(",", Parameters.Select(x => (x.IsMulInverse ? "/" : "") + x.ToPrefix())) + "]";
+        }
+
+        public override string ToString()
+        {
+            string s = "";
+
+            s += "(" + Parameters[0].ToString() + ")";
             for (int i = 1; i < Parameters.Length; i++)
             {
-                builder.Append(",");
-                AppendPrefixTermToString(Parameters[i], builder);
+                if (Parameters[i].IsMulInverse)
+                    s += "/(" + Parameters[i].ToString() + ")";
+                else
+                    s += "*(" + Parameters[i].ToString() + ")";
             }
-            builder.Append("]");
-            return builder.ToString();
+
+            return s;
         }
-
-        private void AppendPrefixTermToString(Term t, StringBuilder builder)
-        {
-            if (t.IsMulInverse)
-            {
-                // TODO: hässlich, besser support mit nur einem Argument
-                builder.Append("/[1," + t.ToPrefix() + "]");
-            }
-            else
-            {
-
-                builder.Append(t.ToPrefix());
-            }
-        }
-
         public override Term Reduce()
         {
             List<Term> paras = Parameters.Select(x => x.Reduce()).Where(x => !x.IsOne()).ToList();

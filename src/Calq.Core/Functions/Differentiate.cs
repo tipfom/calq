@@ -54,12 +54,12 @@ namespace Calq.Core
 
         public override string ToPrefix()
         {
-            return $"Differentiate[{Parameters[0].ToPrefix()}]";
+            return $"Differentiate[{string.Join(",", Parameters.Select(x => x.ToPrefix()))}]";
         }
 
         public override string ToString()
         {
-            return ToPrefix();
+            return $"Differentiate({string.Join(",", Parameters.Select(x => x.ToString()))})";
         }
         public override Term Reduce()
         {

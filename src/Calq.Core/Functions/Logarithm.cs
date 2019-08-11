@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Calq.Core
@@ -8,6 +9,8 @@ namespace Calq.Core
     {
         public Logarithm(params Term[] p) : base(FuncType.Log, p)
         {
+            if (!(p.Length == 1 || p.Length == 2))
+                throw new InvalidParameterCountException("Log takes one or two arguments");
         }
 
         public override Term Approximate()
@@ -40,12 +43,12 @@ namespace Calq.Core
 
         public override string ToPrefix()
         {
-            return "ln[" + Parameters[0] + "]";
+            return "log[" + string.Join(",", Parameters.Select(x => x.ToPrefix())) + "]";
         }
 
         public override string ToString()
         {
-            return ToPrefix();
+            return "log(" + string.Join(",", Parameters.Select(x => x.ToString())) + ")";
         }
 
         public override Term Reduce()
