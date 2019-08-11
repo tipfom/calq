@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Calq.Core
 {
-    class Cos : Function
+    public class Cos : Function
     {
         public Cos(params Term[] p) : base(FuncType.Cos, p)
         {

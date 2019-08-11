@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Calq.Core
 {
-    class Sin : Function
+    public class Sin : Function
     {
         public Sin(params Term[] p) : base(FuncType.Sin, p)
         {

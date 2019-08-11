@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29123.89
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calq.UWP", "Calq.UWP\Calq.UWP.csproj", "{F29D1DB8-019D-4EAE-811B-5E223DBAE1C1}"
 EndProject
@@ -9,9 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calq.Android", "Calq.Androi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calq.iOS", "Calq.iOS\Calq.iOS.csproj", "{74A8E881-D987-45C1-8B1D-8E835D5C0190}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calq", "Calq\Calq.csproj", "{7E6BEB62-9635-47B3-96D0-A36C4CA1014E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calq", "Calq\Calq.csproj", "{7E6BEB62-9635-47B3-96D0-A36C4CA1014E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calq.Core", "Calq.Core\Calq.Core.csproj", "{1F189AE1-E9B2-4FB6-A370-8D24FA67F79C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calq.Core", "Calq.Core\Calq.Core.csproj", "{1F189AE1-E9B2-4FB6-A370-8D24FA67F79C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calq.UnitTests", "Calq.UnitTests\Calq.UnitTests.csproj", "{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -197,6 +199,30 @@ Global
 		{1F189AE1-E9B2-4FB6-A370-8D24FA67F79C}.Release|x64.Build.0 = Release|Any CPU
 		{1F189AE1-E9B2-4FB6-A370-8D24FA67F79C}.Release|x86.ActiveCfg = Release|Any CPU
 		{1F189AE1-E9B2-4FB6-A370-8D24FA67F79C}.Release|x86.Build.0 = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|x64.Build.0 = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Debug|x86.Build.0 = Debug|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|ARM.Build.0 = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|iPhone.Build.0 = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|x64.ActiveCfg = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|x64.Build.0 = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|x86.ActiveCfg = Release|Any CPU
+		{4AFA6492-F1CF-4786-AD2D-C7754E12F73E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

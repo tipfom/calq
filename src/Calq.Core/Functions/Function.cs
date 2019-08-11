@@ -246,7 +246,7 @@ namespace Calq.Core
                 case FuncType.Equals: return 0;
                 case FuncType.Addition: return 1;
                 case FuncType.Multiplication: return 2;
-                case FuncType.Power: return 2;
+                case FuncType.Power: return 3;
                 default: return int.MaxValue;
             }
         }
