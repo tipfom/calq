@@ -9,7 +9,11 @@ namespace Calq.Core
     {
         public string Name;
 
-        public Variable(string name) : base(SymbolType.Variable)
+        public Variable(string name) : base(SymbolType.Variable, false, false)
+        {
+            Name = name;
+        }
+        public Variable(string name, bool isAddInverse, bool isMultInverse) : base(SymbolType.Variable, isAddInverse, isMultInverse)
         {
             Name = name;
         }
@@ -29,6 +33,11 @@ namespace Calq.Core
                 return new Real(1);
             else
                 return new Real(0);      
+        }
+
+        public override Term Clone()
+        {
+            return new Variable(Name, IsAddInverse, IsMulInverse);
         }
 
         public override HashSet<string> GetVariableNames()

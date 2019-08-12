@@ -6,12 +6,8 @@ namespace Calq.Core
 {
     public class Addition : Function
     {
-        public Addition(params Term[] p) : base(FuncType.Addition, p) { }
-        public Addition(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Addition, p)
-        {
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMulInverse;
-        }
+        public Addition(params Term[] p) : base(FuncType.Addition,false, false, p) { }
+        public Addition(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Addition, isAddInverse, isMulInverse, p) { }
 
         public override Term Reduce()
         {
@@ -98,7 +94,7 @@ namespace Calq.Core
                     buffer += "+" + Parameters[i].ToLaTeX();
             }
 
-            if (IsMulInverse) buffer += ")";
+            if (IsAddInverse) buffer += ")";
 
             return buffer;
         }

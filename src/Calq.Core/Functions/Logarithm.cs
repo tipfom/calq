@@ -7,18 +7,15 @@ namespace Calq.Core
 {
     public class Logarithm : Function
     {
-        public Logarithm(params Term[] p) : base(FuncType.Log, p)
+        public Logarithm(params Term[] p) : base(FuncType.Log, false, false, p)
         {
             if (!(p.Length == 1 || p.Length == 2))
                 throw new InvalidParameterCountException("Log takes one or two arguments");
         }
-        public Logarithm(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Log, p)
+        public Logarithm(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Log, isAddInverse, isMulInverse, p)
         {
             if (!(p.Length == 1 || p.Length == 2))
                 throw new InvalidParameterCountException("Log takes one or two arguments");
-
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMulInverse;
         }
 
         public override Term Approximate()

@@ -23,7 +23,7 @@ namespace Calq.Core
         public bool IsInfix { get { return (int)Name <= (int)FuncType.Power; } }
         public readonly FuncType Name;
         public readonly Term[] Parameters;
-        protected Function(FuncType name, Term[] paras) : base(TermType.Function)
+        protected Function(FuncType name, bool isAddInverse, bool isMulInverse, Term[] paras): base(TermType.Function, isAddInverse, isMulInverse)
         {
             Name = name;
             Parameters = paras;
@@ -163,25 +163,22 @@ namespace Calq.Core
             switch (Name)
             {
                 case FuncType.Addition:
-                    ret = new Addition(paras); break;
+                    ret = new Addition(IsAddInverse, IsMulInverse, paras); break;
                 case FuncType.Multiplication:
-                    ret = new Multiplication(paras); break;
+                    ret = new Multiplication(IsAddInverse, IsMulInverse, paras); break;
                 case FuncType.Power:
-                    ret = new Power(paras); break;
+                    ret = new Power(IsAddInverse, IsMulInverse, paras); break;
                 case FuncType.Sin:
-                    ret = new Sin(paras); break;
+                    ret = new Sin(IsAddInverse, IsMulInverse, paras); break;
                 case FuncType.Cos:
-                    ret = new Cos(paras); break;
+                    ret = new Cos(IsAddInverse, IsMulInverse, paras); break;
                 case FuncType.Log:
-                    ret = new Logarithm(paras); break;
+                    ret = new Logarithm(IsAddInverse, IsMulInverse, paras); break;
                 case FuncType.Differentiate:
-                    ret = new Differentiate(paras); break;
+                    ret = new Differentiate(IsAddInverse, IsMulInverse, paras); break;
                 case FuncType.Integrate:
-                    ret = new Integrate(paras); break;
+                    ret = new Integrate(IsAddInverse, IsMulInverse, paras); break;
             }
-
-            ret.IsAddInverse = IsAddInverse;
-            ret.IsMulInverse = IsMulInverse;
 
             return ret;
         }
@@ -219,9 +216,7 @@ namespace Calq.Core
                             {
                                 if (cast.IsMulInverse)
                                 {
-                                    Term buffer = p.Clone();
-                                    p.IsMulInverse = !p.IsMulInverse;
-                                    paras.Add(p);
+                                    paras.Add(p.GetMultInverse());
                                 }
                                 else
                                     paras.Add(p.Clone());

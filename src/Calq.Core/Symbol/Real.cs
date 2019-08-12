@@ -8,7 +8,11 @@ namespace Calq.Core
     {
         public readonly double Value;
 
-        public Real(double value) : base(SymbolType.Real)
+        public Real(double value) : base(SymbolType.Real, false, false)
+        {
+            Value = value;
+        }
+        public Real(double value, bool isAddInverse, bool isMultInverse) : base(SymbolType.Real, isAddInverse, isMultInverse)
         {
             Value = value;
         }
@@ -26,7 +30,10 @@ namespace Calq.Core
         {
             return new Real(v);
         }
-
+        public override Term Clone()
+        {
+            return new Real(Value, IsAddInverse, IsMulInverse);
+        }
         public override Term GetDerivative(string argument)
         {
             return new Real(0);

@@ -8,7 +8,7 @@ namespace Calq.Core
     class Differentiate : Function
     {
         //Function, argument, N
-        public Differentiate(params Term[] p) : base(FuncType.Differentiate, p)
+        public Differentiate(params Term[] p) : base(FuncType.Differentiate, false, false, p)
         {
             if (!(p.Length == 2 || p.Length == 3))
                 throw new InvalidParameterCountException("Differentiate takes two or three arguments");
@@ -22,7 +22,7 @@ namespace Calq.Core
                     throw new ArgumentException("The second argument of Differentiate needs to be an Integer");
             }
         }
-        public Differentiate(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Differentiate, p)
+        public Differentiate(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Differentiate, isAddInverse, isMulInverse, p)
         {
             if (!(p.Length == 2 || p.Length == 3))
                 throw new InvalidParameterCountException("Differentiate takes two or three arguments");
@@ -35,9 +35,6 @@ namespace Calq.Core
                 if (p[2].GetType() != typeof(Real))
                     throw new ArgumentException("The second argument of Differentiate needs to be an Integer");
             }
-
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMulInverse;
         }
 
         public override Term GetDerivative(string argument)

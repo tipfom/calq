@@ -10,7 +10,7 @@ namespace Calq.Core
         private bool HasLimits { get { return Parameters.Length == 4; } }
 
         //fuction, argument, a, b
-        public Integrate(params Term[] p) : base(FuncType.Integrate, p)
+        public Integrate(params Term[] p) : base(FuncType.Integrate, false, false, p)
         {
             if (!(p.Length == 2 || p.Length == 4))
                 throw new InvalidParameterCountException("Integrate takes two or four arguments");
@@ -19,17 +19,13 @@ namespace Calq.Core
                 throw new ArgumentException("The second argument of Inegrate needs to be a Variable");
         }
 
-        public Integrate(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Integrate, p)
+        public Integrate(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Integrate, isAddInverse, isMulInverse, p)
         {
             if (!(p.Length == 2 || p.Length == 4))
                 throw new InvalidParameterCountException("Integrate takes two or four arguments");
 
             if (p[1].GetType() != typeof(Variable))
                 throw new ArgumentException("The second argument of Inegrate needs to be a Variable");
-
-
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMulInverse;
         }
 
         public override Term Approximate()

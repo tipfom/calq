@@ -14,7 +14,11 @@ namespace Calq.Core
 
         public ConstType Name;
 
-        public Constant(ConstType name) : base(SymbolType.Const)
+        public Constant(ConstType name) : base(SymbolType.Const, false, false)
+        {
+            Name = name;
+        }
+        public Constant(ConstType name, bool isAddInverse, bool isMultInverse) : base(SymbolType.Const, isAddInverse, isMultInverse)
         {
             Name = name;
         }
@@ -41,7 +45,11 @@ namespace Calq.Core
             return !(a == b);
         }
 
-        //[TODO] nur bei funktionen approximieren/wenn nötig
+        public override Term Clone()
+        {
+            return new Constant(Name, IsAddInverse, IsMulInverse);
+        }
+
         public override Term Evaluate()
         {
             return this;

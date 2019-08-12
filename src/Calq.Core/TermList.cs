@@ -9,18 +9,16 @@ namespace Calq.Core
     {
         public readonly Term[] Terms;
 
-        public TermList(params Term[] terms) : base(TermType.TermList)
+        public TermList(params Term[] terms) : base(TermType.TermList, false, false)
         {
             Terms = terms;
         }
-        public TermList(bool isAddInverse, bool isMulInverse, params Term[] terms) : base(TermType.TermList)
+        public TermList(bool isAddInverse, bool isMulInverse, params Term[] terms) : base(TermType.TermList, isAddInverse, isMulInverse)
         {
             Terms = terms;
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMulInverse;
         }
 
-        public TermList(string s) : base(TermType.TermList)
+        public TermList(string s) : base(TermType.TermList, false, false)
         {
             s = s.Substring(1, s.Length - 2);
 

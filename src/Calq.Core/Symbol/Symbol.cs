@@ -13,7 +13,7 @@ namespace Calq.Core
 
         public SymbolType SType;
 
-        protected Symbol(SymbolType type) : base(TermType.Symbol)
+        protected Symbol(SymbolType type, bool isAddInverse, bool isMultInverse) : base(TermType.Symbol, isAddInverse, isMultInverse)
         {
             SType = type;
         }
@@ -45,14 +45,6 @@ namespace Calq.Core
         public static bool operator !=(Symbol a, Symbol b)
         {
             return !(a == b);
-        }
-
-        public override Term Clone()
-        {
-            Term t = FromString(IsAddInverse ? ToInfix().Substring(1) : ToInfix());
-            t.IsAddInverse = IsAddInverse;
-            t.IsMulInverse = IsMulInverse;
-            return t;
         }
 
         public override Term Reduce()

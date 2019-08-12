@@ -7,18 +7,15 @@ namespace Calq.Core
 {
     public class Multiplication : Function
     {
-        public Multiplication(params Term[] p) : base(FuncType.Multiplication, p)
+        public Multiplication(params Term[] p) : base(FuncType.Multiplication, false, false, p)
         {
             if (p.Length < 2)
                 throw new InvalidParameterCountException("Multiplication needs at least 2 arguments");
         }
-        public Multiplication(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Multiplication, p)
+        public Multiplication(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Multiplication, isAddInverse, isMultInverse, p)
         {
             if (p.Length < 2)
                 throw new InvalidParameterCountException("Multiplication needs at least 2 arguments");
-
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMultInverse;
         }
 
         public override Term GetDerivative(string argument)
@@ -103,8 +100,7 @@ namespace Calq.Core
                 for (int j = i + 1; j < copy.Length; j++)
                 {
                     if (used[j]) continue;
-                    Term b = copy[j].Clone();
-                    b.IsMulInverse = !b.IsMulInverse;
+                    Term b = copy[j].Clone().GetMultInverse();
 
                     if (copy[i] == b)
                     {

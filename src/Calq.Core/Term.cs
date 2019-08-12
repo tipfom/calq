@@ -12,12 +12,14 @@ namespace Calq.Core
         }
 
         public readonly TermType Type;
-        public bool IsAddInverse = false;
-        public bool IsMulInverse = false;
+        public bool IsAddInverse { get; private set; } = false;
+        public bool IsMulInverse { get; private set; } = false;
 
-        protected Term(TermType type)
+        protected Term(TermType type, bool isAddInverse, bool isMulInverse)
         {
             Type = type;
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
         }
 
         public bool IsZero()
@@ -160,10 +162,7 @@ namespace Calq.Core
 
         public static Multiplication operator /(Term a, Term b)
         {
-            Term b1 = b.Clone();
-            b1.IsMulInverse = !b1.IsMulInverse;
-
-            return a * b1;
+            return a * b.GetMultInverse();
         }
 
         public static Power operator ^(Term a, Term b)

@@ -4,18 +4,15 @@ namespace Calq.Core
 {
     public class Power : Function
     {
-        public Power(params Term[] p) : base(FuncType.Power, p)
+        public Power(params Term[] p) : base(FuncType.Power, false, false, p)
         {
             if (p.Length != 2)
                 throw new InvalidParameterCountException("Power takes exactly two arguments");
         }
-        public Power(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Power, p)
+        public Power(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Power, isAddInverse, isMultInverse, p)
         {
             if (p.Length < 2)
                 throw new InvalidParameterCountException("Power takes exactly two arguments");
-
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMultInverse;
         }
 
         public override Term GetDerivative(string argument)

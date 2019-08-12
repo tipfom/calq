@@ -7,15 +7,15 @@ namespace Calq.Core
 {
     public class Cos : Function
     {
-        public Cos(params Term[] p) : base(FuncType.Cos, p)
+        public Cos(params Term[] p) : base(FuncType.Cos, false, false, p)
         {
             if (p.Length != 1)
                 throw new InvalidParameterCountException("Cos takes exactly one argument");
         }
-        public Cos(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Cos, p)
+        public Cos(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Cos, isAddInverse, isMulInverse, p)
         {
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMulInverse;
+            if (p.Length != 1)
+                throw new InvalidParameterCountException("Cos takes exactly one argument");
         }
 
         public override Term GetDerivative(string argument)

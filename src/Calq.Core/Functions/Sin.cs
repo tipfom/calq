@@ -6,18 +6,15 @@ namespace Calq.Core
 {
     public class Sin : Function
     {
-        public Sin(params Term[] p) : base(FuncType.Sin, p)
+        public Sin(params Term[] p) : base(FuncType.Sin, false, false, p)
         {
             if (p.Length != 1)
                 throw new InvalidParameterCountException("Sin takes exactly one argument");
         }
-        public Sin(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Sin, p)
+        public Sin(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Sin, isAddInverse, isMultInverse, p)
         {
-            if (p.Length < 2)
+            if (p.Length != 1)
                 throw new InvalidParameterCountException("Sin takes exactly one argument");
-
-            IsAddInverse = isAddInverse;
-            IsMulInverse = isMultInverse;
         }
 
         public override Term GetDerivative(string argument)
