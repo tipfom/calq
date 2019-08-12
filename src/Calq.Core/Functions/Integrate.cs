@@ -25,11 +25,11 @@ namespace Calq.Core
                 string term;
                 if (HasLimits)
                 {
-                    WebHelper.GetIntegral(Parameters[0].ToPrefix(), Parameters[0].GetVariableNames(), Parameters[1].ToString(), Parameters[2].ToPrefix(), Parameters[3].ToPrefix(), out term);
+                    WebHelper.GetIntegral(Parameters[0].ToPrefix(), Parameters.SelectMany(t => t.GetVariableNames()), Parameters[1].ToString(), Parameters[2].ToPrefix(), Parameters[3].ToPrefix(), out term);
                 }
                 else
                 {
-                    WebHelper.GetIntegral(Parameters[0].ToPrefix(), Parameters[0].GetVariableNames(), Parameters[1].ToString(), out term);
+                    WebHelper.GetIntegral(Parameters[0].ToPrefix(), Parameters.SelectMany(t => t.GetVariableNames()), Parameters[1].ToString(), out term);
                 }
                 return Term.Parse(term.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf"));
             }
