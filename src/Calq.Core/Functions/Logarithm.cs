@@ -42,8 +42,10 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            if (Parameters.Length == 1) return GetSign() + $@"\log{"{" + Parameters[0].ToLaTeX() + "}"}";
-            return GetSign() + $@"\log_{"{" + Parameters[1].ToLaTeX() + "}"} {Parameters[0].ToLaTeX()}";
+            if (Parameters.Length == 1)
+                return GetSign() + $@"\log{"(" + Parameters[0].ToLaTeX() + ")"}";
+            else
+                return GetSign() + $@"\log_{"{" + Parameters[1].ToLaTeX() + "}"} {"(" + Parameters[0].ToLaTeX() + ")"}";
         }
 
         public override string ToString()
