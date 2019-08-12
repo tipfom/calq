@@ -4,4 +4,4 @@ obj/
 .vscode/
 __pycache__/
 *.user
-UpgradeLog?.htm
+UpgradeLog*.htm
