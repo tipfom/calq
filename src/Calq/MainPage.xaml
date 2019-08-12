@@ -32,7 +32,8 @@
                        Grid.Row="1"
                        ItemTemplateSelector="{StaticResource Key=LogListViewItemSelector}"
                        VerticalScrollBarVisibility="Never"
-                       SelectionMode="None">
+                       SelectionMode="None"
+                       HasUnevenRows="True">
         </c:LogListView>
 
         <Entry Text="{Binding Expression}"

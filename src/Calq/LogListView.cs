@@ -34,7 +34,7 @@ namespace Calq
                     if (templateView == null && templateCell == null)
                         throw new InvalidOperationException("DataTemplate must be either a Cell or a View");
                     if (templateView != null) // we got a view, wrap in a cell
-                        templateCell = new ViewCell { View = templateView };
+                        templateCell = new ViewCell { View = templateView, Height = templateView.HeightRequest };
                     return templateCell;
                 }
             }
