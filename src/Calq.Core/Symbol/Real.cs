@@ -55,5 +55,11 @@ namespace Calq.Core
         {
             return (IsAddInverse ? "-" : "") + Value.ToString();
         }
+
+        public override string ToString(bool includeSign)
+        {
+            if (includeSign) return ToString();
+            return Value.ToString();
+        }
     }
 }

@@ -83,7 +83,12 @@ namespace Calq.Core
 
         public override string ToString()
         {
-            string sign = IsAddInverse ? "-" : "";
+            return ToString(true);
+        }
+
+        public override string ToString(bool includeSign)
+        {
+            string sign = includeSign && IsAddInverse ? "-" : "";
             switch (Name)
             {
                 case ConstType.Pi: return sign + "π";

@@ -49,7 +49,7 @@ namespace Calq.Core
 
         public override Term Clone()
         {
-            Term t = FromString(ToString());
+            Term t = FromString(ToString(false));
             t.IsAddInverse = IsAddInverse;
             t.IsMulInverse = IsMulInverse;
             return t;
@@ -69,5 +69,7 @@ namespace Calq.Core
         {
             return this;
         }
+
+        public abstract string ToString(bool includeSign);
     }
 }

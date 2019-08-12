@@ -79,7 +79,7 @@ namespace Calq.Core
 
         public override string ToPrefix()
         {
-            return "*[" + string.Join(",", Parameters.Select(x => (x.IsMulInverse ? "/" : "") + x.ToPrefix())) + "]";
+            return "*[" + string.Join(",", Parameters.Select(x => x.IsMulInverse ? $"/[{x.ToPrefix()}]" : x.ToPrefix())) + "]";
         }
 
         public override string ToString()
