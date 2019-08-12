@@ -59,15 +59,18 @@ def buildFunctionFromTree(tree, sympy_vars):
             expr *= buildFunctionFromTree(ch, sympy_vars)
     
     elif tree.key == "/":
-        expr = buildFunctionFromTree(tree.childs[0], sympy_vars) / buildFunctionFromTree(tree.childs[1], sympy_vars)
-
+        if len(tree.childs) == 1:
+            expr = 1 / buildFunctionFromTree(tree.childs[0], sympy_vars)
+        else:
+            expr = buildFunctionFromTree(tree.childs[0], sympy_vars) / buildFunctionFromTree(tree.childs[1], sympy_vars)
+    
     elif tree.key == "sin":
         expr = sympy.sin(buildFunctionFromTree(tree.childs[0], sympy_vars))
 
     elif tree.key == "cos":
         expr = sympy.cos(buildFunctionFromTree(tree.childs[0], sympy_vars))
 
-    elif tree.key == "ln":
+    elif tree.key == "log":
         expr = sympy.ln(buildFunctionFromTree(tree.childs[0], sympy_vars))
 
     elif tree.key == "^":
