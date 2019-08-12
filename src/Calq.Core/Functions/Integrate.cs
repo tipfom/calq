@@ -9,8 +9,14 @@ namespace Calq.Core
     {
         private bool HasLimits { get { return Parameters.Length == 4; } }
 
-        public Integrate(params Term[] paras) : base(FuncType.Integrate, paras)
+        //fuction, argument, a, b
+        public Integrate(params Term[] p) : base(FuncType.Integrate, p)
         {
+            if (!(p.Length == 2 || p.Length == 4))
+                throw new InvalidParameterCountException("Integrate takes two or four arguments");
+
+            if (p[1].GetType() != typeof(Variable))
+                throw new ArgumentException("The second argument of Inegrate needs to be a Variable");
         }
 
         public override Term Approximate()

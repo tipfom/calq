@@ -18,6 +18,7 @@ namespace Calq.Core
             List<Term> paras = new List<Term>();
             bool[] used = new bool[Parameters.Length];
 
+            //inverse equvalent
             for(int i = 0; i < Parameters.Length; i++)
             {
                 if (used[i]) continue;
@@ -43,7 +44,7 @@ namespace Calq.Core
 
             paras = paras.Select(x => x.Reduce()).Where(x => !x.IsZero()).ToList();
 
-
+            //Multiple reals
             List<Real> reals = paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>().ToList();
             if (reals.Count > 1)
             {

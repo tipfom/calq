@@ -53,7 +53,10 @@ namespace Calq
                     Term t = Term.Parse(Expression);
                     string expLat = t.ToLaTeX();
                     t = t.MergeBranches();
-                    t = t.Evaluate().Reduce();
+                    t = t.Evaluate();
+                    t = t.MergeBranches();
+                    t = t.Reduce();
+
 
                     string ret = t.ToLaTeX();
                     Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });

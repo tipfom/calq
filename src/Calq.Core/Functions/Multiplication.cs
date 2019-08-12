@@ -69,7 +69,12 @@ namespace Calq.Core
 
             if (inverse.Count > 0)
             {
-                return $@"\frac{"{" + string.Join(@"\cdot ", Parameters.Where(t => !t.IsMulInverse).Select(t => t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
+                List<Term> normal = Parameters.Where(t => !t.IsMulInverse).ToList();
+
+                if(normal.Count == 0)
+                    return $@"\frac{"{1}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
+                else
+                    return $@"\frac{"{" + string.Join(@"\cdot ", normal.Select(t => t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
             }
             else
             {
@@ -99,15 +104,45 @@ namespace Calq.Core
         }
         public override Term Reduce()
         {
-            List<Term> paras = Parameters.Select(x => x.Reduce()).Where(x => !x.IsOne()).ToList();
+            Term[] copy = Parameters.Select(x => x.Reduce()).Where(x => !x.IsOne()).ToArray();
+            List<Term> paras = new List<Term>();
 
+            bool[] used = new bool[copy.Length];
+            //inverse equvalent
+            for (int i = 0; i < copy.Length; i++)
+            {
+                if (used[i]) continue;
+                if (copy[i].IsOne()) continue;
+
+                bool foundInverse = false;
+                for (int j = i + 1; j < copy.Length; j++)
+                {
+                    if (used[j]) continue;
+                    Term b = copy[j].Clone();
+                    b.IsMulInverse = !b.IsMulInverse;
+
+                    if (copy[i] == b)
+                    {
+                        foundInverse = true;
+                        used[j] = true;
+                        break;
+                    }
+                }
+
+                if (!foundInverse)
+                {
+                    paras.Add(copy[i]);
+                }
+            }
+
+            //multiple reals
             List<Real> reals = paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>().ToList();
             if (reals.Count > 1)
             {
                 double product = 1;
                 for (int i = 0; i < reals.Count; i++)
                 {
-                    if (reals[i].IsAddInverse)
+                    if (reals[i].IsMulInverse)
                         product /= reals[i].Value;
                     else
                         product *= reals[i].Value;
@@ -117,10 +152,17 @@ namespace Calq.Core
                 if (product != 1) paras.Add(product);
             }
 
+            if (paras.Where(x => x.IsZero()).Count() > 0)
+                return 0;
+
+
             switch (paras.Count)
             {
-                case 0: return 0;
-                case 1: return paras[0];
+                case 0: return 1;
+                case 1: if (paras[0].IsMulInverse)
+                        return new Multiplication(IsAddInverse, IsMulInverse, 1, paras[0]);
+                    else
+                        return paras[0];
                 default: return new Multiplication(IsAddInverse, IsMulInverse, paras.ToArray());
             }
         }

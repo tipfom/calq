@@ -7,6 +7,7 @@ namespace Calq.Core
 {
     class Differentiate : Function
     {
+        //Function, argument, N
         public Differentiate(params Term[] p) : base(FuncType.Differentiate, p)
         {
             if (!(p.Length == 2 || p.Length == 3))
@@ -33,7 +34,8 @@ namespace Calq.Core
             Term ret = Parameters[0];
             int n = 1;
             if (Parameters.Length == 3) n = (int)((Real)Parameters[2]).Value;
-            for (int i = 0; i < n; i++) ret = ret.GetDerivative(Parameters[1].ToString());
+            for (int i = 0; i < n; i++)
+                ret = ret.GetDerivative(Parameters[1].ToString());
 
             return ret;
         }
