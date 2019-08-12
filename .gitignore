@@ -1,6 +1,6 @@
-**/bin/
-**/obj/
-**/.vs/
-**/.vscode/
-**/__pycache__/
+bin/
+obj/
+.vs/
+.vscode/
+__pycache__/
 *.user

@@ -14,7 +14,7 @@ namespace Calq.Core
 
             Sqrt, Log, Sin, Cos, Differentiate,
 
-            Lim, Int,
+            Lim, Integrate,
             Solve, Erf,
 
             Unknown
@@ -43,6 +43,7 @@ namespace Calq.Core
                 case "cos": type = FuncType.Cos; break;
                 case "log": type = FuncType.Log; break;
                 case "dif": type = FuncType.Differentiate; break;
+                case "int": type = FuncType.Integrate; break;
                 default: return null;
             }
 
@@ -78,6 +79,7 @@ namespace Calq.Core
                 case FuncType.Cos: return new Cos(paras);
                 case FuncType.Log: return new Logarithm(paras);
                 case FuncType.Differentiate: return new Differentiate(paras);
+                case FuncType.Integrate: return new Integrate(paras);
             }
 
             return null;
@@ -173,6 +175,8 @@ namespace Calq.Core
                     ret = new Logarithm(paras); break;
                 case FuncType.Differentiate:
                     ret = new Differentiate(paras); break;
+                case FuncType.Integrate:
+                    ret = new Integrate(paras); break;
             }
 
             ret.IsAddInverse = IsAddInverse;

@@ -108,9 +108,17 @@ namespace Calq.Core
                     return false;
                 }
             }
+            catch (WebException e)
+            {
+                if (e.Response != null)
+                    value = new StreamReader(e.Response.GetResponseStream()).ReadToEnd();
+                else
+                    value = "general errer";
+                return false;
+            }
             catch
             {
-                value = "error connecting";
+                value = "general error";
                 return false;
             }
         }

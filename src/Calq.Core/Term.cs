@@ -153,5 +153,6 @@ namespace Calq.Core
 
         public static implicit operator Term(double d) => new Real(d);
         public static implicit operator Term(int i) => new Real(i);
+        public static implicit operator Term(string var) => new Variable(var);
     }
 }

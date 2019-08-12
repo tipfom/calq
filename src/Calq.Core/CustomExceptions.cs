@@ -15,7 +15,7 @@ namespace Calq.Core
     public class MissingArgumentException : Exception
     {
         public MissingArgumentException(string message) : base(message)
-        {   
+        {
 
         }
     }
@@ -25,6 +25,13 @@ namespace Calq.Core
         public NotEvaluateableException(string message) : base(message)
         {
 
+        }
+    }
+
+    public class NotOnlineException : NotEvaluateableException
+    {
+        public NotOnlineException() : base("You need to be online in order to evaluate integrals")
+        {
         }
     }
 }
