@@ -50,16 +50,27 @@ namespace Calq
             {
                 if (Term.CheckBracketCount(Expression))
                 {
+
                     Term t = Term.Parse(Expression);
                     string expLat = t.ToLaTeX();
+
+                    
                     t = t.MergeBranches();
                     t = t.Evaluate();
-                    t = t.MergeBranches();
-                    t = t.Reduce();
 
 
+                    int i = 0;
+                    int lastLength = int.MaxValue;
+                    while(t.ToInfix().Length < lastLength)
+                    {
+                        lastLength = t.ToInfix().Length;
+                        t = t.MergeBranches();
+                        t = t.Reduce();
+                        i++;
+                    }
+                    
                     string ret = t.ToLaTeX();
-                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat, ResultLaTeX = t.ToLaTeX() });
+                    Log.Insert(0, new Logging.ExpressionResult() { ExpressionLaTeX = expLat + "(" +i.ToString()+ ")", ResultLaTeX = t.ToLaTeX() });
                 }
                 else
                 {
