@@ -12,6 +12,14 @@ namespace Calq.Core
             if (!(p.Length == 1 || p.Length == 2))
                 throw new InvalidParameterCountException("Log takes one or two arguments");
         }
+        public Logarithm(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Log, p)
+        {
+            if (!(p.Length == 1 || p.Length == 2))
+                throw new InvalidParameterCountException("Log takes one or two arguments");
+
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
+        }
 
         public override Term Approximate()
         {
@@ -37,23 +45,18 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            if (Parameters.Length == 1) return $@"\log{"{" + Parameters[0].ToLaTeX() + "}"}";
-            return $@"\log_{"{" + Parameters[1].ToLaTeX() + "}"} {Parameters[0].ToLaTeX()}";
-        }
-
-        public override string ToPrefix()
-        {
-            return "log[" + string.Join(",", Parameters.Select(x => x.ToPrefix())) + "]";
+            if (Parameters.Length == 1) return GetSign() + $@"\log{"{" + Parameters[0].ToLaTeX() + "}"}";
+            return GetSign() + $@"\log_{"{" + Parameters[1].ToLaTeX() + "}"} {Parameters[0].ToLaTeX()}";
         }
 
         public override string ToString()
         {
-            return "log(" + string.Join(",", Parameters.Select(x => x.ToString())) + ")";
+            return base.ToString();
         }
 
         public override Term Reduce()
         {
-            return this;
+            return new Logarithm(IsAddInverse, IsMulInverse, Parameters.Select(x => x.Reduce()).ToArray());
         }
     }
 }

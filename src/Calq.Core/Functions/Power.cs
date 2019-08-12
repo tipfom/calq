@@ -9,6 +9,14 @@ namespace Calq.Core
             if (p.Length != 2)
                 throw new InvalidParameterCountException("Power takes exactly two arguments");
         }
+        public Power(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Power, p)
+        {
+            if (p.Length < 2)
+                throw new InvalidParameterCountException("Power takes exactly two arguments");
+
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMultInverse;
+        }
 
         public override Term GetDerivative(string argument)
         {
@@ -30,18 +38,14 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return $@"({"{"+Parameters[0].ToLaTeX()+"}"}^{"{" + Parameters[1].ToLaTeX() + "}"})";
-        }
-
-        public override string ToPrefix()
-        {
-            return $"^[{Parameters[0].ToPrefix()},{Parameters[1].ToPrefix()}]";
+            return GetSign() + $@"({"{"+Parameters[0].ToLaTeX()+"}"}^{"{" + Parameters[1].ToLaTeX() + "}"})";
         }
 
         public override string ToString()
         {
-            return "(" + Parameters[0].ToPrefix() + ")^(" + Parameters[1].ToPrefix() + ")";
+            return base.ToString();
         }
+
         public override Term Reduce()
         {
             Term reducedBase = Parameters[0].Reduce();
@@ -51,7 +55,7 @@ namespace Calq.Core
             Power arg0_parsed = reducedBase as Power;
             if (arg0_parsed != null)
             {
-                return new Power(arg0_parsed.Parameters[0], arg0_parsed.Parameters[1] * reducedExponent).Reduce();
+                return new Power(IsAddInverse, IsMulInverse, arg0_parsed.Parameters[0], arg0_parsed.Parameters[1] * reducedExponent).Reduce();
             }
 
             return new Power(reducedBase, reducedExponent);

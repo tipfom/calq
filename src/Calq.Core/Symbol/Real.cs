@@ -48,18 +48,17 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return (IsAddInverse ? "-" : "") + Value.ToString();
+            return GetSign() + Value.ToString();
+        }
+        public override string ToInfix()
+        {
+            return GetSign() + Value.ToString();
         }
 
         public override string ToString()
         {
-            return (IsAddInverse ? "-" : "") + Value.ToString();
+            return base.ToString();
         }
 
-        public override string ToString(bool includeSign)
-        {
-            if (includeSign) return ToString();
-            return Value.ToString();
-        }
     }
 }

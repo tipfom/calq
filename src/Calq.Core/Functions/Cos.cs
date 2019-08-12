@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Calq.Core
@@ -10,6 +11,11 @@ namespace Calq.Core
         {
             if (p.Length != 1)
                 throw new InvalidParameterCountException("Cos takes exactly one argument");
+        }
+        public Cos(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Cos, p)
+        {
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
         }
 
         public override Term GetDerivative(string argument)
@@ -30,21 +36,17 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return $"\\cos({"{" + Parameters[0].ToLaTeX() + "}"})";
-        }
-
-        public override string ToPrefix()
-        {
-            return $"cos[{Parameters[0].ToPrefix()}]";
+            return GetSign() + $"\\cos({"{" + Parameters[0].ToLaTeX() + "}"})";
         }
 
         public override string ToString()
         {
-            return $"cos({Parameters[0].ToString()})";
+            return base.ToString();
         }
+
         public override Term Reduce()
         {
-            return new Cos(Parameters[0].Reduce());
+            return new Cos(IsAddInverse, IsMulInverse, Parameters[0]);
         }
     }
 }

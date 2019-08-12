@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Calq.Core
@@ -35,21 +36,27 @@ namespace Calq.Core
             return new HashSet<string>() { Name };
         }
 
-        //[TODO] Latexcode phi, psi ...
         public override string ToLaTeX()
         {
-            return (IsAddInverse ? "-" : "") + Name;
-        }
+            string[] coolGreekLetters = new string[]
+            {
+                "lambda", "Lambda", "Gamma", "gamma", "Delta", "epsilon", "eta", "theta", "my",
+                "sigma", "Psi", "Phi", "phi", "Omega"
+            };
 
+            if (coolGreekLetters.Contains(Name))
+            {
+                return "\\" + Name;
+            }
+            return GetSign() + Name;
+        }
+        public override string ToInfix()
+        {
+            return GetSign() + Name;
+        }
         public override string ToString()
         {
-            return (IsAddInverse ? "-" : "") + Name;
-        }
-
-        public override string ToString(bool includeSign)
-        {
-            if (includeSign) ToString();
-            return Name;
+            return base.ToString();
         }
     }
 }

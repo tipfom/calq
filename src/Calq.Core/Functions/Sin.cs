@@ -11,6 +11,14 @@ namespace Calq.Core
             if (p.Length != 1)
                 throw new InvalidParameterCountException("Sin takes exactly one argument");
         }
+        public Sin(bool isAddInverse, bool isMultInverse, params Term[] p) : base(FuncType.Sin, p)
+        {
+            if (p.Length < 2)
+                throw new InvalidParameterCountException("Sin takes exactly one argument");
+
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMultInverse;
+        }
 
         public override Term GetDerivative(string argument)
         {
@@ -30,21 +38,16 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return $"\\sin({"{" + Parameters[0].ToLaTeX() + "}"})";
+            return GetSign() + $"\\sin({"{" + Parameters[0].ToLaTeX() + "}"})";
         }
-
-        public override string ToPrefix()
-        {
-            return $"sin[{Parameters[0].ToPrefix()}]";
-        }
-
         public override string ToString()
         {
-            return $"sin({Parameters[0].ToString()})";
+            return base.ToString();
         }
+
         public override Term Reduce()
         {
-            return new Sin(Parameters[0].Reduce());
+            return new Sin(IsAddInverse, IsMulInverse, Parameters[0].Reduce());
         }
     }
 }

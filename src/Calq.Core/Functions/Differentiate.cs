@@ -22,6 +22,23 @@ namespace Calq.Core
                     throw new ArgumentException("The second argument of Differentiate needs to be an Integer");
             }
         }
+        public Differentiate(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Differentiate, p)
+        {
+            if (!(p.Length == 2 || p.Length == 3))
+                throw new InvalidParameterCountException("Differentiate takes two or three arguments");
+
+            if (p[1].GetType() != typeof(Variable))
+                throw new ArgumentException("The second argument of Differentiate needs to be a Variable");
+
+            if (p.Length > 2)
+            {
+                if (p[2].GetType() != typeof(Real))
+                    throw new ArgumentException("The second argument of Differentiate needs to be an Integer");
+            }
+
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
+        }
 
         public override Term GetDerivative(string argument)
         {
@@ -48,24 +65,19 @@ namespace Calq.Core
         public override string ToLaTeX()
         {
             if(Parameters.Length == 2)
-                return @"\frac{d " + Parameters[0].ToLaTeX() + "}{d " + Parameters[1].ToString() + "}";
+                return GetSign() + @"\frac{d " + Parameters[0].ToLaTeX() + "}{d " + Parameters[1].ToLaTeX() + "}";
             else
-                return @"\frac{d^{" + Parameters[2].ToString() + "} " + Parameters[0].ToLaTeX() + "}{d " + Parameters[1].ToString() + "^{" + Parameters[2].ToString() + "}}";
+                return GetSign() + @"\frac{d^{" + Parameters[2].ToLaTeX() + "} " + Parameters[0].ToLaTeX() + "}{d " + Parameters[1].ToLaTeX() + "^{" + Parameters[2].ToLaTeX() + "}}";
 
-        }
-
-        public override string ToPrefix()
-        {
-            return $"Differentiate[{string.Join(",", Parameters.Select(x => x.ToPrefix()))}]";
         }
 
         public override string ToString()
         {
-            return $"Differentiate({string.Join(",", Parameters.Select(x => x.ToString()))})";
+            return base.ToString();
         }
         public override Term Reduce()
         {
-            return new Differentiate(Parameters.Select(x => x.Reduce()).ToArray());
+            return new Differentiate(IsAddInverse, IsMulInverse, Parameters.Select(x => x.Reduce()).ToArray());
         }
     }
 }

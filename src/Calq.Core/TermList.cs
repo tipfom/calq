@@ -13,6 +13,12 @@ namespace Calq.Core
         {
             Terms = terms;
         }
+        public TermList(bool isAddInverse, bool isMulInverse, params Term[] terms) : base(TermType.TermList)
+        {
+            Terms = terms;
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
+        }
 
         public TermList(string s) : base(TermType.TermList)
         {
@@ -90,12 +96,17 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return @"\left{" + string.Join(",", Terms.Select(x => x.ToLaTeX())) + @"\right}";
+            return GetSign() + @"\left{" + string.Join(",", Terms.Select(x => x.ToLaTeX())) + @"\right}";
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
         }
 
         public override string ToPrefix()
         {
-            return "{" + string.Join(",", Terms.Select(x => x.ToLaTeX())) + "}";
+            return GetSign() + "{" + string.Join(",", Terms.Select(x => x.ToPrefix())) + "}";
         }
 
         public override Term Clone()
@@ -106,6 +117,11 @@ namespace Calq.Core
         public override Term MergeBranches()
         {
             return new TermList(Terms.Select(x => x.MergeBranches()).ToArray());
+        }
+
+        public override string ToInfix()
+        {
+            return GetSign() + "{" + string.Join(",", Terms.Select(x => x.ToInfix())) + "}";
         }
     }
 }

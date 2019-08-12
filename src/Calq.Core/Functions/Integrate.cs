@@ -19,6 +19,19 @@ namespace Calq.Core
                 throw new ArgumentException("The second argument of Inegrate needs to be a Variable");
         }
 
+        public Integrate(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Integrate, p)
+        {
+            if (!(p.Length == 2 || p.Length == 4))
+                throw new InvalidParameterCountException("Integrate takes two or four arguments");
+
+            if (p[1].GetType() != typeof(Variable))
+                throw new ArgumentException("The second argument of Inegrate needs to be a Variable");
+
+
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
+        }
+
         public override Term Approximate()
         {
             return Evaluate();
@@ -54,23 +67,20 @@ namespace Calq.Core
 
         public override Term Reduce()
         {
-            if (HasLimits)
-                return new Integrate(Parameters[0].Reduce(), Parameters[1].Reduce(), Parameters[2].Reduce(), Parameters[3].Reduce());
-            else
-                return new Integrate(Parameters[0].Reduce(), Parameters[1].Reduce());
+            return new Integrate(IsAddInverse, IsMulInverse, Parameters.Select(x => x.Reduce()).ToArray());
         }
 
         public override string ToLaTeX()
         {
             if (HasLimits)
-                return $@"\int_{"{" + Parameters[2].ToLaTeX() + "}"}^{"{" + Parameters[3].ToLaTeX() + "}"} {Parameters[0].ToLaTeX()} d{Parameters[1].ToLaTeX()}";
+                return GetSign() + $@"\int_{"{" + Parameters[2].ToLaTeX() + "}"}^{"{" + Parameters[3].ToLaTeX() + "}"} {Parameters[0].ToLaTeX()} d{Parameters[1].ToLaTeX()}";
             else
-                return $@"\int {Parameters[0].ToLaTeX()} d{Parameters[1].ToLaTeX()}";
+                return GetSign() + $@"\int {Parameters[0].ToLaTeX()} d{Parameters[1].ToLaTeX()}";
         }
 
-        public override string ToPrefix()
+        public override string ToString()
         {
-            return $"int[{string.Join(",", Parameters.Select(p => p.ToPrefix()))}]";
+            return base.ToString();
         }
     }
 }

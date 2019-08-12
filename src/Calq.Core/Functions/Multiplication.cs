@@ -72,36 +72,21 @@ namespace Calq.Core
                 List<Term> normal = Parameters.Where(t => !t.IsMulInverse).ToList();
 
                 if(normal.Count == 0)
-                    return $@"\frac{"{1}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
+                    return GetSign() + $@"\frac{"{1}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
                 else
-                    return $@"\frac{"{" + string.Join(@"\cdot ", normal.Select(t => t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
+                    return GetSign() + $@"\frac{"{" + string.Join(@"\cdot ", normal.Select(t => t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
             }
             else
             {
-                return "(" + string.Join(@"\cdot ", Parameters.Select(t => t.ToLaTeX())) + ")";
+                return GetSign() + "(" + string.Join(@"\cdot ", Parameters.Select(t => t.ToLaTeX())) + ")";
             }
-        }
-
-        public override string ToPrefix()
-        {
-            return "*[" + string.Join(",", Parameters.Select(x => x.IsMulInverse ? $"/[{x.ToPrefix()}]" : x.ToPrefix())) + "]";
         }
 
         public override string ToString()
         {
-            string s = "";
-
-            s += "(" + Parameters[0].ToString() + ")";
-            for (int i = 1; i < Parameters.Length; i++)
-            {
-                if (Parameters[i].IsMulInverse)
-                    s += "/(" + Parameters[i].ToString() + ")";
-                else
-                    s += "*(" + Parameters[i].ToString() + ")";
-            }
-
-            return s;
+            return base.ToString();
         }
+
         public override Term Reduce()
         {
             Term[] copy = Parameters.Select(x => x.Reduce()).Where(x => !x.IsOne()).ToArray();

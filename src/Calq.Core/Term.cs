@@ -28,6 +28,24 @@ namespace Calq.Core
         {
             return ToString() == "1";
         }
+        public string GetSign()
+        {
+            return IsAddInverse ? "-" : "";
+        }
+        public string GetMultSign()
+        {
+            return IsMulInverse ? "/" : "";
+        }
+        public Term GetMultInverse()
+        {
+            Term b = Clone();
+            b.IsMulInverse = !b.IsMulInverse;
+            return b;
+        }
+        public override string ToString()
+        {
+            return ToInfix();
+        }
 
         public abstract Term Evaluate();
         public abstract Term Approximate();
@@ -37,8 +55,17 @@ namespace Calq.Core
 
         public abstract HashSet<string> GetVariableNames();
 
+        public abstract string ToInfix();
         public abstract string ToPrefix();
+
         public abstract string ToLaTeX();
+
+        public abstract Term Clone();
+
+        public int CompareTo(Term other)
+        {
+            throw new NotImplementedException();
+        }
 
         public static bool CheckBracketCount(string s)
         {
@@ -88,13 +115,6 @@ namespace Calq.Core
 
             return Symbol.FromString(s);
         }
-
-        public int CompareTo(Term other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public abstract Term Clone();
 
         public static bool operator ==(Term a, Term b)
         {

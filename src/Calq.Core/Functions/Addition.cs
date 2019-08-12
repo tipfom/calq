@@ -86,28 +86,26 @@ namespace Calq.Core
 
         public override string ToLaTeX()
         {
-            return ToString();
-        }
+            string buffer = "";
+            if (IsAddInverse) buffer += "-(";
 
-        public override string ToPrefix()
-        {
-            return "+[" + string.Join(",", Parameters.Select(x => x.ToPrefix())) + "]";
+            buffer += Parameters[0].ToLaTeX();
+            for (int i = 1; i < Parameters.Length; i++)
+            {
+                if (Parameters[i].IsAddInverse)
+                    buffer += "-" + (-Parameters[i]).ToLaTeX();
+                else
+                    buffer += "+" + Parameters[i].ToLaTeX();
+            }
+
+            if (IsMulInverse) buffer += ")";
+
+            return buffer;
         }
 
         public override string ToString()
         {
-            string s = "";
-
-            s += Parameters[0].ToString();
-            for(int i = 1; i < Parameters.Length; i++)
-            {
-                if (Parameters[i].IsAddInverse)
-                    s += "-" + (-Parameters[i]).ToString();
-                else
-                    s += "+" + Parameters[i].ToString();
-            }
-
-            return s;
+            return base.ToString();
         }
     }
 }

@@ -49,7 +49,7 @@ namespace Calq.Core
 
         public override Term Clone()
         {
-            Term t = FromString(ToString(false));
+            Term t = FromString(IsAddInverse ? ToInfix().Substring(1) : ToInfix());
             t.IsAddInverse = IsAddInverse;
             t.IsMulInverse = IsMulInverse;
             return t;
@@ -62,14 +62,16 @@ namespace Calq.Core
 
         public override string ToPrefix()
         {
-            return ToString();
+            return ToInfix();
+        }
+        public override string ToString()
+        {
+            return base.ToString();
         }
 
         public override Term MergeBranches()
         {
             return this;
         }
-
-        public abstract string ToString(bool includeSign);
     }
 }

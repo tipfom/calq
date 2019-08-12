@@ -20,6 +20,7 @@ namespace Calq.Core
             Unknown
         }
 
+        public bool IsInfix { get { return (int)Name <= (int)FuncType.Power; } }
         public readonly FuncType Name;
         public readonly Term[] Parameters;
         protected Function(FuncType name, Term[] paras) : base(TermType.Function)
@@ -229,6 +230,77 @@ namespace Calq.Core
                     return new Multiplication(IsAddInverse, IsMulInverse, paras.ToArray());
                 default: return Clone();
             }
+        }
+        public override string ToPrefix()
+        {
+            string s = GetSign();
+
+            switch (Name)
+            {
+                case FuncType.Equals: s = "="; break;
+                case FuncType.Addition: s = "+"; break;
+                case FuncType.Multiplication: s = "*"; break;
+                case FuncType.Power: s = "^"; break;
+                case FuncType.Sin: s = "sin"; break;
+                case FuncType.Cos: s = "cos"; break;
+                case FuncType.Log: s = "log"; break;
+                case FuncType.Differentiate: s = "dif"; break;
+                case FuncType.Integrate: s = "int"; break;
+            }
+
+            return s + "[" + string.Join(",", Parameters.Select(x => x.ToPrefix())) + "]";
+        }
+        public override string ToInfix()
+        {
+            switch (Name)
+            {
+                case FuncType.Equals:
+                    return string.Join("=", Parameters.Select(x => x.ToPrefix()));
+                case FuncType.Addition:
+                    string buffer = "";
+
+                    buffer += Parameters[0].ToInfix();
+                    for (int i = 1; i < Parameters.Length; i++)
+                    {
+                        if (Parameters[i].IsAddInverse)
+                            buffer += "-" + (-Parameters[i]).ToInfix();
+                        else
+                            buffer += "+" + Parameters[i].ToInfix();
+                    }
+
+                    return buffer;
+                case FuncType.Multiplication:
+                    buffer = "";
+
+                    buffer += Parameters[0].ToInfix();
+                    for (int i = 1; i < Parameters.Length; i++)
+                    {
+                        if (Parameters[i].IsAddInverse)
+                            buffer += "/" + Parameters[i].GetMultInverse().ToInfix();
+                        else
+                            buffer += "*" + Parameters[i].ToInfix();
+                    }
+
+                    return buffer;
+                case FuncType.Power:
+                    return "(" + string.Join(")^(", Parameters.Select(x => x.ToInfix())) + ")";
+            }
+
+            string s = "";
+            switch (Name)
+            {
+                case FuncType.Sin: s = "sin"; break;
+                case FuncType.Cos: s = "cos"; break;
+                case FuncType.Log: s = "log"; break;
+                case FuncType.Differentiate: s = "dif"; break;
+                case FuncType.Integrate: s = "int"; break;
+            }
+
+            return s + "(" + string.Join(",", Parameters.Select(x => x.ToInfix())) + ")";
+        }
+        public override string ToString()
+        {
+            return base.ToString();
         }
 
         public static FuncType InfixOperator(string name)
