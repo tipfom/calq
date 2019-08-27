@@ -15,7 +15,7 @@ namespace Calq.Core
 #if LOCAL
         const string SERVER_URL = "http://localhost:8080";
 #else
-        const string SERVER_URL = "http://timpokart.de:8080";
+        const string SERVER_URL = "http://timpokart.de:8084";
 #endif
 
         public event Action IsOnlineChanged;
@@ -47,7 +47,7 @@ namespace Calq.Core
                 if (_IsOnline != value)
                 {
                     _IsOnline = value;
-                    IsOnlineChanged.Invoke();
+                    IsOnlineChanged?.Invoke();
                 }
             }
         }
