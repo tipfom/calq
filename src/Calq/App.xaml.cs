@@ -5,8 +5,6 @@ namespace Calq
 {
     public partial class App : Application
     {
-        public static PythonWebProvider PythonWebProvider = new PythonWebProvider();
-
         public App()
         {
             InitializeComponent();

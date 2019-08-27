@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IronPython" Version="2.7.9" />
-    <PackageReference Include="IronPython.StdLib" Version="2.7.9" />
+    <PackageReference Include="IronPython" Version="2.7.10-alpha0" />
+    <PackageReference Include="IronPython.StdLib" Version="2.7.10-alpha0" />
     <PackageReference Include="Telegram.Bot" Version="15.0.0" />
   </ItemGroup>
 

@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 
-namespace Calq
+namespace Calq.Core
 {
     public class PythonWebProvider : IPythonProvider
     {

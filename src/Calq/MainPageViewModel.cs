@@ -30,14 +30,14 @@ namespace Calq
 
         public Command EvaluateExpressionCommand { get; private set; }
 
-        public string OnlineText { get { return App.PythonWebProvider.IsOnline ? "Online" : "Offline"; } }
+        public string OnlineText { get { return ((PythonWebProvider)Term.PlatformPythonProvider).IsOnline ? "Online" : "Offline"; } }
 
-        public Color OnlineColor { get { return App.PythonWebProvider.IsOnline ? Color.Green : Color.Red; } }
+        public Color OnlineColor { get { return ((PythonWebProvider)Term.PlatformPythonProvider).IsOnline ? Color.Green : Color.Red; } }
 
         public MainPageViewModel()
         {
             EvaluateExpressionCommand = new Command(EvaluateExpression);
-            App.PythonWebProvider.IsOnlineChanged += () =>
+            ((PythonWebProvider)Term.PlatformPythonProvider).IsOnlineChanged += () =>
             {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineText"));
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineColor"));

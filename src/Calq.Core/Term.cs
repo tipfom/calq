@@ -6,7 +6,7 @@ namespace Calq.Core
 {
     public abstract class Term : IComparable<Term>
     {
-        public static IPythonProvider PlatformPythonProvider;
+        public static IPythonProvider PlatformPythonProvider = new PythonWebProvider();
 
         public enum TermType
         {
