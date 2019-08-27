@@ -7,14 +7,13 @@ namespace Calq.Telegram
 {
     class Program
     {
+        const string HTTP_API_KEY = "814183760:AAHLq3QDHlFGYg5lUuH5Fs4Fl7eNq5Aj3hM";
         static TelegramBotClient bot;
+        
+
         static void Main(string[] args)
         {
-            bot = new TelegramBotClient("846107457:AAG1xHj6JAcWtTVkT-Qai23Xxws_PCpNHI0");
-            var me = bot.GetMeAsync().Result;
-            Console.WriteLine(
-              $"Hello, World! I am user {me.Id} and my name is {me.FirstName}."
-            );
+            bot = new TelegramBotClient(HTTP_API_KEY);
             bot.OnMessage += BotClient_OnMessage;
             bot.StartReceiving(Array.Empty<UpdateType>());
             Console.ReadLine();
@@ -22,6 +21,10 @@ namespace Calq.Telegram
 
         private static void BotClient_OnMessage(object? sender, global::Telegram.Bot.Args.MessageEventArgs e)
         {
+            if (e.Message.Text.StartsWith("/"))
+            {
+                return;
+            }
             Term t = Term.Parse(e.Message.Text);
             string expLat = t.ToLaTeX();
 
