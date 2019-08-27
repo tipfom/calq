@@ -122,8 +122,8 @@ namespace Calq.Core
 
         public static bool operator ==(Term a, Term b)
         {
-            if (a is null || a is null)
-                return a is null && a is null;
+            if (a is null || b is null)
+                return a is null && b is null;
             if (a.Type != b.Type) return false;
 
             switch (a.Type)
