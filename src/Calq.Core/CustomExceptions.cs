@@ -27,4 +27,11 @@ namespace Calq.Core
 
         }
     }
+
+    public class NotOnlineException : NotEvaluateableException
+    {
+        public NotOnlineException() : base("You need to be online in order to evaluate integrals")
+        {
+        }
+    }
 }

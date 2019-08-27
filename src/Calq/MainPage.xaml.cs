@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Calq.Core;
-using MathNet.Symbolics;
 using Xamarin.Forms;
 
 namespace Calq

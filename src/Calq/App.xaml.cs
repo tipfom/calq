@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Calq.Core;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace Calq
 {
@@ -10,6 +9,7 @@ namespace Calq
         {
             InitializeComponent();
 
+            Term.PlatformPythonProvider = PythonWebProvider;
             MainPage = new MainPage();
         }
 

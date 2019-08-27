@@ -1,19 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using MathNet.Symbolics;
+using System.Linq;
 
 namespace Calq.Core
 {
-    public abstract class Term
+    public abstract class Term : IComparable<Term>
     {
+        public static IPythonProvider PlatformPythonProvider = new PythonWebProvider();
+
+        public enum TermType
+        {
+            Symbol, Function, TermList, Vector
+        }
+
+        public readonly TermType Type;
+        public bool IsAddInverse { get; private set; } = false;
+        public bool IsMulInverse { get; private set; } = false;
+
+        protected Term(TermType type, bool isAddInverse, bool isMulInverse)
+        {
+            Type = type;
+            IsAddInverse = isAddInverse;
+            IsMulInverse = isMulInverse;
+        }
+
+        public bool IsZero()
+        {
+            return ToString() == "0";
+        }
+        public bool IsOne()
+        {
+            return ToString() == "1";
+        }
+        public string GetSign()
+        {
+            return IsAddInverse ? "-" : "";
+        }
+        public string GetMultSign()
+        {
+            return IsMulInverse ? "/" : "";
+        }
+        public Term GetMultInverse()
+        {
+            Term b = Clone();
+            b.IsMulInverse = !b.IsMulInverse;
+            return b;
+        }
+        public override string ToString()
+        {
+            return ToInfix();
+        }
+
         public abstract Term Evaluate();
-        public abstract Expression GetAsExpression();
+        public abstract Term Approximate();
+        public abstract Term GetDerivative(string argument);
+        public abstract Term Reduce();
+        public abstract Term MergeBranches();
+
+        public abstract HashSet<string> GetVariableNames();
+
         public abstract string ToInfix();
-        public abstract IEnumerable<string> GetVariableNames();
-        public abstract Term Differentiate(string argument);
+        public abstract string ToPrefix();
 
         public abstract string ToLaTeX();
+
+        public abstract Term Clone();
+
+        public int CompareTo(Term other)
+        {
+            throw new NotImplementedException();
+        }
+
         public static bool CheckBracketCount(string s)
         {
             if (s == null)
@@ -31,7 +88,7 @@ namespace Calq.Core
                 {
                     if (brackets.Count == 0) return false;
 
-                    if(s[i] == ')')
+                    if (s[i] == ')')
                     {
                         if (brackets.Pop() != '(') return false;
                     }
@@ -43,51 +100,80 @@ namespace Calq.Core
 
             return brackets.Count == 0;
         }
-        public static Term TermFromMixedString(string s)
+        public static Term Parse(string s)
         {
-            if (s == null)
-                throw new MissingArgumentException("");
             s = s.Replace(" ", "");
-            if(s == "")
-                throw new MissingArgumentException("");
-            
+            if (s == "") throw new MissingArgumentException("InfixString was Empty");
 
-            Term x = Function.FunctionFromMixedString(s);
-            if (x != null)
-                return x;
-            else
+            Term t = Function.InfixFuncFromString(s);
+
+            if (!(t is null)) return t;
+
+            t = Function.PrefixFuncFromString(s);
+            if (!(t is null)) return t;
+
+            if (s[0] == '{') return new TermList(s);
+
+            if (s[0] == '(' && s[s.Length - 1] == ')')
+                return Parse(s.Substring(1, s.Length - 2));
+
+            return Symbol.FromString(s);
+        }
+
+        public static bool operator ==(Term a, Term b)
+        {
+            if (a is null || b is null)
+                return a is null && b is null;
+            if (a.Type != b.Type) return false;
+
+            switch (a.Type)
             {
-                if(s[0] == '{' && s[s.Length - 1] == '}')
-                {
-                    return new TermList(s);
-                }
-                else return new Variable(s);
+                case TermType.Symbol: return (Symbol)a == (Symbol)b;
+                case TermType.Function: return (Function)a == (Function)b;
+                case TermType.TermList: return (TermList)a == (TermList)b;
             }
+
+            return false;
         }
 
-        public static Term operator +(Term a, Term b)
+        public static bool operator !=(Term a, Term b)
         {
-            return new Function(Function.Add, a, b);
+            return !(a == b);
         }
-        public static Term operator -(Term a, Term b)
+
+        public static Addition operator +(Term a, Term b)
         {
-            return new Function(Function.Sub, a, b);
+            return new Addition(a.Clone(), b.Clone());
         }
-        public static Term operator *(Term a, Term b)
+
+        public static Addition operator -(Term a, Term b)
         {
-            return new Function(Function.Mul, a, b);
-        }
-        public static Term operator /(Term a, Term b)
-        {
-            return new Function(Function.Div, a, b);
-        }
-        public static Term operator ^(Term a, Term b)
-        {
-            return new Function(Function.Pow, a, b);
+            return a + -b;
         }
         public static Term operator -(Term a)
         {
-            return new Variable(-1) * a;
+            Term t = a.Clone();
+            t.IsAddInverse = !t.IsAddInverse;
+            return t;            
         }
+
+        public static Multiplication operator *(Term a, Term b)
+        {
+            return new Multiplication(a.Clone(), b.Clone());
+        }
+
+        public static Multiplication operator /(Term a, Term b)
+        {
+            return a * b.GetMultInverse();
+        }
+
+        public static Power operator ^(Term a, Term b)
+        {
+            return new Power(a.Clone(), b.Clone());
+        }
+
+        public static implicit operator Term(double d) => new Real(d);
+        public static implicit operator Term(int i) => new Real(i);
+        public static implicit operator Term(string var) => new Variable(var);
     }
 }

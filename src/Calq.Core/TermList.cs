@@ -2,84 +2,124 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MathNet.Symbolics;
 
 namespace Calq.Core
 {
     class TermList : Term
     {
-        public List<Term> Terms;
+        public readonly Term[] Terms;
 
-
-        public TermList(List<Term> terms)
+        public TermList(params Term[] terms) : base(TermType.TermList, false, false)
         {
-            this.Terms = terms;
+            Terms = terms;
+        }
+        public TermList(bool isAddInverse, bool isMulInverse, params Term[] terms) : base(TermType.TermList, isAddInverse, isMulInverse)
+        {
+            Terms = terms;
         }
 
-        public TermList(string s)
+        public TermList(string s) : base(TermType.TermList, false, false)
         {
-            Terms = new List<Term>();
             s = s.Substring(1, s.Length - 2);
 
             List<int> splits = new List<int>();
             int bracketDepth = 0;
-            for(int i = 0; i < s.Length; i++)
+            for (int i = 0; i < s.Length; i++)
             {
                 if (s[i] == '(' || s[i] == '{') bracketDepth++;
                 if (s[i] == ')' || s[i] == '}') bracketDepth--;
 
-                if (s[i] == ',' && bracketDepth == 0)
+                if (s[i] == ',' && bracketDepth == 1)
                 {
                     splits.Add(i);
                 }
             }
+
+            Terms = new Term[splits.Count + 1];
 
             splits.Insert(0, -1);
             splits.Add(s.Length);
 
             for (int j = 1; j < splits.Count; j++)
             {
-                Terms.Add(TermFromMixedString(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1)));
+                Terms[j - 1] = Parse(s.Substring(splits[j - 1] + 1, splits[j] - splits[j - 1] - 1));
             }
-            
+        }
+
+        public static bool operator ==(TermList a, TermList b)
+        {
+            if (a.Terms.Length != b.Terms.Length) return false;
+
+            for (int i = 0; i < a.Terms.Length; i++)
+            {
+                if (a.Terms[i] != b.Terms[i]) return false;
+            }
+
+            return true;
+        }
+        public static bool operator !=(TermList a, TermList b)
+        {
+            return !(a == b);
+        }
+
+        public override Term Approximate()
+        {
+            return new TermList(Terms.Select(x => x.Approximate()).ToArray());
+        }
+
+        public override Term GetDerivative(string argument)
+        {
+            return new TermList(Terms.Select(x => x.GetDerivative(argument)).ToArray());
         }
 
         public override Term Evaluate()
         {
-            return this;
+            return new TermList(Terms.Select(x => x.Evaluate()).ToArray());
         }
 
-        public override Expression GetAsExpression()
+        public override HashSet<string> GetVariableNames()
         {
-            return Expression.Symbol(ToString());
+            HashSet<string> ret = new HashSet<string>();
+
+            foreach (Term t in Terms)
+                ret.UnionWith(t.GetVariableNames());
+
+            return ret;
         }
 
-        public override string ToInfix()
+        public override Term Reduce()
         {
-            return "{" + string.Join(",", Terms.Select(x => x.ToInfix())) + "}";
+            throw new NotImplementedException();
         }
 
-        public override IEnumerable<string> GetVariableNames()
+        public override string ToLaTeX()
         {
-            foreach (Term param in Terms)
-            {
-                foreach (string variable in param.GetVariableNames())
-                    yield return variable;
-            }
+            return GetSign() + @"\left{" + string.Join(",", Terms.Select(x => x.ToLaTeX())) + @"\right}";
         }
 
         public override string ToString()
         {
-            return "{" + string.Join(",", Terms) + "}";
+            return base.ToString();
         }
 
-        public override Term Differentiate(string argument)
+        public override string ToPrefix()
         {
-            throw new NotImplementedException();
+            return GetSign() + "{" + string.Join(",", Terms.Select(x => x.ToPrefix())) + "}";
         }
-        public override string ToLaTeX()
+
+        public override Term Clone()
         {
-            return @"\{" + string.Join(", ", Terms.Select(t => t.ToLaTeX())) + @"\}";
+            return new TermList(Terms.Select(x => x.Clone()).ToArray());
+        }
+
+        public override Term MergeBranches()
+        {
+            return new TermList(Terms.Select(x => x.MergeBranches()).ToArray());
+        }
+
+        public override string ToInfix()
+        {
+            return GetSign() + "{" + string.Join(",", Terms.Select(x => x.ToInfix())) + "}";
         }
     }
 }
