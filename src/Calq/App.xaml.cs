@@ -1,15 +1,17 @@
-﻿using System;
+﻿using Calq.Core;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace Calq
 {
     public partial class App : Application
     {
+        public static PythonWebProvider PythonWebProvider = new PythonWebProvider();
+
         public App()
         {
             InitializeComponent();
 
+            Term.PlatformPythonProvider = PythonWebProvider;
             MainPage = new MainPage();
         }
 

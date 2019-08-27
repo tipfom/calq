@@ -6,6 +6,8 @@ namespace Calq.Core
 {
     public abstract class Term : IComparable<Term>
     {
+        public static IPythonProvider PlatformPythonProvider;
+
         public enum TermType
         {
             Symbol, Function, TermList, Vector

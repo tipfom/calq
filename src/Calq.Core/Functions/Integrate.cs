@@ -35,20 +35,18 @@ namespace Calq.Core
 
         public override Term Evaluate()
         {
-            if (WebHelper.IsOnline)
+            if (HasLimits)
             {
-                string term;
-                if (HasLimits)
-                {
-                    WebHelper.GetIntegral(Parameters[0].ToPrefix(), Parameters.SelectMany(t => t.GetVariableNames()), Parameters[1].ToString(), Parameters[2].ToPrefix(), Parameters[3].ToPrefix(), out term);
-                }
-                else
-                {
-                    WebHelper.GetIntegral(Parameters[0].ToPrefix(), Parameters.SelectMany(t => t.GetVariableNames()), Parameters[1].ToString(), out term);
-                }
-                return Term.Parse(term.Replace("**", "^").Replace("-oo", "ninf").Replace("oo", "pinf"));
+                Term r = PlatformPythonProvider.Integrate(Parameters[0], Parameters.SelectMany(t => t.GetVariableNames()), Parameters[1], Parameters[2], Parameters[3]);
+                if (r != null) return r;
+                return this;
             }
-            return this;
+            else
+            {
+                Term r = PlatformPythonProvider.Integrate(Parameters[0], Parameters.SelectMany(t => t.GetVariableNames()), Parameters[1]);
+                if (r != null) return r;
+                return this;
+            }
         }
 
         public override Term GetDerivative(string argument)

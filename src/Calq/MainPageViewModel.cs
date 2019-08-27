@@ -30,14 +30,14 @@ namespace Calq
 
         public Command EvaluateExpressionCommand { get; private set; }
 
-        public string OnlineText { get { return WebHelper.IsOnline ? "Online" : "Offline"; } }
+        public string OnlineText { get { return App.PythonWebProvider.IsOnline ? "Online" : "Offline"; } }
 
-        public Color OnlineColor { get { return WebHelper.IsOnline ? Color.Green : Color.Red; } }
+        public Color OnlineColor { get { return App.PythonWebProvider.IsOnline ? Color.Green : Color.Red; } }
 
         public MainPageViewModel()
         {
             EvaluateExpressionCommand = new Command(EvaluateExpression);
-            WebHelper.IsOnlineChanged += () =>
+            App.PythonWebProvider.IsOnlineChanged += () =>
             {
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineText"));
                 PropertyChanged.Invoke(this, new PropertyChangedEventArgs("OnlineColor"));
