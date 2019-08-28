@@ -55,7 +55,37 @@ namespace Calq.Core
 
         public override Term Reduce()
         {
-            return new Logarithm(IsAddInverse, IsMulInverse, Parameters.Select(x => x.Reduce()).ToArray());
+            // cases to handle:
+            // 1.) inner is power
+            // 2.) inner is equal to base
+            // 3.) inner is multiplication or division ? (this should probably not be reduced)
+
+            Term inner = Parameters[0].Reduce();
+            if (inner.GetType() == typeof(Power))
+            {
+                Function finner = inner as Function;
+                if (Parameters.Length > 1)
+                    return (finner.Parameters[1] * new Logarithm(IsAddInverse, IsMulInverse, finner.Parameters[0], Parameters[1].Reduce())).Reduce();
+                else
+                    return (finner.Parameters[1] * new Logarithm(IsAddInverse, IsMulInverse, finner.Parameters[0])).Reduce();
+            }
+
+            if (inner.Type == TermType.Symbol)
+            {
+                if (Parameters.Length == 1)
+                {
+                    if (Parameters[0].GetType() == typeof(Constant) && ((Constant)Parameters[0]).Name == Constant.ConstType.E) return 1;
+                }
+                else
+                {
+                    if (Parameters[1].Reduce() == inner) return 1;
+                }
+            }
+
+            if (Parameters.Length > 1)
+                return new Logarithm(IsAddInverse, IsMulInverse, inner, Parameters[1].Reduce());
+            else
+                return new Logarithm(IsAddInverse, IsMulInverse, inner);
         }
     }
 }
