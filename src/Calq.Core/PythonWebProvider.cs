@@ -12,8 +12,10 @@ namespace Calq.Core
     public class PythonWebProvider : IPythonProvider
     {
         const string VERSION = "1.0";
-#if LOCAL
+#if DEBUG_SERVER_LOCAL
         const string SERVER_URL = "http://localhost:8080";
+#elif DEBUG_SERVER_GLOBAL
+        const string SERVER_URL = "http://timpokart.de:8090";
 #else
         const string SERVER_URL = "http://timpokart.de:8084";
 #endif

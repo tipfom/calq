@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-
 
 namespace Calq.Core
 {
@@ -67,23 +64,6 @@ namespace Calq.Core
         public abstract string ToLaTeX();
 
         public abstract Term Clone();
-
-        public Image ToPng()
-        {
-            var painter = new CSharpMath.SkiaSharp.TextPainter
-            {
-                Text = @"Some Text $\frac23-5$ Auto line breaks $$\int^4_3$$ Some Text",
-                HighlightColor = SkiaSharp.SKColors.Transparent
-            };
-            using (var surface = SkiaSharp.SKSurface.Create(new SkiaSharp.SKImageInfo(200, 200)))
-            {
-                painter.Draw(surface.Canvas);
-                using (var snapshot = surface.Snapshot())
-                using (var pngData = snapshot.Encode())
-                using (var png = pngData.AsStream())
-                    return Image.FromStream(png);
-            }
-        }
 
         public int CompareTo(Term other)
         {

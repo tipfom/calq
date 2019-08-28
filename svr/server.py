@@ -1,3 +1,8 @@
+import socket
+import os
+import sys
+from http.server import HTTPServer
+from socketserver import ThreadingMixIn
 import http.server
 import socketserver
 import sympy
@@ -6,33 +11,43 @@ from urllib.parse import urlparse, parse_qs
 from integration import integrateExpression
 from limits import limitExpression
 from solver import solveExpression
+from draw_expression import getDrawnLatex
 import threading
 
 PORT = 8080
 
 version = "1.0"
 
+
 class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/handshake":
             self.handleGET_Handshake()
+        elif self.path.startswith("/print"):
+            self.handleGET_Print(self.path.split("/")[-1].replace(".png", ""))
         elif self.path.startswith("/math"):
             self.handleGET_Math(parse_qs(urlparse(self.path).query))
         else:
             self.send_response(200)
             self.end_headers()
             self.wfile.write(threading.current_thread().getName().encode())
-    
-      
+
     def replyError(self, error_message):
         self.send_response(400)
         self.end_headers()
         self.wfile.write(error_message.encode())
-        
+
     def handleGET_Handshake(self):
         self.send_response(200)
         self.end_headers()
         self.wfile.write(version.encode())
+
+    def handleGET_Print(self, txt_expression):
+        self.send_response(200)
+        self.end_headers()
+        with open(getDrawnLatex(base64.b64decode(txt_expression.encode()).decode("utf-8")), 'rb') as file:
+            # Read the file and send the contents
+            self.wfile.write(file.read())
 
     def replyResult(self, r):
         if r[0]:
@@ -42,26 +57,29 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             self.replyError("error on limit")
 
-
     def handleGET_Math(self, params):
         if params.__contains__("method") and len(params["method"]) == 1:
-            if params["method"][0] == "int": 
+            if params["method"][0] == "int":
                 if not params.__contains__("expr") or len(params["expr"]) != 1 or not params.__contains__("var") or not params.__contains__("d") or len(params["d"]) != 1:
                     return self.replyError("invalid parameters for integrate")
-        
-                txt_expression = base64.b64decode((params["expr"][0]).encode()).decode("utf-8") 
+
+                txt_expression = base64.b64decode(
+                    (params["expr"][0]).encode()).decode("utf-8")
                 txt_variables = params["var"]
                 txt_delta = params["d"][0]
                 txt_limit = None
                 if params.__contains__("llim") and params.__contains__("ulim"):
-                    txt_limit = (base64.b64decode((params["llim"][0]).encode()).decode("utf-8"), base64.b64decode((params["ulim"][0]).encode()).decode("utf-8"))
-                self.replyResult(integrateExpression(txt_expression, txt_variables, txt_delta, txt_limit))
+                    txt_limit = (base64.b64decode((params["llim"][0]).encode()).decode(
+                        "utf-8"), base64.b64decode((params["ulim"][0]).encode()).decode("utf-8"))
+                self.replyResult(integrateExpression(
+                    txt_expression, txt_variables, txt_delta, txt_limit))
 
             elif params["method"][0] == "lim":
                 if not params.__contains__("expr") or len(params["expr"]) != 1 or not params.__contains__("var") or not params.__contains__("arg") or len(params["arg"]) != 1 or not params.__contains__("val") or len(params["val"]) != 1:
                     return self.replyError("invalid parameters for limit")
-                
-                txt_expression = base64.b64decode((params["expr"][0]).encode()).decode("utf-8") 
+
+                txt_expression = base64.b64decode(
+                    (params["expr"][0]).encode()).decode("utf-8")
                 txt_variables = params["var"]
                 txt_argument = params["arg"][0]
                 txt_value = params["val"][0]
@@ -71,30 +89,31 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                     txt_dir = "-"
                 elif params["dir"][0] == "3":
                     txt_dir = "+-"
-                self.replyResult(limitExpression(txt_expression, txt_variables, txt_argument, txt_value, txt_dir))
-    
+                self.replyResult(limitExpression(
+                    txt_expression, txt_variables, txt_argument, txt_value, txt_dir))
+
             elif params["method"][0] == "sol":
-                if not params.__contains__("expr")  or not params.__contains__("var") or not params.__contains__("solve"):
+                if not params.__contains__("expr") or not params.__contains__("var") or not params.__contains__("solve"):
                     return self.replyError("invalid parameters for limit")
-                
+
                 txts_expression = []
                 for func in params["expr"]:
-                    txts_expression.append(base64.b64decode(func.encode()).decode("utf-8"))
+                    txts_expression.append(base64.b64decode(
+                        func.encode()).decode("utf-8"))
                 txt_variables = params["var"]
                 txt_solve = params["solve"]
-                self.replyResult(solveExpression(txts_expression, txt_variables, txt_solve))
+                self.replyResult(solveExpression(
+                    txts_expression, txt_variables, txt_solve))
 
             else:
                 return self.replyError("method unknown")
         else:
             return self.replyError("method missing")
-   
-import sys, os, socket
-from socketserver import ThreadingMixIn
-from http.server import HTTPServer
+
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
+
 
 server = ThreadingSimpleServer(("", PORT), SimpleHTTPRequestHandler)
 while 1:
