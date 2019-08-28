@@ -151,52 +151,44 @@ namespace Calq.Core
 
         public override Term CheckAddReduce(Term t)
         {
-            if (Parameters.Length == 2)
-            {
-
-            }
-
             if (t.GetType() == typeof(Multiplication))
             {
                 Multiplication cMult = (Multiplication)t;
-                double realP1 = 1, realP2 = 1;
-                bool realP2set = false;
-                int cLeft = cMult.Parameters.Length;
-                for(int i = 0; i < Parameters.Length; i++)
+
+                List<Term> a = Parameters.ToList(), b = cMult.Parameters.ToList();
+                List<Term> commonTerms = new List<Term>();
+
+                for (int i = 0; i < a.Count; i++)
                 {
-                    if(Parameters[i].GetType() == typeof(Real))
+                    for (int k = 0; k < b.Count; k++)
                     {
-                        realP1 = (Parameters[i].IsAddInverse ? -1 : 1) *((Real)Parameters[i]).Value;
-                        continue;
-                    }
-
-                    bool succ = false;
-                    for(int k = 0; k < cMult.Parameters.Length; k++)
-                    {
-                        if (Parameters[k].GetType() == typeof(Real))
+                        if (a[i] == b[k])
                         {
-                            if (!realP2set) cLeft--;
-                            realP2set = true;
-                            realP2 = (cMult.Parameters[k].IsAddInverse ? -1 : 1) * ((Real)cMult.Parameters[k]).Value;
-                            continue;
-                        }
-
-                        if(cMult.Parameters[k] == Parameters[i])
-                        {
-                            cLeft--;
-                            succ = true;
+                            commonTerms.Add(a[i]);
+                            a.RemoveAt(i);
+                            b.RemoveAt(k);
+                            i--;
                             break;
                         }
                     }
-
-                    if (!succ) return null;
                 }
 
-                if (cLeft > 0) return null;
-                if (realP1 + realP2 == 0) return 0;
-                List<Term> param = new List<Term>() { new Real(realP1 + realP2) };
-                param.AddRange(Parameters.Where(x => x.GetType() != typeof(Real)));
-                return new Multiplication(param.ToArray());
+                if (a.Count == 0) a.Add(1);
+                if (b.Count == 0) a.Add(1);
+
+                commonTerms.Add(new Addition((a.Count == 1) ? a[0] : new Multiplication(a.ToArray()), (b.Count == 1) ? b[0] : new Multiplication(b.ToArray())).Reduce());
+
+                for (int i = 0; i < commonTerms.Count; i++)
+                {
+                    if(commonTerms[i].GetType() == typeof(Real) && ((Real)commonTerms[i]).Value == 0)
+                    {
+                        return 0;
+                    }
+                }
+
+                if (commonTerms.Count == 1) return commonTerms[0];
+                
+                return new Multiplication(commonTerms.ToArray());
             }
 
             return null;

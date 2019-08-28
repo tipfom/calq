@@ -33,9 +33,9 @@ namespace Calq.UnitTests
 
             Assert.IsTrue((new Multiplication(2, x, y) + new Multiplication(new Real(-2), x, y)).Reduce() == 0);
 
-            Assert.IsTrue((new Multiplication(2, x, y) + new Multiplication(new Real(3), x, y)).Reduce() == new Multiplication(new Real(5), x, y));
+            Assert.IsTrue((new Multiplication(2, x, y) + new Multiplication(new Real(3), x, y)).Reduce() == new Multiplication(x, y, new Real(5)));
 
-            Assert.IsTrue((new Multiplication(2, x, y) + new Multiplication(new Real(3), x, y) + new Multiplication(new Real(3), x, y, pi)).Reduce() == new Multiplication(new Real(5), x, y) + new Multiplication(new Real(3), x, y, pi));
+            Assert.IsTrue((new Multiplication(2, x, y) + new Multiplication(new Real(3), x, y) + new Multiplication(new Real(3), x, y, pi)).Reduce() == new Multiplication(x, y, new Addition(new Real(5), new Multiplication(new Real(3), pi))));
         }
 
         [TestMethod]
@@ -45,6 +45,8 @@ namespace Calq.UnitTests
             Variable y = new Variable("y");
             
             Assert.IsTrue((new Addition(new Logarithm(x), new Logarithm(y))).Reduce() == new Logarithm(x*y) );
+
+            Assert.IsTrue((new Addition(new Logarithm(x), new Logarithm(x))).Reduce() == 2*new Logarithm(x));
         }
     }
 }
