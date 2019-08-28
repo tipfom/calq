@@ -6,55 +6,44 @@ namespace Calq.Core
 {
     public class Addition : Function
     {
-        public Addition(params Term[] p) : base(FuncType.Addition,false, false, p) { }
+        public Addition(params Term[] p) : base(FuncType.Addition, false, false, p) { }
         public Addition(bool isAddInverse, bool isMulInverse, params Term[] p) : base(FuncType.Addition, isAddInverse, isMulInverse, p) { }
 
         public override Term Reduce()
         {
-            List<Term> paras = new List<Term>();
-            bool[] used = new bool[Parameters.Length];
-
-            //inverse equvalent
-            for(int i = 0; i < Parameters.Length; i++)
+            List<Term> paras = Parameters.Select(t => t.Reduce()).ToList();
+            
+            for(int i = 0; i< paras.Count; i++)
             {
-                if (used[i]) continue;
-
-                bool foundInverse = false;
-                for(int j = i + 1; j < Parameters.Length; j++)
+                if(paras[i].GetType() == typeof(Addition))
                 {
-                    if (used[j]) continue;
-
-                    if (Parameters[i] == -Parameters[j])
+                    foreach(Term t in ((Addition)paras[i]).Parameters)
                     {
-                        foundInverse = true;
-                        used[j] = true;
-                        break;
+                        paras.Add(t);
                     }
-                }
-
-                if (!foundInverse)
-                {
-                    paras.Add(Parameters[i]);
+                    paras.RemoveAt(i);
+                    i--;
                 }
             }
 
-            paras = paras.Select(x => x.Reduce()).Where(x => !x.IsZero()).ToList();
-
-            //Multiple reals
-            List<Real> reals = paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>().ToList();
-            if (reals.Count > 1)
+            for (int i = 0; i < paras.Count - 1; i++)
             {
-                double sum = 0;
-                for (int i = 0; i < reals.Count; i++)
+                for (int k = i + 1; k < paras.Count; k++)
                 {
-                    if(reals[i].IsAddInverse)
-                        sum -= reals[i].Value;
-                    else
-                        sum += reals[i].Value;
+                    Term check = paras[i].CheckAddReduce(paras[k]);
+                    if (check != null)
+                    {
+                        paras[i] = check;
+                        paras.RemoveAt(k);
+                        k--;
+                        
+                        if(check == 0)
+                        {
+                            paras.RemoveAt(i);
+                            i--;
+                        }
+                    }
                 }
-                    
-                paras = paras.Where(x => x.GetType() != typeof(Real)).ToList();
-                if(sum != 0) paras.Add(sum);
             }
 
             switch (paras.Count)
@@ -102,6 +91,11 @@ namespace Calq.Core
         public override string ToString()
         {
             return base.ToString();
+        }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            return null;
         }
     }
 }

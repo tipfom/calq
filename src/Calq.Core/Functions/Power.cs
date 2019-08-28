@@ -57,5 +57,10 @@ namespace Calq.Core
 
             return new Power(reducedBase, reducedExponent);
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            return null;
+        }
     }
 }

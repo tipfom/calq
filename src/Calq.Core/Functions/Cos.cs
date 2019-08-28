@@ -48,5 +48,10 @@ namespace Calq.Core
         {
             return new Cos(IsAddInverse, IsMulInverse, Parameters[0]);
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            return null;
+        }
     }
 }

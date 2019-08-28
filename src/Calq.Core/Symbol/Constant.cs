@@ -107,5 +107,19 @@ namespace Calq.Core
         {
             return base.ToString();
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            if (t.GetType() == typeof(Constant))
+            {
+                if (((Constant)t).Name == this.Name)
+                {
+                    if (t.IsAddInverse && IsAddInverse) return 2 * t;
+                    if (t.IsAddInverse || IsAddInverse) return 0;
+                    return 2 * t;
+                }
+            }
+            return null;
+        }
     }
 }

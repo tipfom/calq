@@ -68,7 +68,7 @@ namespace Calq.Core
             {
                 List<Term> normal = Parameters.Where(t => !t.IsMulInverse).ToList();
 
-                if(normal.Count == 0)
+                if (normal.Count == 0)
                     return GetSign() + $@"\frac{"{1}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
                 else
                     return GetSign() + $@"\frac{"{" + string.Join(@"\cdot ", normal.Select(t => t.ToLaTeX())) + "}"}{"{" + string.Join(@"\cdot ", inverse.Select(t => t.ToLaTeX())) + "}"}";
@@ -140,12 +140,66 @@ namespace Calq.Core
             switch (paras.Count)
             {
                 case 0: return 1;
-                case 1: if (paras[0].IsMulInverse)
+                case 1:
+                    if (paras[0].IsMulInverse)
                         return new Multiplication(IsAddInverse, IsMulInverse, 1, paras[0]);
                     else
                         return paras[0];
                 default: return new Multiplication(IsAddInverse, IsMulInverse, paras.ToArray());
             }
+        }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            if (Parameters.Length == 2)
+            {
+
+            }
+
+            if (t.GetType() == typeof(Multiplication))
+            {
+                Multiplication cMult = (Multiplication)t;
+                double realP1 = 1, realP2 = 1;
+                bool realP2set = false;
+                int cLeft = cMult.Parameters.Length;
+                for(int i = 0; i < Parameters.Length; i++)
+                {
+                    if(Parameters[i].GetType() == typeof(Real))
+                    {
+                        realP1 = (Parameters[i].IsAddInverse ? -1 : 1) *((Real)Parameters[i]).Value;
+                        continue;
+                    }
+
+                    bool succ = false;
+                    for(int k = 0; k < cMult.Parameters.Length; k++)
+                    {
+                        if (Parameters[k].GetType() == typeof(Real))
+                        {
+                            if (!realP2set) cLeft--;
+                            realP2set = true;
+                            realP2 = (cMult.Parameters[k].IsAddInverse ? -1 : 1) * ((Real)cMult.Parameters[k]).Value;
+                            continue;
+                        }
+
+                        if(cMult.Parameters[k] == Parameters[i])
+                        {
+                            cLeft--;
+                            succ = true;
+                            break;
+                        }
+                    }
+
+                    if (!succ) return null;
+                }
+
+                if (cLeft > 0) return null;
+                if (realP1 + realP2 == 0) return 0;
+                List<Term> param = new List<Term>() { new Real(realP1 + realP2) };
+                param.AddRange(Parameters.Where(x => x.GetType() != typeof(Real)));
+                return new Multiplication(param.ToArray());
+            }
+
+            return null;
         }
     }
 }

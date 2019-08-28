@@ -9,7 +9,6 @@ namespace Calq
         {
             InitializeComponent();
 
-            Term.PlatformPythonProvider = PythonWebProvider;
             MainPage = new MainPage();
         }
 

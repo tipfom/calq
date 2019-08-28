@@ -46,5 +46,10 @@ namespace Calq.Core
         {
             return new Sin(IsAddInverse, IsMulInverse, Parameters[0].Reduce());
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            return null;
+        }
     }
 }

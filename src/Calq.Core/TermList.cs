@@ -121,5 +121,10 @@ namespace Calq.Core
         {
             return GetSign() + "{" + string.Join(",", Terms.Select(x => x.ToInfix())) + "}";
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            return null;
+        }
     }
 }

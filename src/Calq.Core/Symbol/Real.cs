@@ -67,5 +67,13 @@ namespace Calq.Core
             return base.ToString();
         }
 
+        public override Term CheckAddReduce(Term t)
+        {
+            if (t.GetType() == typeof(Real))
+            {
+                return new Real((IsAddInverse ? -1 : 1) * Value + (t.IsAddInverse ? -1 : 1) * ((Real)t).Value);
+            }
+            return null;
+        }
     }
 }

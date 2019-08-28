@@ -76,5 +76,10 @@ namespace Calq.Core
         {
             return new Differentiate(IsAddInverse, IsMulInverse, Parameters.Select(x => x.Reduce()).ToArray());
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            return null;
+        }
     }
 }

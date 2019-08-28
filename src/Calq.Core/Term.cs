@@ -56,7 +56,7 @@ namespace Calq.Core
         public abstract Term GetDerivative(string argument);
         public abstract Term Reduce();
         public abstract Term MergeBranches();
-
+        public abstract Term CheckAddReduce(Term t);
         public abstract HashSet<string> GetVariableNames();
 
         public abstract string ToInfix();

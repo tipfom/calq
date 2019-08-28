@@ -87,5 +87,22 @@ namespace Calq.Core
             else
                 return new Logarithm(IsAddInverse, IsMulInverse, inner);
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            if (t.GetType() == typeof(Logarithm))
+            {
+                Logarithm tAsLogarithm = t as Logarithm;
+                if(Parameters.Length == 1 && tAsLogarithm.Parameters.Length == 1)
+                {
+                    return new Logarithm((Parameters[0] * tAsLogarithm.Parameters[0]).Reduce());
+                }
+                else if(Parameters.Length == 2 && tAsLogarithm.Parameters.Length == 2 && Parameters[1] == tAsLogarithm.Parameters[1])
+                {
+                    return new Logarithm((Parameters[0] * tAsLogarithm.Parameters[0]).Reduce(), Parameters[1]);
+                }
+            }
+            return null;
+        }
     }
 }

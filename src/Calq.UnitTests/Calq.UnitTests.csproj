@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionTest.cs" />
     <Compile Include="CoreTermTests.cs" />
     <Compile Include="LogarithmTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

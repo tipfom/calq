@@ -76,5 +76,10 @@ namespace Calq.Core
         {
             return base.ToString();
         }
+
+        public override Term CheckAddReduce(Term t)
+        {
+            return null;
+        }
     }
 }
