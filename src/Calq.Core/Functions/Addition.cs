@@ -31,6 +31,7 @@ namespace Calq.Core
                 for (int k = i + 1; k < paras.Count; k++)
                 {
                     Term check = paras[i].CheckAddReduce(paras[k]);
+                    if (check == null) check = paras[k].CheckAddReduce(paras[i]);
                     if (check != null)
                     {
                         paras[i] = check;

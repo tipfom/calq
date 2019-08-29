@@ -191,6 +191,12 @@ namespace Calq.Core
                 return new Multiplication(commonTerms.ToArray());
             }
 
+            if (Parameters.Any(x => x == t))
+            {
+                IEnumerable<Term> terms = Parameters.Where(x => x != t);
+                return new Multiplication(t, new Addition(terms.Count() > 1 ? new Multiplication(terms.ToArray()) : terms.First(), 1).Reduce());
+            }            
+
             return null;
         }
     }

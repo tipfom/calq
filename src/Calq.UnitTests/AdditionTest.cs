@@ -39,6 +39,14 @@ namespace Calq.UnitTests
         }
 
         [TestMethod]
+        public void SimpleMultiplicationTestMethod()
+        {
+            Variable x = new Variable("x");
+            var o = (x + new Multiplication(new Real(2), x)).Reduce();
+            Assert.IsTrue((x + new Multiplication(new Real(2), x)).Reduce() == x*3);
+        }
+
+        [TestMethod]
         public void ConcatLogarithmTestMethod()
         {
             Variable x = new Variable("x");
