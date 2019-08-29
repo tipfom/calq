@@ -11,6 +11,8 @@ namespace Calq.UnitTests
         {
             Assert.IsTrue((new Variable("x") + new Variable("x")).Reduce() == 2 * new Variable("x"));
 
+            Assert.IsTrue((new Variable("x") - new Variable("x")).Reduce() == 0);
+
             Assert.IsTrue((new Real(3) + new Variable("x")).Reduce() == new Real(3) + new Variable("x"));
 
             Assert.IsTrue((new Real(3) + new Real(2)).Reduce() == new Real(5));
@@ -21,7 +23,7 @@ namespace Calq.UnitTests
         [TestMethod]
         public void ConcatSimpleTestMethod()
         {
-            Assert.IsTrue((new Addition(new Variable("x") + new Real(2), new Variable("x"))).Reduce() == 2 * new Variable("x") + new Real(2));
+            Assert.IsTrue((new Addition(new Variable("x") + new Real(2), new Variable("x"))).Reduce() == 2 * (new Variable("x") + new Real(1)));
         }
 
         [TestMethod]
@@ -54,6 +56,8 @@ namespace Calq.UnitTests
             
             Assert.IsTrue((new Addition(new Logarithm(x), new Logarithm(y))).Reduce() == new Logarithm(x*y) );
 
+            var i = (new Addition(new Logarithm(x), new Logarithm(x))).Reduce();
+            
             Assert.IsTrue((new Addition(new Logarithm(x), new Logarithm(x))).Reduce() == 2*new Logarithm(x));
         }
     }
