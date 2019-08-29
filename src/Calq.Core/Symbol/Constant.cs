@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Calq.Core
 {
-    public class Constant : Symbol
+    public class Constant : Symbol, IComparable<Constant>
     {
         public enum ConstType
         {
@@ -120,6 +120,11 @@ namespace Calq.Core
                 }
             }
             return null;
+        }
+
+        public int CompareTo(Constant other)
+        {
+            return Name.CompareTo(other.Name);
         }
     }
 }

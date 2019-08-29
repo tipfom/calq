@@ -2,7 +2,7 @@
 
 namespace Calq.Core
 {
-    public abstract class Symbol : Term
+    public abstract class Symbol : Term, IComparable<Symbol>
     {
         public enum SymbolType
         {
@@ -34,8 +34,8 @@ namespace Calq.Core
 
         public static bool operator ==(Symbol a, Symbol b)
         {
-            if ((object)a == null || (object)a == null)
-                return (object)a == null && (object)a == null;
+            if (a is null || b is null)
+                return a is null && b is null;
 
             if (a.SType != b.SType) return false;
 
@@ -64,6 +64,26 @@ namespace Calq.Core
         public override Term MergeBranches()
         {
             return this;
+        }
+
+        public int CompareTo(Symbol other)
+        {
+            if (SType == other.SType)
+            {
+                switch (SType)
+                {
+                    case SymbolType.Real:
+                        return ((Real)this).CompareTo((Real)other);
+
+                    case SymbolType.Const:
+                        return ((Constant)this).CompareTo((Constant)other);
+ 
+                    case SymbolType.Variable:
+                        return ((Variable)this).CompareTo((Variable)other);
+                }
+            }
+
+            return SType.CompareTo(other.SType);
         }
     }
 }

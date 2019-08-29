@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Calq.Core
 {
-    public class Variable : Symbol
+    public class Variable : Symbol, IComparable<Variable>
     {
         public string Name;
 
@@ -79,6 +79,11 @@ namespace Calq.Core
                 }
             }
             return null;
+        }
+
+        public int CompareTo(Variable other)
+        {
+            return Name.CompareTo(other.Name);
         }
     }
 }

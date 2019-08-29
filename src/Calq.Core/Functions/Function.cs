@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Calq.Core
 {
-    public abstract class Function : Term
+    public abstract class Function : Term, IComparable<Function>
     {
         public enum FuncType
         {
@@ -12,7 +13,7 @@ namespace Calq.Core
             Multiplication,
             Power,
 
-            Sqrt, Log, Sin, Cos, Differentiate,
+            Log, Sin, Cos, Differentiate,
 
             Lim, Integrate,
             Solve, Erf,
@@ -23,7 +24,7 @@ namespace Calq.Core
         public bool IsInfix { get { return (int)Name <= (int)FuncType.Power; } }
         public readonly FuncType Name;
         public readonly Term[] Parameters;
-        protected Function(FuncType name, bool isAddInverse, bool isMulInverse, Term[] paras): base(TermType.Function, isAddInverse, isMulInverse)
+        protected Function(FuncType name, bool isAddInverse, bool isMulInverse, Term[] paras) : base(TermType.Function, isAddInverse, isMulInverse)
         {
             Name = name;
             Parameters = paras;
@@ -33,10 +34,10 @@ namespace Calq.Core
         {
             string fName = "";
             if (s.Contains("("))
-                fName = s.Split('(')[0];           
+                fName = s.Split('(')[0];
             else
                 return null;
-            
+
             FuncType type = FuncType.Unknown;
             switch (fName)
             {
@@ -188,14 +189,14 @@ namespace Calq.Core
             switch (Name)
             {
                 case FuncType.Addition:
-                    foreach(Term t in Parameters.Select(x => x.MergeBranches()))
+                    foreach (Term t in Parameters.Select(x => x.MergeBranches()))
                     {
                         Addition cast = t as Addition;
 
                         if (cast is null)
                             paras.Add(t.Clone());
                         else
-                            foreach(Term p in cast.Parameters)
+                            foreach (Term p in cast.Parameters)
                             {
                                 if (cast.IsAddInverse)
                                     paras.Add(-p.Clone());
@@ -330,6 +331,24 @@ namespace Calq.Core
         public static int GetOrder(string name)
         {
             return GetOrder(InfixOperator(name) + (name == "-" ? 1 : 0));
+        }
+
+        public int CompareTo(Function other)
+        {
+            if (Name == other.Name)
+            {
+                if (Parameters.Length == other.Parameters.Length)
+                {
+                    for (int i = 0; i < Parameters.Length; i++)
+                    {
+                        int val = Parameters[i].CompareTo(other.Parameters[i]);
+
+                        if (val != 0) return val;
+                    }
+                }
+            }
+
+            return Name.CompareTo(other.Name);
         }
     }
 }

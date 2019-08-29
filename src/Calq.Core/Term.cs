@@ -10,7 +10,7 @@ namespace Calq.Core
 
         public enum TermType
         {
-            Symbol, Function, TermList, Vector
+            Symbol, Function, Vector, TermList
         }
 
         public readonly TermType Type;
@@ -68,7 +68,22 @@ namespace Calq.Core
 
         public int CompareTo(Term other)
         {
-            throw new NotImplementedException();
+            if (Type == other.Type)
+            {
+                switch (Type)
+                {
+                    case TermType.Symbol:
+                        return ((Symbol)this).CompareTo((Symbol)other);
+
+                    case TermType.Function:
+                        return ((Function)this).CompareTo((Function)other);
+
+                    case TermType.TermList:
+                        return ((TermList)this).CompareTo((TermList)other);
+                }
+            }
+
+            return Type.CompareTo(other.Type);
         }
 
         public static bool CheckBracketCount(string s)

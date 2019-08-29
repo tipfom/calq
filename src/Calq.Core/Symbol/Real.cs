@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Calq.Core
 {
-    public class Real : Symbol
+    public class Real : Symbol, IComparable<Real>
     {
         public readonly double Value;
 
@@ -74,6 +74,11 @@ namespace Calq.Core
                 return new Real((IsAddInverse ? -1 : 1) * Value + (t.IsAddInverse ? -1 : 1) * ((Real)t).Value);
             }
             return null;
+        }
+
+        public int CompareTo(Real other)
+        {
+            return Value.CompareTo(other.Value);
         }
     }
 }
