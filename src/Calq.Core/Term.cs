@@ -14,8 +14,8 @@ namespace Calq.Core
         }
 
         public readonly TermType Type;
-        public bool IsAddInverse { get; private set; } = false;
-        public bool IsMulInverse { get; private set; } = false;
+        public bool IsAddInverse { get; set; } = false;
+        public bool IsMulInverse { get; set; } = false;
 
         protected Term(TermType type, bool isAddInverse, bool isMulInverse)
         {
@@ -26,11 +26,11 @@ namespace Calq.Core
 
         public bool IsZero()
         {
-            return ToString() == "0";
+            return GetType() == typeof(Real) && ((Real)this).Value == 1;
         }
         public bool IsOne()
         {
-            return ToString() == "1";
+            return GetType() == typeof(Real) && ((Real)this).Value == 1;
         }
         public string GetSign()
         {

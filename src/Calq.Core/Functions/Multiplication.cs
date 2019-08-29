@@ -86,66 +86,118 @@ namespace Calq.Core
 
         public override Term Reduce()
         {
-            Term[] copy = Parameters.Select(x => x.Reduce()).Where(x => !x.IsOne()).ToArray();
-            List<Term> paras = new List<Term>();
-
-            bool[] used = new bool[copy.Length];
-            //inverse equvalent
-            for (int i = 0; i < copy.Length; i++)
-            {
-                if (used[i]) continue;
-                if (copy[i].IsOne()) continue;
-
-                bool foundInverse = false;
-                for (int j = i + 1; j < copy.Length; j++)
-                {
-                    if (used[j]) continue;
-                    Term b = copy[j].Clone().GetMultInverse();
-
-                    if (copy[i] == b)
-                    {
-                        foundInverse = true;
-                        used[j] = true;
-                        break;
-                    }
-                }
-
-                if (!foundInverse)
-                {
-                    paras.Add(copy[i]);
-                }
-            }
-
-            //multiple reals
-            List<Real> reals = paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>().ToList();
-            if (reals.Count > 1)
-            {
-                double product = 1;
-                for (int i = 0; i < reals.Count; i++)
-                {
-                    if (reals[i].IsMulInverse)
-                        product /= reals[i].Value;
-                    else
-                        product *= reals[i].Value;
-                }
-
-                paras = paras.Where(x => x.GetType() != typeof(Real)).ToList();
-                if (product != 1) paras.Add(product);
-            }
+            List<Term> paras = Parameters.Select(x => x.Reduce()).Where(x => !x.IsOne()).ToList();
 
             if (paras.Where(x => x.IsZero()).Count() > 0)
                 return 0;
 
+            // merge branches
+            for (int i = 0; i < paras.Count; i++)
+            {
+                if (paras[i].GetType() == typeof(Multiplication))
+                {
+                    paras.AddRange(((Multiplication)paras[i]).Parameters);
+                    paras.RemoveAt(i);
+                }
+            }
 
-            switch (paras.Count)
+            // extract sign
+            bool isAddInverse = IsAddInverse;
+            foreach (Term t in paras)
+                if (t.IsAddInverse) isAddInverse = !isAddInverse;
+
+            // merge powers
+            List<(Term b, Term p)> powerCounter = new List<(Term, Term)>();
+            for (int i = 0; i < paras.Count; i++)
+            {
+                if (paras[i].GetType() == typeof(Real)) continue;
+
+                if (paras[i].GetType() == typeof(Power))
+                {
+                    Power p = paras[i] as Power;
+                    int index = powerCounter.FindIndex(x => x.b == p.Parameters[0]);
+                    if (index > -1)
+                    {
+                        if (paras[i].IsMulInverse)
+                            powerCounter[index] = (powerCounter[index].b, powerCounter[index].p - p.Parameters[1]);
+                        else
+                            powerCounter[index] = (powerCounter[index].b, powerCounter[index].p + p.Parameters[1]);
+
+                    }
+                    else
+                    {
+                        if (p.IsMulInverse)
+                            powerCounter.Add((p.Parameters[0], -p.Parameters[1]));
+                        else
+                            powerCounter.Add((p.Parameters[0], p.Parameters[1]));
+                    }
+                }
+                else
+                {
+                    int index = powerCounter.FindIndex(x => x.b == paras[i]);
+                    if (index > -1)
+                    {
+                        if (paras[i].IsMulInverse)
+                            powerCounter[index] = (powerCounter[index].b, powerCounter[index].p - new Real(1));
+                        else
+                            powerCounter[index] = (powerCounter[index].b, powerCounter[index].p + new Real(1));
+
+                    }
+                    else
+                    {
+                        if (paras[i].IsMulInverse)
+                            powerCounter.Add((paras[i], -new Real(1)));
+                        else
+                            powerCounter.Add((paras[i], new Real(1)));
+                    }
+                }
+            }
+
+            double real = 1;
+            foreach (Real r in paras.Where(x => x.GetType() == typeof(Real)).Cast<Real>())
+            {
+                if (r.IsMulInverse)
+                    real /= r.Value;
+                else
+                    real *= r.Value;
+            }
+            if (real != 1) powerCounter.Add((new Real(real), 1));
+
+            List<Term> reducedTerms = new List<Term>();
+            foreach ((Term b, Term p) powerPair in powerCounter)
+            {
+                Term p = powerPair.p.Reduce();
+                Term b = powerPair.b.Clone();
+                if (p.IsOne())
+                {
+                    b.IsAddInverse = false;
+                    b.IsMulInverse = p.IsAddInverse;
+                    reducedTerms.Add(b);
+                }
+                else
+                {
+                    b.IsMulInverse = false;
+                    b.IsAddInverse = false;
+                    if (p.IsAddInverse)
+                    {
+                        reducedTerms.Add(new Power(false, true, b, p));
+                    }
+                    else
+                    {
+                        reducedTerms.Add(new Power(false, false, b, p));
+                    }
+                }
+            }
+
+            switch (reducedTerms.Count)
             {
                 case 0: return 1;
                 case 1:
-                    if (paras[0].IsMulInverse)
-                        return new Multiplication(IsAddInverse, IsMulInverse, 1, paras[0]);
+                    if (reducedTerms[0].IsMulInverse)
+                        return new Multiplication(IsAddInverse, IsMulInverse, 1, reducedTerms[0]);
                     else
-                        return paras[0];
-                default: return new Multiplication(IsAddInverse, IsMulInverse, paras.ToArray());
+                        return reducedTerms[0];
+                default: return new Multiplication(IsAddInverse, IsMulInverse, reducedTerms.ToArray());
             }
         }
 
@@ -180,22 +232,28 @@ namespace Calq.Core
 
                 for (int i = 0; i < commonTerms.Count; i++)
                 {
-                    if(commonTerms[i].GetType() == typeof(Real) && ((Real)commonTerms[i]).Value == 0)
+                    if (commonTerms[i].GetType() == typeof(Real) && ((Real)commonTerms[i]).Value == 0)
                     {
                         return 0;
                     }
                 }
 
-                if (commonTerms.Count == 1) return commonTerms[0];
-                
-                return new Multiplication(commonTerms.ToArray());
+                if (commonTerms.Count == 1)
+                {
+                    Term term = commonTerms[0];
+                    if (IsMulInverse) term.IsMulInverse = !commonTerms[0].IsMulInverse;
+                    if (IsMulInverse) term.IsAddInverse = !commonTerms[0].IsAddInverse;
+                    return term;
+                }
+
+                return new Multiplication(IsAddInverse, IsMulInverse, commonTerms.ToArray());
             }
 
             if (Parameters.Any(x => x == t))
             {
                 IEnumerable<Term> terms = Parameters.Where(x => x != t);
-                return new Multiplication(t, new Addition(terms.Count() > 1 ? new Multiplication(terms.ToArray()) : terms.First(), 1).Reduce());
-            }            
+                return new Multiplication(IsAddInverse, IsMulInverse, t, new Addition(terms.Count() > 1 ? new Multiplication(terms.ToArray()) : terms.First(), 1).Reduce());
+            }
 
             return null;
         }

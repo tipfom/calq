@@ -10,7 +10,7 @@ namespace Calq.UnitTests
         [TestMethod]
         public void ReduceTestMethod()
         {
-            Assert.IsTrue(new Logarithm(new Power(new Variable("x"), 2)).Reduce() == 2 * new Logarithm(new Variable("x")));
+            Assert.IsTrue(new Logarithm(new Power(new Variable("x"), 2)).Reduce() == new Logarithm(new Variable("x")) * 2);
 
             Assert.IsTrue(new Logarithm(new Power(new Variable("x"), 2), new Variable("x")).Reduce() == 2);
 

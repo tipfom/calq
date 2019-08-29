@@ -52,6 +52,7 @@
     <Compile Include="AdditionTest.cs" />
     <Compile Include="CoreTermTests.cs" />
     <Compile Include="LogarithmTest.cs" />
+    <Compile Include="MultiplicationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

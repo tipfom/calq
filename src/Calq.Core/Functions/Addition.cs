@@ -49,7 +49,7 @@ namespace Calq.Core
             switch (paras.Count)
             {
                 case 0: return 0;
-                case 1: return paras[0];
+                case 1: return paras[0].Reduce();
                 default: return new Addition(IsAddInverse, IsMulInverse, paras.ToArray());
             }
         }
