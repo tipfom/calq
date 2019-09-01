@@ -24,6 +24,7 @@ namespace Calq.Core
             IsMulInverse = isMulInverse;
         }
 
+
         public bool IsZero()
         {
             return GetType() == typeof(Real) && ((Real)this).Value == 1;
@@ -45,6 +46,18 @@ namespace Calq.Core
             Term b = Clone();
             b.IsMulInverse = !b.IsMulInverse;
             return b;
+        }
+        public Term Sort()
+        {
+            if (Type == TermType.Function)
+            {
+                Term[] paras = ((Function)this).Parameters.Select(x => x.Sort()).ToArray();
+                Array.Sort(paras);
+
+                return Function.FromParas(((Function)this).Name, paras);
+            }
+            else
+                return Clone();
         }
         public override string ToString()
         {

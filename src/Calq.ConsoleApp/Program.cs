@@ -8,6 +8,13 @@ namespace Calq.ConsoleApp
     {
         static void Main(string[] args)
         {
+
+            Variable x = new Variable("x"), y = new Variable("y"), z = new Variable("z");
+            Term m = new Multiplication(new Addition(x, z, y), new Addition(y, x, x));
+            Console.WriteLine(m.ToInfix());
+            m = m.Sort();
+            Console.WriteLine(m.ToInfix());
+
             string s = Console.ReadLine();
 
             while(s != "stop")

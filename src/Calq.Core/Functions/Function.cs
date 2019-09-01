@@ -30,6 +30,22 @@ namespace Calq.Core
             Parameters = paras;
         }
 
+        public static Function FromParas(FuncType name, params Term[] paras)
+        {
+            switch (name)
+            {
+                case FuncType.Addition: return new Addition(paras);
+                case FuncType.Multiplication: return new Multiplication(paras);
+                case FuncType.Power: return new Power(paras);
+                case FuncType.Sin: return new Sin(paras);
+                case FuncType.Cos: return new Cos(paras);
+                case FuncType.Log: return new Logarithm(paras);
+                case FuncType.Differentiate: return new Differentiate(paras);
+                case FuncType.Integrate: return new Integrate(paras);
+            }
+
+            throw new NotImplementedException("Add new function here");
+        }
         public static Function PrefixFuncFromString(string s)
         {
             string fName = "";
@@ -268,13 +284,19 @@ namespace Calq.Core
                 case FuncType.Multiplication:
                     buffer = "";
 
-                    buffer += Parameters[0].ToInfix();
+                    buffer += (Parameters[0] is Addition ? "(" : "") + Parameters[0].ToInfix();
+                    if (Parameters[0] is Addition)
+                        buffer += ")";
+
                     for (int i = 1; i < Parameters.Length; i++)
                     {
-                        if (Parameters[i].IsAddInverse)
-                            buffer += "/" + Parameters[i].GetMultInverse().ToInfix();
+                        if (Parameters[i].IsMulInverse)
+                            buffer += "/" + (Parameters[i] is Addition ? "(" : "") + Parameters[i].GetMultInverse().ToInfix();
                         else
-                            buffer += "*" + Parameters[i].ToInfix();
+                            buffer += "*" + (Parameters[i] is Addition ? "(" : "") + Parameters[i].ToInfix();
+
+                        if (Parameters[i] is Addition)
+                            buffer += ")";
                     }
 
                     return buffer;
@@ -342,10 +364,11 @@ namespace Calq.Core
                     for (int i = 0; i < Parameters.Length; i++)
                     {
                         int val = Parameters[i].CompareTo(other.Parameters[i]);
-
                         if (val != 0) return val;
                     }
                 }
+
+                return Parameters.Length.CompareTo(other.Parameters.Length);
             }
 
             return Name.CompareTo(other.Name);

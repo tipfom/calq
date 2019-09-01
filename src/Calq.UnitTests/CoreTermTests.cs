@@ -8,7 +8,7 @@ namespace Calq.UnitTests
     public class CoreTermTests
     {
         [TestMethod]
-        public void Parse_InfixOpearatos()
+        public void ParseInfixOpearatos()
         {
             Variable x = new Variable("x");
             Variable y = new Variable("y");
@@ -46,7 +46,7 @@ namespace Calq.UnitTests
         }
 
         [TestMethod]
-        public void Parse_MixedOperators()
+        public void ParseMixedOperators()
         {
             Variable x = new Variable("x");
             Variable y = new Variable("y");
