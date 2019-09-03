@@ -51,10 +51,15 @@ namespace Calq.Core
         {
             if (Type == TermType.Function)
             {
-                Term[] paras = ((Function)this).Parameters.Select(x => x.Sort()).ToArray();
-                Array.Sort(paras);
+                if (((Function)this).Name == Function.FuncType.Addition || ((Function)this).Name == Function.FuncType.Multiplication)
+                {
+                    Term[] paras = ((Function)this).Parameters.Select(x => x.Sort()).ToArray();
+                    Array.Sort(paras);
 
-                return Function.FromParas(((Function)this).Name, paras);
+                    return Function.FromParas(((Function)this).Name, paras);
+                }
+                else
+                    return Clone();
             }
             else
                 return Clone();
